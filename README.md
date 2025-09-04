@@ -1,82 +1,173 @@
 # **Projet Informatique 2A ENSAI – Application Utilisateurs & Chat IA**
 
 ## **Description**
-Ce projet a été réalisé dans le cadre du cours de **Projet Informatique en 2ème année à l’ENSAI**.  
-Il vise à mettre en pratique plusieurs concepts fondamentaux de l’ingénierie logicielle et des systèmes d’information :  
-- l’architecture en couches (DAO, service, view, business_object)  
-- la connexion à une base de données PostgreSQL  
-- une interface en ligne de commande (CLI) avec [InquirerPy](https://inquirerpy.readthedocs.io/en/latest/)  
-- l’appel à un webservice externe  
-- la création d’un webservice avec FastAPI  
-
-Un second aspect clé du projet est l’intégration d’un service de **chat IA** à partir de l’API :  
+Ce projet est réalisé dans le cadre du **Projet Informatique de 2ème année à l’ENSAI**.  
+Il met en œuvre une architecture en couches (DAO, service, view, business_object), une base de données PostgreSQL, une interface en ligne de commande avec InquirerPy, et un webservice construit avec FastAPI.  
+Un module de **Chat IA** est intégré grâce à l’API :  
 👉 [API ENSAI-GPT](https://ensai-gpt-109912438483.europe-west4.run.app/docs#/default/chat_generate_post)
+
+---
+
+## **Objectifs**
+- Gérer des utilisateurs (inscription, connexion, modification, suppression) avec persistance en base.  
+- Proposer une interface CLI pour interagir avec l’application.  
+- Fournir une API REST via FastAPI pour exposer les fonctionnalités.  
+- Intégrer un client externe permettant de discuter avec une **IA** dotée de différentes personnalités.  
+- Mettre en place des tests unitaires, des logs et une intégration continue.  
 
 ---
 
 ## **Structure du Projet**
 
 ### **1. Dossier `data`**
-Contient les scripts SQL permettant d’initialiser et de peupler la base de données.  
+Contient les scripts SQL de gestion de la base.  
+- **`init_db.sql`** : création des tables.  
+- **`pop_db.sql`** : insertion des données principales.  
+- **`pop_db_test.sql`** : données spécifiques aux tests unitaires.  
 
-- **`init_db.sql`** : création des tables  
-- **`pop_db.sql`** : données initiales de la base  
-- **`pop_db_test.sql`** : données spécifiques aux tests unitaires  
+### **2. Dossier `doc/suivi`**
+Notes et rendus hebdomadaires du projet.  
+- **`2025.09.04-semaine1.md`** : suivi de la première semaine.  
 
-### **2. Dossier `src/business_object`**
-Contient les classes métiers représentant les objets du domaine.  
-- `utilisateur.py` : définit la classe `Utilisateur` (attributs, méthodes, etc.)
+### **3. Dossier `logs`**
+Fichiers de logs générés automatiquement.  
+- **`my_application.log`** : trace des actions exécutées.  
 
-### **3. Dossier `src/dao`**
+### **4. Dossier `src/business_object`**
+Objets métiers représentant les entités du projet.  
+- **`utilisateur.py`** : classe `Utilisateur` avec ses attributs et méthodes.  
+
+### **5. Dossier `src/dao`**
 Accès aux données (Data Access Object).  
-- `db_connection.py` : gestion de la connexion PostgreSQL  
-- `utilisateur_dao.py` : CRUD sur les utilisateurs  
+- **`db_connection.py`** : gestion de la connexion PostgreSQL.  
+- **`utilisateur_dao.py`** : CRUD complet sur les utilisateurs.  
 
-### **4. Dossier `src/service`**
-Logique applicative (entre la DAO et la vue).  
-- `utilisateur_service.py` : gestion des règles métier liées aux utilisateurs  
+### **6. Dossier `src/service`**
+Logique applicative entre DAO et vues.  
+- **`utilisateur_service.py`** : création, authentification, modification et suppression des utilisateurs.  
 
-### **5. Dossier `src/view`**
-Interface en ligne de commande.  
-- `vue_abstraite.py` : classe de base pour les vues  
-- `accueil_vue.py` : menu d’accueil  
-- `menu_utilisateur_vue.py` : menu principal utilisateur  
-- `chat_ai_vue.py` : choix d’une personnalité IA  
-- `chat_session_vue.py` : boucle de discussion avec l’IA  
+### **7. Dossier `src/view`**
+Interface CLI avec InquirerPy.  
+- **`accueil_vue.py`** : menu d’accueil.  
+- **`connexion_vue.py`** : vue de connexion.  
+- **`inscription_vue.py`** : vue d’inscription.  
+- **`menu_utilisateur_vue.py`** : menu principal utilisateur.  
+- **`session.py`** : gestion de la session courante.  
+- **`vue_abstraite.py`** : classe de base pour les vues.  
 
-### **6. Dossier `src/client`**
-Clients vers des webservices externes.  
-- `ia_client.py` : client HTTP vers l’API de Chat IA  
+### **8. Dossier `src/ChatIA`**
+Gestion du module de Chat IA.  
+- **`ia_client.py`** (à créer) : client HTTP vers l’API IA.  
+- **`personas/`** (à créer) : définition des différentes personnalités (docteur, philosophe, etc.).  
 
-### **7. Dossier `src/personas`**
-Gestion des personnalités de l’IA.  
-- `persona.py` : structure de données d’un persona  
-- `registry.py` : liste des personnalités disponibles (ex. docteur, philosophe, ami, etc.)  
+### **9. Dossier `src/utilisateur`**
+Client pour manipuler les utilisateurs depuis l’extérieur.  
+- **`utilisateur_client.py`** : appels à l’API côté utilisateur.  
 
-### **8. Dossier `src/utils`**
-Outils communs.  
-- `reset_database.py` : réinitialisation du schéma et des données  
-- `securite.py` : hashage des mots de passe  
-- `singleton.py`, `log_decorator.py`, `log_init.py` : design patterns et logs  
+### **10. Dossier `src/utils`**
+Outils techniques transverses.  
+- **`log_init.py`** : configuration des logs.  
+- **`log_decorator.py`** : décorateur pour tracer entrées/sorties.  
+- **`reset_database.py`** : réinitialisation de la base.  
+- **`securite.py`** : gestion du hash des mots de passe.  
+- **`singleton.py`** : implémentation du pattern Singleton.  
 
-### **9. Dossier `tests`**
-Tests unitaires du projet (pytest).  
-- `test_utilisateur_dao.py`  
-- `test_utilisateur_service.py`
+### **11. Dossier `src`**
+Fichiers principaux de l’application.  
+- **`main.py`** : lance l’application CLI.  
+- **`app.py`** : lance le webservice FastAPI.  
 
-### **10. Autres fichiers**
-| Item                       | Description                                                              |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `.github/workflows/ci.yml` | Pipeline CI (tests + linting avec pylint)                                 |
-| `.vscode/settings.json`    | Paramètres de développement VS Code                                      |
-| `.env`                     | Variables d’environnement (BDD + webservice)                             |
-| `requirements.txt`         | Dépendances Python nécessaires                                           |
+### **12. Dossier `tests`**
+Tests unitaires avec Pytest.  
+- **`test_dao/test_utilisateur_dao.py`** : tests sur la DAO.  
+- **`test_service/test_utilisateur_service.py`** : tests sur la logique métier.  
+
+### **13. Fichiers racine**
+| Fichier                   | Description                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- |
+| `.env`                     | Variables d’environnement (PostgreSQL + API IA).                           |
+| `requirements.txt`         | Dépendances Python nécessaires.                                             |
+| `logging_config.yml`       | Configuration YAML pour les logs.                                           |
+| `.coveragerc`              | Configuration Coverage pour les tests.                                      |
+| `.github/workflows/ci.yml` | Pipeline CI : tests, analyse avec pylint, build automatique.                 |
 
 ---
 
-## **Installation**
-Clonez ce repository et installez les dépendances :  
 
-```bash
-pip install -r requirements.txt
-pip list
+## **:arrow_forward: Variables d’environnement**
+Créer un fichier `.env` à la racine et y ajouter :  
+
+```default
+WEBSERVICE_HOST=https://ensai-gpt-109912438483.europe-west4.run.app
+
+POSTGRES_HOST=sgbd-eleves.domensai.ecole
+POSTGRES_PORT=5432
+POSTGRES_DATABASE=idxxxx
+POSTGRES_USER=idxxxx
+POSTGRES_PASSWORD=idxxxx
+POSTGRES_SCHEMA=projet
+
+
+---
+
+## **:arrow_forward: Lancer l’application CLI**
+python src/main.py
+
+- Menu interactif avec InquirerPy.  
+- Permet l’inscription, la connexion et l’accès au Chat IA.  
+
+---
+
+## **:arrow_forward: Lancer le webservice**
+python src/app.py
+
+
+Documentation interactive :  
+- [http://localhost:9876/docs](http://localhost:9876/docs)  
+- [http://localhost:9876/redoc](http://localhost:9876/redoc)  
+
+Endpoints principaux :  
+- `GET /utilisateur`  
+- `GET /utilisateur/{id}`  
+- `POST /utilisateur/`  
+- `PUT /utilisateur/{id}`  
+- `DELETE /utilisateur/{id}`  
+
+---
+
+## **:arrow_forward: Tests unitaires**
+Exécuter :  
+
+pytest -v
+
+
+Les tests DAO utilisent le schéma `projet_test_dao` et les données `pop_db_test.sql`.  
+
+### Couverture des tests
+Il est possible de générer un rapport de couverture avec :  
+
+coverage run -m pytest
+coverage report -m
+coverage html
+
+
+➡️ Ouvrir `coverage_report/index.html` pour un rapport détaillé.  
+
+---
+
+## **:arrow_forward: Logs**
+- Configurés via `src/utils/log_init.py` et `logging_config.yml`.  
+- Stockés dans `logs/my_application.log`.  
+
+Exemple de log :  
+
+07/08/2024 09:07:07 - INFO - ConnexionVue
+07/08/2024 09:07:08 - INFO - utilisateurService.se_connecter('a', '') - DEBUT
+07/08/2024 09:07:08 - INFO - utilisateurDao.se_connecter('a', '') - DEBUT
+07/08/2024 09:07:08 - INFO - utilisateurDao.se_connecter('a', '*****') - FIN
+07/08/2024 09:07:08 - INFO - └─> Sortie : utilisateur(a, 20 ans)
+
+
+---
+
+
