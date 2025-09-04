@@ -9,11 +9,11 @@ Un module de **Chat IA** est intégré grâce à l’API :
 ---
 
 ## **Objectifs**
-- Gérer des utilisateurs (inscription, connexion, modification, suppression) avec persistance en base.  
-- Proposer une interface CLI pour interagir avec l’application.  
-- Fournir une API REST via FastAPI pour exposer les fonctionnalités.  
-- Intégrer un client externe permettant de discuter avec une **IA** dotée de différentes personnalités.  
-- Mettre en place des tests unitaires, des logs et une intégration continue.  
+- Développer un assistant conversationnel ensaiGPT où chaque utilisateur peut se connecter et discuter avec une IA.
+
+- Permettre la personnalisation de l’agent (ton, style, niveau de détail, humour/professionnalisme).
+
+- Offrir un carnet de bord interactif pour retrouver l’historique des conversations. 
 
 ---
 
@@ -57,8 +57,7 @@ Interface CLI avec InquirerPy.
 
 ### **8. Dossier `src/ChatIA`**
 Gestion du module de Chat IA.  
-- **`ia_client.py`** (à créer) : client HTTP vers l’API IA.  
-- **`personas/`** (à créer) : définition des différentes personnalités (docteur, philosophe, etc.).  
+- **`ia_client.py`** (à créer) : client HTTP vers l’API IA. 
 
 ### **9. Dossier `src/utilisateur`**
 Client pour manipuler les utilisateurs depuis l’extérieur.  
