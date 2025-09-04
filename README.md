@@ -93,7 +93,7 @@ Tests unitaires avec Pytest.
 ---
 
 
-## **:arrow_forward: Variables d’environnement**
+## **Variables d’environnement**
 Créer un fichier `.env` à la racine et y ajouter :  
 
 ```default
@@ -105,21 +105,23 @@ POSTGRES_DATABASE=idxxxx
 POSTGRES_USER=idxxxx
 POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
+````
 
-
----
-
-## **:arrow_forward: Lancer l’application CLI**
+## **Lancer l’application CLI**
+```python
 python src/main.py
+````
+
 
 - Menu interactif avec InquirerPy.  
 - Permet l’inscription, la connexion et l’accès au Chat IA.  
 
 ---
 
-## **:arrow_forward: Lancer le webservice**
+## **Lancer le webservice**
+```python
 python src/app.py
-
+````
 
 Documentation interactive :  
 - [http://localhost:9876/docs](http://localhost:9876/docs)  
@@ -134,11 +136,12 @@ Endpoints principaux :
 
 ---
 
-## **:arrow_forward: Tests unitaires**
+## **Tests unitaires**
 Exécuter :  
 
+```python
 pytest -v
-
+````
 
 Les tests DAO utilisent le schéma `projet_test_dao` et les données `pop_db_test.sql`.  
 
@@ -154,7 +157,7 @@ coverage html
 
 ---
 
-## **:arrow_forward: Logs**
+## Logs**
 - Configurés via `src/utils/log_init.py` et `logging_config.yml`.  
 - Stockés dans `logs/my_application.log`.  
 
