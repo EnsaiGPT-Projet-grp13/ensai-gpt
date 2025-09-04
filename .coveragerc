@@ -1,0 +1,14 @@
+# Files for test coverage
+
+[run]
+include =
+    # include files in folders service and dao
+    src/service/*
+    src/dao/*
+omit = 
+    # exclude those files
+    */__init__.py
+
+    
+[html]
+    directory = coverage_report
