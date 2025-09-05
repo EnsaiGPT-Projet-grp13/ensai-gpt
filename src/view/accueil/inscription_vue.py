@@ -21,6 +21,11 @@ class InscriptionVue(VueAbstraite):
             from view.accueil.accueil_vue import AccueilVue
             return AccueilVue(f"L'adresse {mail} est déjà utilisée.")
 
+        naiss = inquirer.text(
+            message="Entrez votre date de naissance (YYYY-MM-DD) : ",
+            validate=EmptyInputValidator(),
+        ).execute()
+        
         mdp = inquirer.secret(
             message="Entrez votre mot de passe : ",
             validate=PasswordValidator(
@@ -31,10 +36,7 @@ class InscriptionVue(VueAbstraite):
             ),
         ).execute()
 
-        naiss = inquirer.text(
-            message="Entrez votre date de naissance (YYYY-MM-DD) : ",
-            validate=EmptyInputValidator(),
-        ).execute()
+        
 
         # Appel du service pour créer l'utilisateur
         utilisateur = UtilisateurService().creer(prenom, nom, mdp, naiss, mail)
