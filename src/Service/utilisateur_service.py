@@ -86,6 +86,7 @@ class UtilisateurService:
         """Se connecter à partir de mail et mdp"""
         return UtilisateurDao().se_connecter(mail, hash_password(mdp, mail))
 
+
     @log
     def mail_deja_utilise(self, mail) -> bool:
         """Vérifie si le mail est déjà utilisé

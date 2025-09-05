@@ -2,6 +2,7 @@ from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
+from view.menu_utilisateur_vue import MenuUtilisateurVue
 
 from service.utilisateur_service import UtilisateurService
 
@@ -20,11 +21,11 @@ class ConnexionVue(VueAbstraite):
         # Si l'utilisateur a été trouvé à partir de ses identifiants
         if utilisateur:
             message = f"Vous êtes connecté en tant que {utilisateur.prenom} {utilisateur.nom}"
-            Session().connexion(utilisateur)
-
-            from view.menu_utilisateur_vue import MenuUtilisateurVue
-            return MenuUtilisateurVue(message)
+                next_vue = MenuUtilisateurVue(message)
+                next_vue.afficher()
+                return next_vue.choisir_menu()
 
         message = "Erreur de connexion (e-mail ou mot de passe invalide)"
         from view.accueil.accueil_vue import AccueilVue
         return AccueilVue(message)
+    

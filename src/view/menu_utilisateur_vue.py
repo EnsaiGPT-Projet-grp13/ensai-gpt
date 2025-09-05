@@ -1,54 +1,56 @@
 from InquirerPy import inquirer
 
+from view.vue_abstraite import VueAbstraite
 from view.session import Session
-from service.utilisateur_service import UtilisateurService
 
+from view.chatIA_old import OldChat
+from view.chatIA_new import ChatNew
 
-def menu_utilisateur(message: str = ""):
-    """Menu Utilisateur (version fonctionnelle)
-    
-    Parameters
-    ----------
-    message : str
-        Message optionnel à afficher en haut du menu (résultats, infos...)
-    
-    Returns
-    -------
-    next_view : any
-        La prochaine 'vue' (fonction ou objet) à exécuter, selon ton architecture.
-        Ici on renvoie soit une fonction (pour boucler), soit une autre vue.
+class MenuUtilisateurVue(VueAbstraite):
     """
-    # En-tête
-    print("\n" + "-" * 50 + "\nMenu Utilisateur\n" + "-" * 50 + "\n")
-    if message:
-        print(message)
+    Menu principal Utilisateur
 
-    choix = inquirer.select(
-        message="Faites votre choix : ",
-        choices=[
-            "Afficher les utilisateurs de la base de données",
-            "Discuter avec une IA (choisir une personnalité)",
-            "Infos de session",
-            "Se déconnecter",
-        ],
-    ).execute()
+    - Démarrer un chat : choix d'une personnalité IA puis création d'une nouvelle session
+    - Reprendre un chat : lister les sessions existantes de l'utilisateur et en rouvrir une
+    - Infos de session : afficher l'utilisateur connecté et la session en cours (si existante)
+    - Se déconnecter : retour à l'écran d'accueil
+    """
 
-    if choix == "Se déconnecter":
-        Session().deconnexion()
-        from view.accueil.accueil_vue import AccueilVue
-        return AccueilVue()
+    def __init__(self, message: str = "") -> None:
+        self.message = message
 
-    if choix == "Infos de session":
-        return menu_utilisateur(Session().afficher())
+    def choisir_menu(self):
+        # En-tête
+        print("\n" + "-" * 50 + "\nMenu Utilisateur\n" + "-" * 50 + "\n")
+        if self.message:
+            print(self.message)
 
-    if choix == "Afficher les utilisateurs de la base de données":
-        utilisateurs_str = UtilisateurService().afficher_tous()
-        return menu_utilisateur(utilisateurs_str)
+        # Choix utilisateur
+        choix = inquirer.select(
+            message="Faites votre choix : ",
+            choices=[
+                "Démarrer un chat",
+                "Reprendre un chat",
+                "Infos de session",
+                "Se déconnecter",
+            ],
+        ).execute()
 
-    if choix == "Discuter avec une IA (choisir une personnalité)":
-        # Vue de sélection de personnalité, puis lancement de session de chat
-        from view.chat_ai_vue import ChatAIVue  # cf. la vue fournie précédemment
-        return ChatAIVue()
+        match choix:
+            case "Se déconnecter":
+                Session().deconnexion()
+                from view.accueil.accueil_vue import AccueilVue
+                return AccueilVue("Déconnecté. À bientôt !")
 
-    # Valeur de repli
-    return menu_utilisateur()
+            case "Infos de session":
+                return MenuUtilisateurVue(Session().afficher())
+
+            case "Démarrer un chat":
+                text = inquirer.text(message="Que veux tu savoir?").execute()
+                return ChatAIVue(text)
+
+            case "Reprendre un chat":
+                return ReprendreChatVue()
+
+        # Sécurité : si aucun match (ne devrait pas arriver), on reboucle
+        return MenuUtilisateurVue()

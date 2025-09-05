@@ -135,9 +135,11 @@ class UtilisateurDao(metaclass=Singleton):
             raise
         return res > 0
 
+
+class UtilisateurDao:
     @log
-    def se_connecter(self, mail, mdp) -> Utilisateur:
-        """Connexion d'un utilisateur avec mail et mot de passe"""
+    def se_connecter(self, mail, mdp) -> Utilisateur | None:
+        res = None
         try:
             with DBConnection().connection as connection:
                 with connection.cursor() as cursor:
@@ -148,16 +150,17 @@ class UtilisateurDao(metaclass=Singleton):
                     )
                     res = cursor.fetchone()
         except Exception as e:
-            logging.info(e)
+            logging.exception(e)  # <-- utile pour voir l’erreur exacte
             return None
 
-        if res:
-            return Utilisateur(
-                id_utilisateur=res["id_utilisateur"],
-                prenom=res["prenom"],
-                nom=res["nom"],
-                mdp=res["mdp"],
-                naiss=res["naiss"],
-                mail=res["mail"],
-            )
-        return None
+        if not res:
+            return None
+
+        return Utilisateur(
+            id_utilisateur=res["id_utilisateur"],
+            prenom=res["prenom"],
+            nom=res["nom"],
+            mdp=res["mdp"],
+            naiss=str(res["naiss"]),
+            mail=res["mail"],
+        )
