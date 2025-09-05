@@ -169,7 +169,7 @@ Exemple de log :
 07/08/2024 09:07:08 - INFO - utilisateurDao.se_connecter('a', '*****') - FIN
 07/08/2024 09:07:08 - INFO - └─> Sortie : utilisateur(a, 20 ans)
 
-
+yyy
 ---
 
 
