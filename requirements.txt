@@ -10,3 +10,4 @@ regex
 requests
 tabulate
 uvicorn
+psycopg2

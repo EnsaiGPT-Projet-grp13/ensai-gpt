@@ -1,3 +1,5 @@
+# init_db.py — compatible PostgreSQL anciens (<9.5 pour IF NOT EXISTS sur index et <11 pour EXECUTE FUNCTION)
+
 import os
 import psycopg2
 
@@ -12,12 +14,10 @@ PG_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
 PG_DB   = os.getenv("POSTGRES_DATABASE", "postgres")
 PG_USER = os.getenv("POSTGRES_USER", "postgres")
 PG_PWD  = os.getenv("POSTGRES_PASSWORD", "postgres")
-SCHEMA  = os.getenv("POSTGRES_SCHEMA", "projetGPT")  # utilisera la valeur de ton .env
-
+SCHEMA  = os.getenv("POSTGRES_SCHEMA", "projetGPT")  # lira ta valeur depuis .env
 
 DDL = f"""
 CREATE SCHEMA IF NOT EXISTS {SCHEMA};
-
 SET search_path TO {SCHEMA};
 
 
@@ -26,15 +26,15 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     prenom           VARCHAR(100) NOT NULL,
     nom              VARCHAR(100) NOT NULL,
     mail             VARCHAR(255) NOT NULL UNIQUE,
-    mdp              TEXT NOT NULL,               -- mot de passe hashé
+    mdp              TEXT NOT NULL,
     naiss            DATE NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
-CREATE TABLE IF NOT EXISTS persona (
-    id_persona    VARCHAR(64) PRIMARY KEY,        -- ex: 'docteur', 'philosophe'
+CREATE TABLE IF NOT EXISTS personageIA (
+    id_personageIA    VARCHAR(64) PRIMARY KEY,
     name          VARCHAR(100) NOT NULL UNIQUE,
     system_prompt TEXT NOT NULL
 );
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS persona (
 CREATE TABLE IF NOT EXISTS chat_session (
     id_session     SERIAL PRIMARY KEY,
     id_utilisateur INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
-    id_persona     VARCHAR(64) REFERENCES persona(id_persona),
+    id_personageIA     VARCHAR(64) REFERENCES persona(id_persona),
     started_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     ended_at       TIMESTAMPTZ NULL
 );
@@ -57,12 +57,17 @@ CREATE TABLE IF NOT EXISTS chat_message (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+DROP INDEX IF EXISTS idx_utilisateur_mail;
+CREATE INDEX idx_utilisateur_mail ON utilisateur(mail);
 
-CREATE INDEX IF NOT EXISTS idx_utilisateur_mail       ON utilisateur(mail);
-CREATE INDEX IF NOT EXISTS idx_session_user           ON chat_session(id_utilisateur);
-CREATE INDEX IF NOT EXISTS idx_session_persona        ON chat_session(id_persona);
-CREATE INDEX IF NOT EXISTS idx_message_session_time   ON chat_message(id_session, created_at);
+DROP INDEX IF EXISTS idx_session_user;
+CREATE INDEX idx_session_user ON chat_session(id_utilisateur);
 
+DROP INDEX IF EXISTS idx_session_persona;
+CREATE INDEX idx_session_persona ON chat_session(id_persona);
+
+DROP INDEX IF EXISTS idx_message_session_time;
+CREATE INDEX idx_message_session_time ON chat_message(id_session, created_at);
 
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
@@ -75,9 +80,8 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS utilisateur_set_updated_at ON utilisateur;
 CREATE TRIGGER utilisateur_set_updated_at
 BEFORE UPDATE ON utilisateur
-FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
 """
-
 
 def main():
     conn = psycopg2.connect(
@@ -87,10 +91,9 @@ def main():
     try:
         with conn.cursor() as cur:
             cur.execute(DDL)
-            print(f"✅ Base ensaiGPT créée/mise à jour dans le schéma `{SCHEMA}`.")
+            print(f"Base ensaiGPT créée/mise à jour dans le schéma `{SCHEMA}`.")
     finally:
         conn.close()
-
 
 if __name__ == "__main__":
     main()
