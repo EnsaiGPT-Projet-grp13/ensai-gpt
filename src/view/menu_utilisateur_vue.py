@@ -2,12 +2,18 @@ from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
-from view.chatIA_new import ChatNew
 
+from view.chatIA_old import OldChat
+from view.chatIA_new import ChatNew
 
 class MenuUtilisateurVue(VueAbstraite):
     """
-    Menu principal Utilisateur (mode sans base)
+    Menu principal Utilisateur
+
+    - Démarrer un chat : choix d'une personnalité IA puis création d'une nouvelle session
+    - Reprendre un chat : lister les sessions existantes de l'utilisateur et en rouvrir une
+    - Infos de session : afficher l'utilisateur connecté et la session en cours (si existante)
+    - Se déconnecter : retour à l'écran d'accueil
     """
 
     def __init__(self, message: str = "") -> None:
@@ -40,12 +46,11 @@ class MenuUtilisateurVue(VueAbstraite):
                 return MenuUtilisateurVue(Session().afficher())
 
             case "Démarrer un chat":
-                text = inquirer.text(message="Que veux-tu savoir ?").execute()
-                return ChatNew(text)
+                text = inquirer.text(message="Que veux tu savoir?").execute()
+                return ChatAIVue(text)
 
             case "Reprendre un chat":
-                # Pas de DB -> on affiche un message et on reboucle
-                return MenuUtilisateurVue("Reprendre un chat est indisponible en mode sans BDD.")
+                return ReprendreChatVue()
 
-        # Sécurité
+        # Sécurité : si aucun match (ne devrait pas arriver), on reboucle
         return MenuUtilisateurVue()

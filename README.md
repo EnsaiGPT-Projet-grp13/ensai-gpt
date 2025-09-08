@@ -22,12 +22,12 @@ Un module de **Chat IA** est intégré grâce à l’API :
 ### **1. Dossier `data`**
 Contient les scripts SQL de gestion de la base.  
 - **`init_db.sql`** : création des tables.  
-- **`pop_db.sql`** : insertion des données principales.  
-- **`pop_db_test.sql`** : données spécifiques aux tests unitaires.  
+- **`pop_db.sql`** 
+- **`pop_db_test.sql`** 
 
 ### **2. Dossier `doc/suivi`**
 Notes et rendus hebdomadaires du projet.  
-- **`2025.09.04-semaine1.md`** : suivi de la première semaine.  
+- **`2025.XX.XX-semaineX.md`**  
 
 ### **3. Dossier `logs`**
 Fichiers de logs générés automatiquement.  
@@ -40,7 +40,7 @@ Objets métiers représentant les entités du projet.
 ### **5. Dossier `src/dao`**
 Accès aux données (Data Access Object).  
 - **`db_connection.py`** : gestion de la connexion PostgreSQL.  
-- **`utilisateur_dao.py`** : CRUD complet sur les utilisateurs.  
+- **`utilisateur_dao.py`**  
 
 ### **6. Dossier `src/service`**
 Logique applicative entre DAO et vues.  
@@ -57,11 +57,10 @@ Interface CLI avec InquirerPy.
 
 ### **8. Dossier `src/ChatIA`**
 Gestion du module de Chat IA.  
-- **`ia_client.py`** (à créer) : client HTTP vers l’API IA. 
+- **`ia_client.py`** (à créer)
 
 ### **9. Dossier `src/utilisateur`**
-Client pour manipuler les utilisateurs depuis l’extérieur.  
-- **`utilisateur_client.py`** : appels à l’API côté utilisateur.  
+ 
 
 ### **10. Dossier `src/utils`**
 Outils techniques transverses.  
@@ -73,8 +72,8 @@ Outils techniques transverses.
 
 ### **11. Dossier `src`**
 Fichiers principaux de l’application.  
-- **`main.py`** : lance l’application CLI.  
-- **`app.py`** : lance le webservice FastAPI.  
+- **`main.py`** : lance l’application 
+- **`app.py`**  
 
 ### **12. Dossier `tests`**
 Tests unitaires avec Pytest.  
@@ -107,7 +106,7 @@ POSTGRES_PASSWORD=idxxxx
 POSTGRES_SCHEMA=projet
 ````
 
-## **Lancer l’application CLI**
+## **Lancer l’application**
 ```python
 python src/main.py
 ````
@@ -143,7 +142,6 @@ Exécuter :
 pytest -v
 ````
 
-Les tests DAO utilisent le schéma `projet_test_dao` et les données `pop_db_test.sql`.  
 
 ### Couverture des tests
 Il est possible de générer un rapport de couverture avec :  
@@ -153,7 +151,7 @@ coverage report -m
 coverage html
 
 
-➡️ Ouvrir `coverage_report/index.html` pour un rapport détaillé.  
+-> Ouvrir `coverage_report/index.html` pour un rapport détaillé.  
 
 ---
 
