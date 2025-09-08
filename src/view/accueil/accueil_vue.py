@@ -1,23 +1,15 @@
 from InquirerPy import inquirer
 
-from utils.reset_database import ResetDatabase
-
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
+from utils.reset_database import ResetDatabase
 
 
 class AccueilVue(VueAbstraite):
     """Vue d'accueil de l'application"""
 
     def choisir_menu(self):
-        """Choix du menu suivant
-
-        Return
-        ------
-        view
-            Retourne la vue choisie par l'utilisateur dans le terminal
-        """
-
+        """Choix du menu suivant"""
         print("\n" + "-" * 50 + "\nAccueil\n" + "-" * 50 + "\n")
 
         choix = inquirer.select(
@@ -33,24 +25,35 @@ class AccueilVue(VueAbstraite):
 
         match choix:
             case "Quitter":
-                pass
+                return  # fin
 
             case "Se connecter":
-                from view.accueil.connexion_vue import ConnexionVue
+                # --- Mode sans base : on mock l'authentification ---
+                email = inquirer.text(message="Email :").execute()
+                _ = inquirer.secret(message="Mot de passe :").execute()
 
-                return ConnexionVue("Connexion à l'application")
+                # On remplit la session avec un utilisateur factice
+                s = Session()
+                s.utilisateur = {
+                    "id_utilisateur": -1,
+                    "prenom": (email.split("@")[0] or "User").capitalize(),
+                    "nom": "",
+                    "mail": email,
+                }
+                s.session = None  # pas de session DB
+
+                from view.menu_utilisateur_vue import MenuUtilisateurVue
+                return MenuUtilisateurVue(f"Connecté (mode sans base) : {email}")
 
             case "Créer un compte":
-                from view.accueil.inscription_vue import InscriptionVue
-
-                return InscriptionVue("Création de compte utilisateur")
+                # En mode sans base, on redirige vers une 'connexion' simple
+                from view.accueil.accueil_vue import AccueilVue
+                return AccueilVue("Création de compte indisponible sans base. Utilisez 'Se connecter'.")
 
             case "Infos de session":
                 return AccueilVue(Session().afficher())
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
-                message = (
-                    f"Ré-initilisation de la base de données - {'SUCCES' if succes else 'ECHEC'}"
-                )
+                message = f"Ré-initilisation de la base de données - {'SUCCES' if succes else 'ECHEC'}"
                 return AccueilVue(message)

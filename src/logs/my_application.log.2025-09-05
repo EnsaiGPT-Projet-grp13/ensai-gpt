@@ -1,0 +1,202 @@
+05/09/2025 14:05:37 - INFO     - --------------------------------------------------
+05/09/2025 14:05:37 - INFO     - Lancement Application                           
+05/09/2025 14:05:37 - INFO     - --------------------------------------------------
+05/09/2025 14:05:37 - INFO     - AccueilVue
+05/09/2025 14:05:46 - INFO     - InscriptionVue
+05/09/2025 15:20:26 - INFO     - --------------------------------------------------
+05/09/2025 15:20:26 - INFO     - Lancement Application                           
+05/09/2025 15:20:26 - INFO     - --------------------------------------------------
+05/09/2025 15:20:26 - INFO     - AccueilVue
+05/09/2025 15:20:28 - INFO     - InscriptionVue
+05/09/2025 15:20:46 - INFO     -     UtilisateurService.mail_deja_utilise('felicia.dossou@sfr.fr',) - DEBUT
+05/09/2025 15:20:46 - INFO     -         UtilisateurDao.lister_tous() - DEBUT
+05/09/2025 15:20:46 - INFO     -         UtilisateurDao.lister_tous() - FIN
+05/09/2025 15:20:46 - INFO     -            └─> Sortie : [] ... (0 elements)
+05/09/2025 15:20:46 - INFO     -     UtilisateurService.mail_deja_utilise('felicia.dossou@sfr.fr',) - FIN
+05/09/2025 15:20:46 - INFO     -        └─> Sortie : False
+05/09/2025 15:21:14 - INFO     -     UtilisateurService.creer('Fefe', 'Dossou', '*****', '2002-08-08', 'felicia.dossou@sfr.fr') - DEBUT
+05/09/2025 15:21:14 - INFO     -         UtilisateurDao.creer('Utilisateur(Fefe Dossou, né(e) le 2002-08-08)',) - DEBUT
+05/09/2025 15:21:14 - INFO     -         UtilisateurDao.creer('Utilisateur(Fefe Dossou, né(e) le 2002-08-08)',) - FIN
+05/09/2025 15:21:14 - INFO     -            └─> Sortie : True
+05/09/2025 15:21:14 - INFO     -     UtilisateurService.creer('Fefe', 'Dossou', '*****', '2002-08-08', 'felicia.dossou@sfr.fr') - FIN
+05/09/2025 15:21:14 - INFO     -        └─> Sortie : Utilisateur(Fefe Dossou, né(e) le 2002-08-08)
+05/09/2025 15:21:14 - INFO     - AccueilVue
+05/09/2025 15:29:32 - INFO     - ConnexionVue
+05/09/2025 15:29:53 - INFO     -     UtilisateurService.se_connecter('felicia.dossou@sfr.fr', '*****') - DEBUT
+05/09/2025 15:29:53 - INFO     -         UtilisateurDao.se_connecter('felicia.dossou@sfr.fr', '*****') - DEBUT
+05/09/2025 15:29:53 - INFO     -         UtilisateurDao.se_connecter('felicia.dossou@sfr.fr', '*****') - FIN
+05/09/2025 15:29:53 - INFO     -            └─> Sortie : None
+05/09/2025 15:29:53 - INFO     -     UtilisateurService.se_connecter('felicia.dossou@sfr.fr', '*****') - FIN
+05/09/2025 15:29:53 - INFO     -        └─> Sortie : None
+05/09/2025 15:29:53 - INFO     - AccueilVue
+05/09/2025 15:29:57 - INFO     - InscriptionVue
+05/09/2025 15:30:19 - INFO     -     UtilisateurService.mail_deja_utilise('felic.hdsjs@jzj.fr',) - DEBUT
+05/09/2025 15:30:19 - INFO     -         UtilisateurDao.lister_tous() - DEBUT
+05/09/2025 15:30:19 - INFO     -         UtilisateurDao.lister_tous() - FIN
+05/09/2025 15:30:19 - INFO     -            └─> Sortie : ['Utilisateur(Fefe Dossou, né(e) le 2002-08-08)'] ... (1 elements)
+05/09/2025 15:30:19 - INFO     -     UtilisateurService.mail_deja_utilise('felic.hdsjs@jzj.fr',) - FIN
+05/09/2025 15:30:19 - INFO     -        └─> Sortie : False
+05/09/2025 15:30:40 - INFO     -     UtilisateurService.creer('Fefe', 'Lili', '*****', '1900-08-08', 'felic.hdsjs@jzj.fr') - DEBUT
+05/09/2025 15:30:40 - INFO     -         UtilisateurDao.creer('Utilisateur(Fefe Lili, né(e) le 1900-08-08)',) - DEBUT
+05/09/2025 15:30:40 - INFO     -         UtilisateurDao.creer('Utilisateur(Fefe Lili, né(e) le 1900-08-08)',) - FIN
+05/09/2025 15:30:40 - INFO     -            └─> Sortie : True
+05/09/2025 15:30:40 - INFO     -     UtilisateurService.creer('Fefe', 'Lili', '*****', '1900-08-08', 'felic.hdsjs@jzj.fr') - FIN
+05/09/2025 15:30:40 - INFO     -        └─> Sortie : Utilisateur(Fefe Lili, né(e) le 1900-08-08)
+05/09/2025 15:30:40 - INFO     - AccueilVue
+05/09/2025 15:30:41 - INFO     - ConnexionVue
+05/09/2025 16:05:52 - INFO     - --------------------------------------------------
+05/09/2025 16:05:52 - INFO     - Lancement Application                           
+05/09/2025 16:05:52 - INFO     - --------------------------------------------------
+05/09/2025 16:05:52 - INFO     - AccueilVue
+05/09/2025 16:05:57 - INFO     - InscriptionVue
+05/09/2025 16:06:50 - INFO     -     UtilisateurService.mail_deja_utilise('john.beau@gmail.fr',) - DEBUT
+05/09/2025 16:06:50 - INFO     -         UtilisateurDao.lister_tous() - DEBUT
+05/09/2025 16:06:50 - INFO     -         UtilisateurDao.lister_tous() - FIN
+05/09/2025 16:06:50 - INFO     -            └─> Sortie : ['Utilisateur(Fefe Dossou, né(e) le 2002-08-08)', 'Utilisateur(Fefe Lili, né(e) le 1900-08-08)'] ... (2 elements)
+05/09/2025 16:06:50 - INFO     -     UtilisateurService.mail_deja_utilise('john.beau@gmail.fr',) - FIN
+05/09/2025 16:06:50 - INFO     -        └─> Sortie : False
+05/09/2025 16:07:23 - INFO     -     UtilisateurService.creer('John', 'Beau', '*****', '2002-04-07', 'john.beau@gmail.fr') - DEBUT
+05/09/2025 16:07:23 - INFO     -         UtilisateurDao.creer('Utilisateur(John Beau, né(e) le 2002-04-07)',) - DEBUT
+05/09/2025 16:07:23 - INFO     -         UtilisateurDao.creer('Utilisateur(John Beau, né(e) le 2002-04-07)',) - FIN
+05/09/2025 16:07:23 - INFO     -            └─> Sortie : True
+05/09/2025 16:07:23 - INFO     -     UtilisateurService.creer('John', 'Beau', '*****', '2002-04-07', 'john.beau@gmail.fr') - FIN
+05/09/2025 16:07:23 - INFO     -        └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:07:23 - INFO     - AccueilVue
+05/09/2025 16:07:25 - INFO     - ConnexionVue
+05/09/2025 16:07:40 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:07:40 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:07:40 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:07:40 - INFO     -            └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:07:40 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:07:40 - INFO     -        └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:07:40 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\connexion_vue.py", line 25, in choisir_menu
+    from view.menu_utilisateur_vue import MenuUtilisateurVue
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+05/09/2025 16:07:40 - INFO     - AccueilVue
+05/09/2025 16:31:10 - INFO     - ConnexionVue
+05/09/2025 16:31:28 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:31:28 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:31:28 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:31:28 - INFO     -            └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:31:28 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:31:28 - INFO     -        └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:31:28 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\connexion_vue.py", line 25, in choisir_menu
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+05/09/2025 16:31:28 - INFO     - AccueilVue
+05/09/2025 16:38:23 - INFO     - ConnexionVue
+05/09/2025 16:38:42 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:38:42 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:38:42 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:38:42 - INFO     -            └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:38:42 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:38:42 - INFO     -        └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:38:42 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\connexion_vue.py", line 25, in choisir_menu
+    next_vue.afficher()
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+05/09/2025 16:38:42 - INFO     - AccueilVue
+05/09/2025 16:45:24 - INFO     - ConnexionVue
+05/09/2025 16:45:39 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:45:39 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:45:39 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:45:39 - INFO     -            └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:45:39 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:45:39 - INFO     -        └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:45:39 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\connexion_vue.py", line 25, in choisir_menu
+    next_vue.afficher()
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+05/09/2025 16:45:39 - INFO     - AccueilVue
+05/09/2025 16:48:28 - INFO     - ConnexionVue
+05/09/2025 16:48:42 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:48:42 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - DEBUT
+05/09/2025 16:48:42 - INFO     -         UtilisateurDao.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:48:42 - INFO     -            └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:48:42 - INFO     -     UtilisateurService.se_connecter('john.beau@gmail.fr', '*****') - FIN
+05/09/2025 16:48:42 - INFO     -        └─> Sortie : Utilisateur(John Beau, né(e) le 2002-04-07)
+05/09/2025 16:48:42 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\connexion_vue.py", line 25, in choisir_menu
+    next_vue.afficher()
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+05/09/2025 16:48:42 - INFO     - AccueilVue
+05/09/2025 16:49:46 - INFO     -     ResetDatabase.lancer() - DEBUT
+05/09/2025 16:49:46 - ERROR    - FileNotFoundError : [Errno 2] No such file or directory: 'data/init_db.sql'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\accueil_vue.py", line 52, in choisir_menu
+    succes = ResetDatabase().lancer()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\utils\log_decorator.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\utils\reset_database.py", line 39, in lancer
+    with open("data/init_db.sql", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'data/init_db.sql'
+05/09/2025 16:49:46 - INFO     - AccueilVue
+05/09/2025 16:49:48 - INFO     - InscriptionVue
+05/09/2025 16:49:58 - INFO     -         UtilisateurService.mail_deja_utilise('fe.li@gmail.fr',) - DEBUT
+05/09/2025 16:49:58 - INFO     -             UtilisateurDao.lister_tous() - DEBUT
+05/09/2025 16:49:58 - INFO     -             UtilisateurDao.lister_tous() - FIN
+05/09/2025 16:49:58 - INFO     -                └─> Sortie : ['Utilisateur(Fefe Dossou, né(e) le 2002-08-08)', 'Utilisateur(Fefe Lili, né(e) le 1900-08-08)', 'Utilisateur(John Beau, né(e) le 2002-04-07)'] ... (3 elements)
+05/09/2025 16:49:58 - INFO     -         UtilisateurService.mail_deja_utilise('fe.li@gmail.fr',) - FIN
+05/09/2025 16:49:58 - INFO     -            └─> Sortie : False
+05/09/2025 16:50:22 - INFO     -         UtilisateurService.creer('Fe', 'Li', '*****', '2000-08-07', 'fe.li@gmail.fr') - DEBUT
+05/09/2025 16:50:22 - INFO     -             UtilisateurDao.creer('Utilisateur(Fe Li, né(e) le 2000-08-07)',) - DEBUT
+05/09/2025 16:50:22 - INFO     -             UtilisateurDao.creer('Utilisateur(Fe Li, né(e) le 2000-08-07)',) - FIN
+05/09/2025 16:50:22 - INFO     -                └─> Sortie : True
+05/09/2025 16:50:22 - INFO     -         UtilisateurService.creer('Fe', 'Li', '*****', '2000-08-07', 'fe.li@gmail.fr') - FIN
+05/09/2025 16:50:22 - INFO     -            └─> Sortie : Utilisateur(Fe Li, né(e) le 2000-08-07)
+05/09/2025 16:50:22 - INFO     - AccueilVue
+05/09/2025 16:50:23 - INFO     - ConnexionVue
+05/09/2025 16:50:33 - INFO     -         UtilisateurService.se_connecter('fe.li@gmail.fr', '*****') - DEBUT
+05/09/2025 16:50:33 - INFO     -             UtilisateurDao.se_connecter('fe.li@gmail.fr', '*****') - DEBUT
+05/09/2025 16:50:33 - INFO     -             UtilisateurDao.se_connecter('fe.li@gmail.fr', '*****') - FIN
+05/09/2025 16:50:33 - INFO     -                └─> Sortie : Utilisateur(Fe Li, né(e) le 2000-08-07)
+05/09/2025 16:50:33 - INFO     -         UtilisateurService.se_connecter('fe.li@gmail.fr', '*****') - FIN
+05/09/2025 16:50:33 - INFO     -            └─> Sortie : Utilisateur(Fe Li, né(e) le 2000-08-07)
+05/09/2025 16:50:33 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\main.py", line 28, in <module>
+    vue_courante = vue_courante.choisir_menu()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\accueil\connexion_vue.py", line 25, in choisir_menu
+    next_vue.afficher()
+  File "C:\Users\PC\OneDrive\Documents\ensai\projet info\ensai-gpt\src\view\menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+05/09/2025 16:50:33 - INFO     - AccueilVue
