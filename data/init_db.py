@@ -1,5 +1,4 @@
-# init_db.py — compatible PostgreSQL anciens (<9.5 pour IF NOT EXISTS sur index et <11 pour EXECUTE FUNCTION)
-
+# init_db.py — corrige les références vers personageIA(id_personageIA)
 import os
 import psycopg2
 
@@ -20,7 +19,7 @@ DDL = f"""
 CREATE SCHEMA IF NOT EXISTS {SCHEMA};
 SET search_path TO {SCHEMA};
 
-
+-- Utilisateur
 CREATE TABLE IF NOT EXISTS utilisateur (
     id_utilisateur   SERIAL PRIMARY KEY,
     prenom           VARCHAR(100) NOT NULL,
@@ -32,23 +31,23 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-
+-- Personnage IA (gardons ton nom de table/colonnes)
 CREATE TABLE IF NOT EXISTS personageIA (
-    id_personageIA    VARCHAR(64) PRIMARY KEY,
-    name          VARCHAR(100) NOT NULL UNIQUE,
-    system_prompt TEXT NOT NULL
+    id_personageIA VARCHAR(64) PRIMARY KEY,
+    name           VARCHAR(100) NOT NULL UNIQUE,
+    system_prompt  TEXT NOT NULL
 );
 
-
+-- Session de chat
 CREATE TABLE IF NOT EXISTS chat_session (
-    id_session     SERIAL PRIMARY KEY,
-    id_utilisateur INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
-    id_personageIA     VARCHAR(64) REFERENCES persona(id_persona),
-    started_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    ended_at       TIMESTAMPTZ NULL
+    id_session       SERIAL PRIMARY KEY,
+    id_utilisateur   INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
+    id_personageIA   VARCHAR(64) REFERENCES personageIA(id_personageIA),
+    started_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    ended_at         TIMESTAMPTZ NULL
 );
 
-
+-- Messages
 CREATE TABLE IF NOT EXISTS chat_message (
     id_message  SERIAL PRIMARY KEY,
     id_session  INTEGER NOT NULL REFERENCES chat_session(id_session) ON DELETE CASCADE,
@@ -57,18 +56,20 @@ CREATE TABLE IF NOT EXISTS chat_message (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Index
 DROP INDEX IF EXISTS idx_utilisateur_mail;
 CREATE INDEX idx_utilisateur_mail ON utilisateur(mail);
 
 DROP INDEX IF EXISTS idx_session_user;
 CREATE INDEX idx_session_user ON chat_session(id_utilisateur);
 
-DROP INDEX IF EXISTS idx_session_persona;
-CREATE INDEX idx_session_persona ON chat_session(id_persona);
+DROP INDEX IF EXISTS idx_session_personageIA;
+CREATE INDEX idx_session_personageIA ON chat_session(id_personageIA);
 
 DROP INDEX IF EXISTS idx_message_session_time;
 CREATE INDEX idx_message_session_time ON chat_message(id_session, created_at);
 
+-- Trigger de mise à jour du updated_at
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -91,7 +92,7 @@ def main():
     try:
         with conn.cursor() as cur:
             cur.execute(DDL)
-            print(f"Base ensaiGPT créée/mise à jour dans le schéma `{SCHEMA}`.")
+            print(f"Base/Schéma initialisés dans `{SCHEMA}`.")
     finally:
         conn.close()
 

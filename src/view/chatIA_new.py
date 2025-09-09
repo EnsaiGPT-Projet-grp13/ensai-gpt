@@ -51,22 +51,24 @@ class ChatNew(VueAbstraite):
         return str(data)
 
     def choisir_menu(self):
-        # 1re réponse si on a déjà une question
+        # Si on a une question initiale
         if len(self.history) > 1 and self.history[-1]["role"] == "user":
             answer = self._call_api()
             print("\n--- Réponse de l'IA ---\n")
             print(answer)
             self.history.append({"role": "assistant", "content": answer})
 
-        # Boucle
-        while True:
-            user_msg = inquirer.text(message="Ton message (Entrée pour quitter) :").execute()
-            if not user_msg.strip():
-                from view.menu_utilisateur_vue import MenuUtilisateurVue  # ⬅️ import local
-                return MenuUtilisateurVue("Chat terminé.")
+        # Demande une seule entrée puis retourne la vue suivante
+        user_msg = inquirer.text(message="Ton message (Entrée pour quitter) :").execute()
+        if not user_msg.strip():
+            from view.menu_utilisateur_vue import MenuUtilisateurVue
+            return MenuUtilisateurVue("Chat terminé.")
 
-            self.history.append({"role": "user", "content": user_msg})
-            answer = self._call_api()
-            print("\n--- Réponse de l'IA ---\n")
-            print(answer)
-            self.history.append({"role": "assistant", "content": answer})
+        self.history.append({"role": "user", "content": user_msg})
+        answer = self._call_api()
+        print("\n--- Réponse de l'IA ---\n")
+        print(answer)
+        self.history.append({"role": "assistant", "content": answer})
+
+        # On se renvoie soi-même pour continuer la discussion
+        return self

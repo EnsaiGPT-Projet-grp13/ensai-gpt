@@ -3,27 +3,23 @@ from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
 
-from view.chatIA_old import OldChat
-from view.chatIA_new import ChatNew
 
 class MenuUtilisateurVue(VueAbstraite):
     """
     Menu principal Utilisateur
-
-    - Démarrer un chat : choix d'une personnalité IA puis création d'une nouvelle session
-    - Reprendre un chat : lister les sessions existantes de l'utilisateur et en rouvrir une
-    - Infos de session : afficher l'utilisateur connecté et la session en cours (si existante)
-    - Se déconnecter : retour à l'écran d'accueil
     """
 
     def __init__(self, message: str = "") -> None:
         self.message = message
 
+    def afficher(self):
+        # optionnel mais utile si ton main appelle afficher()
+        if self.message:
+            print(self.message)
+
     def choisir_menu(self):
         # En-tête
         print("\n" + "-" * 50 + "\nMenu Utilisateur\n" + "-" * 50 + "\n")
-        if self.message:
-            print(self.message)
 
         # Choix utilisateur
         choix = inquirer.select(
@@ -36,21 +32,25 @@ class MenuUtilisateurVue(VueAbstraite):
             ],
         ).execute()
 
-        match choix:
-            case "Se déconnecter":
-                Session().deconnexion()
-                from view.accueil.accueil_vue import AccueilVue
-                return AccueilVue("Déconnecté. À bientôt !")
+        if choix == "Se déconnecter":
+            Session().deconnexion()
+            from view.accueil.accueil_vue import AccueilVue
+            return AccueilVue("Déconnecté. À bientôt !")
 
-            case "Infos de session":
-                return MenuUtilisateurVue(Session().afficher())
+        if choix == "Infos de session":
+            return MenuUtilisateurVue(Session().afficher())
 
-            case "Démarrer un chat":
-                text = inquirer.text(message="Que veux tu savoir?").execute()
-                return ChatAIVue(text)
+        if choix == "Démarrer un chat":
+            # ⬇️ Import local pour éviter import circulaire
+            from view.chatIA_new import ChatNew
+            text = inquirer.text(message="Que veux-tu savoir ?").execute()
+            return ChatNew(text)
 
-            case "Reprendre un chat":
-                return ReprendreChatVue()
+        if choix == "Reprendre un chat":
+            # Si tu n'as pas encore implémenté cette vue, laisse un message, sinon importe-la localement
+            # from view.reprendre_chat_vue import ReprendreChatVue
+            # return ReprendreChatVue()
+            return MenuUtilisateurVue("Reprendre un chat est indisponible pour le moment.")
 
-        # Sécurité : si aucun match (ne devrait pas arriver), on reboucle
+        # Sécurité : reboucle
         return MenuUtilisateurVue()
