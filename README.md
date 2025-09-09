@@ -92,35 +92,58 @@ Tests unitaires avec Pytest.
 ---
 
 
-## **Variables d’environnement**
-Créer un fichier `.env` à la racine et y ajouter :  
+## **Préparer l’environnement virtuel**
 
-```default
-WEBSERVICE_HOST=https://ensai-gpt-109912438483.europe-west4.run.app
 
-POSTGRES_HOST=sgbd-eleves.domensai.ecole
-POSTGRES_PORT=5432
-POSTGRES_DATABASE=idxxxx
-POSTGRES_USER=idxxxx
-POSTGRES_PASSWORD=idxxxx
-POSTGRES_SCHEMA=projet
+### **1- Cloner le projet dans ton Datalab (VSCode-python).**
+### **2- Créer et activer un environnement virtuel :**
+
+```python
+python -m venv .venv
+source ~/work/ensai-gpt/src/.venv/bin/activate
 ````
 
-## **Lancer l’application**
+### **3- Installer les dépendances :**
+
+```python
+pip install -r requirements.txt
+
+````
+
+## **Configurer la base de données**
+
+Dans Onyxia, lance aussi un service PostgreSQL.
+Un README est généré automatiquement avec tes informations de connexion.
+Exemple :
+POSTGRES_HOST=postgresql-753783.user-toto
+POSTGRES_PORT=5432
+POSTGRES_DATABASE=defaultdb
+POSTGRES_USER=user-toto
+POSTGRES_PASSWORD=motdepassefourni
+POSTGRES_SCHEMA=projetGPT
+
+ Copie ces lignes dans un fichier .env à la racine du projet.
+
+### **4- Initialiser la base**
+ Crée le schéma et les tables :
+
+```python
+python data/init_db.py
+````
+Si tout est correct tu devrai voir,  Base/Schéma initialisés dans `projetGPT`
+
+### **5- remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
+
+A VENIR 
+
+### **6. Lancer l’application CLI**
+Démarre l’interface en ligne de commande (menus, inscription, chat IA, etc.) :
+
 ```python
 python src/main.py
+
 ````
 
-
-- Menu interactif avec InquirerPy.  
-- Permet l’inscription, la connexion et l’accès au Chat IA.  
-
----
-
-## **Lancer le webservice**
-```python
-python src/app.py
-````
 
 Documentation interactive :  
 - [http://localhost:9876/docs](http://localhost:9876/docs)  
