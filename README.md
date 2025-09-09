@@ -96,6 +96,11 @@ Tests unitaires avec Pytest.
 
 
 ### **1- Cloner le projet dans ton Datalab (VSCode-python).**
+
+```python
+git clone https://github.com/EnsaiGPT-Projet-grp13/ensai-gp
+````
+
 ### **2- Créer et activer un environnement virtuel :**
 
 ```python
