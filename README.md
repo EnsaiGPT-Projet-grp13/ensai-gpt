@@ -19,117 +19,85 @@ Un module de **Chat IA** est intégré grâce à l’API :
 
 ## **Structure du Projet**
 
-### **1. Dossier `data`**
-Contient les scripts SQL de gestion de la base.  
-- **`init_db.py`** : création du schéma et des tables (utilisateur, personage, session, messages, settings).  
-- **`pop_db.sql`** : jeu de données de démonstration (utilisateurs + personnages IA).  
-- **`pop_db_test.sql`** : données isolées pour les tests DAO (schéma `projet_test_dao`).  
+## src  
+Contient tout le code source de l’application (logique métier, DAO, services, vues, utilitaires).
 
 ---
 
-### **2. Dossier `doc/suivi`**
-Notes et rendus hebdomadaires du projet.  
-- **`2025.XX.XX-semaineX.md`** : avancées, blocages, décisions.
+## src/business_object  
+Définit les objets métiers (entités simples, sans logique technique).  
+
+- **`utilisateur.py`** → classe `Utilisateur`  
+- **`personageIA.py`** → classe `PersonageIA`  
+- **`chat.py`** → classes `ChatSession`, `ChatMessage`  
+- **`settings.py`** → classe `UserSettings`
 
 ---
 
-### **3. Dossier `logs`**
-Fichiers de logs générés automatiquement.  
-- **`my_application.log`** : trace des actions exécutées.
+## src/dao  
+Gère l’accès à la base de données (requêtes SQL, connexions, DAO).  
 
----
-
-### **4. Dossier `src/business_object`**
-Objets métiers représentant les entités du projet (dataclasses simples, sans logique technique).  
-- **`utilisateur.py`** → `Utilisateur`  
-- **`personage.py`** → `Personage`  
-- **`chat.py`** → `ChatSession`, `ChatMessage`  
-- **`settings.py`** → `UserSettings`
-
----
-
-### **5. Dossier `src/dao`**
-Accès aux données (Data Access Object, SQL uniquement).  
-- **`db_connection.py`** → `DBConnection` (connexion PostgreSQL)  
-- **`utilisateur_dao.py`** → `UtilisateurDao`  
-- **`persona_dao.py`** → `PersonaDao`  
+- **`db_connection.py`** → classe `DBConnection` (connexion PostgreSQL)  
+- **`utilisateur_dao.py`** → `UtilisateurDao` (CRUD utilisateurs)  
+- **`persona_dao.py`** → `PersonaDao` (CRUD personnages IA)  
 - **`chat_session_dao.py`** → `ChatSessionDao`  
 - **`chat_message_dao.py`** → `ChatMessageDao`  
 - **`settings_dao.py`** → `UserSettingsDao`
 
 ---
 
-### **6. Dossier `src/service`**
-Logique applicative (utilise les DAO, sans SQL direct).  
+## src/service  
+Implémente la logique applicative (utilise les DAO, pas de SQL direct).  
+
 - **`auth_service.py`** → `AuthService` (connexion, inscription)  
-- **`utilisateur_service.py`** → `UtilisateurService` (profil utilisateur)  
-- **`persona_service.py`** → `PersonaService` (gestion des personnages IA)  
-- **`chat_service.py`** → `ChatService` (nouvelle session, messages, export, suppression)  
+- **`utilisateur_service.py`** → `UtilisateurService` (profil)  
+- **`persona_service.py`** → `PersonaService` (personnages IA)  
+- **`chat_service.py`** → `ChatService` (sessions de chat, messages)  
 - **`settings_service.py`** → `SettingsService` (préférences utilisateur)  
-- **`search_service.py`** → `SearchService` (recherche dans l’historique)  
-- **`stats_service.py`** → `StatsService` (statistiques utilisateur et usage IA)
+- **`search_service.py`** → `SearchService` (recherche historique)  
+- **`stats_service.py`** → `StatsService` (statistiques)
 
 ---
 
-### **7. Dossier `src/view`**
-Interface CLI avec InquirerPy. Chaque vue **retourne** la vue suivante.  
+## src/view  
+Interface CLI (menus interactifs avec InquirerPy).  
+Chaque vue affiche et retourne la vue suivante.  
 
-- **`vue_abstraite.py`** → `VueAbstraite`  
+- **`vue_abstraite.py`** → classe de base `VueAbstraite`  
 - **`session.py`** → `Session` (utilisateur + session courante)  
-- **`menu_utilisateur_vue.py`** → `MenuUtilisateurVue`  
-- **`reponseIA_vue.py`** → `ChatNew` (chat avec l’API ensai-GPT)  
-- **`historique_vue.py`** → `HistoriqueVue`  
-- **`parametres_vue.py`** → `ParametresVue`  
-- **`personas_vue.py`** → `PersonasVue`
-
-Sous-dossier **`view/accueil`** :  
-- **`accueil_vue.py`** → `AccueilVue` (menu initial : Se connecter, Créer un compte, etc.)  
-- **`connexion_vue.py`** → `ConnexionVue` (connexion avec mail/mdp)  
-- **`inscription_vue.py`** → `InscriptionVue` (création d’un compte utilisateur)
+- **`accueil_vue.py`** → `AccueilVue` (menu principal : connexion, inscription, reset)  
+- **`connexion_vue.py`** → `ConnexionVue` (authentification)  
+- **`inscription_vue.py`** → `InscriptionVue` (création compte)  
+- **`menu_utilisateur_vue.py`** → `MenuUtilisateurVue` (après connexion)  
+- **`reponseIA_vue.py`** → `ReponseIAVue` (chat avec ensai-GPT)  
+- **`historique_vue.py`** → `HistoriqueVue` (liste conversations passées)  
+- **`parametres_vue.py`** → `ParametresVue` (modifier préférences)  
+- **`personages_vue.py`** → `PersonasVue` (choisir/créer un personnage IA)
 
 ---
 
-### **8. Dossier `src/ChatIA`**
-Client API pour l’IA.  
-- **`ia_client.py`** → `IAClient` (appel HTTP `POST /generate` à l’API ENSAI-GPT)
+## src/utils  
+Outils techniques et fonctions transverses.  
+
+- **`log_init.py`** → initialisation des logs  
+- **`log_decorator.py`** → décorateur pour tracer les appels  
+- **`reset_database.py`** → réinitialisation de la base  
+- **`securite.py`** → hashage et vérification mots de passe  
+- **`singleton.py`** → pattern Singleton (connexion DB)  
+- **`ia_client.py`** → `IAClient` (appels API `POST /generate` à ensai-GPT)
 
 ---
 
-### **9. Dossier `src/utilisateur`**
-Optionnel : peut contenir les vues liées uniquement au profil utilisateur.  
-- **`profil_vue.py`** → affichage et modification du profil.  
+## src (fichiers racine)  
+Point d’entrée de l’application et webservice.  
+
+- **`main.py`** → lance l’application CLI (enchaîne les vues)  
+- **`app.py`** → webservice FastAPI (routes REST : utilisateurs, sessions, messages, stats)
 
 ---
 
-### **10. Dossier `src/utils`**
-Outils techniques transverses.  
-- **`log_init.py`** : initialisation des logs  
-- **`log_decorator.py`** : décorateur de traçage  
-- **`reset_database.py`** : réinitialisation de la base  
-- **`securite.py`** : gestion du hashage des mots de passe  
-- **`singleton.py`** : pattern Singleton pour DB  
-- **`validators.py`** : fonctions de validation (mails, titres…)  
-- **`export.py`** : export d’une conversation (JSON, Markdown)
 
----
-
-### **11. Dossier `src`**
-Fichiers principaux de l’application.  
-- **`main.py`** : application CLI (enchaîne les vues)  
-- **`app.py`** : webservice FastAPI (routes REST : utilisateurs, sessions, messages, stats)
-
----
-
-### **12. Dossier `tests`**
-Tests unitaires avec Pytest.  
-- **`test_dao/test_utilisateur_dao.py`**  
-- **`test_service/test_chat_service.py`**  
-- **`test_service/test_auth_service.py`**  
-- **`conftest.py`** : fixtures (connexion test, nettoyage schéma)
-
----
-
-### **13. Fichiers racine**
+### **Fichiers racine**
 | Fichier                   | Description                                                                 |
 | -------------------------- | --------------------------------------------------------------------------- |
 | `.env`                     | Variables d’environnement (PostgreSQL + API IA).                           |
@@ -141,24 +109,11 @@ Tests unitaires avec Pytest.
 ---
 
 
-## 🔁 **Flux typiques**
-
-- **Connexion** : `ConnexionVue` → `AuthService.se_connecter()` → `UtilisateurDao.find_by_mail()` → mot de passe vérifié → retour `MenuUtilisateurVue`.  
-- **Nouveau Chat** : `MenuUtilisateurVue` → `PersonasVue` → `ChatService.start_session()` → `ChatNew` → `IAClient.generate()` → `ChatMessageDao.append()`.  
-- **Historique** : `HistoriqueVue` → `SearchService.search_messages()` → affichage → supprimer/télécharger via `ChatService`.  
-- **Paramètres** : `ParametresVue` → `SettingsService.set_user_prefs()` (tokens, température, profil).  
-- **Statistiques** : `StatsService` → nombre de chats, durée moyenne, personnages IA les plus utilisés.  
-
----
-
-
-
 ## **Préparer l’environnement virtuel**
 
-sur oxyxia,
-lancer vs code
-lancer postgresql
-lancer cloubesver
+### **0- Initialiser l'environnement.**
+
+Sur oxyxia (ou SSPCloud) : lancer VScode, lancer PostGreSQL, lancer CloudBeaver
 
 ### **1- Cloner le projet dans ton Datalab (VSCode-python).**
 
@@ -167,7 +122,9 @@ git clone https://github.com/EnsaiGPT-Projet-grp13/ensai-gpt
 ````
 
 ### **2- Créer et activer un environnement virtuel :**
-dans la racine du projet
+
+Dans la racine du projet :
+
 ```python
 python -m venv .venv
 source ~/work/ensai-gpt/.venv/bin/activate
@@ -182,64 +139,50 @@ pip install -r requirements.txt
 
 ## **Configurer la base de données**
 
- creer un fichier .env à la racine du projet et copier les lignes suivantes :
+ Créer un fichier .env et copier les lignes suivantes :
 
 ```python
-# --- API ENSAI GPT ---
 WEBSERVICE_HOST=https://ensai-gpt-109912438483.europe-west4.run.app
 LLM_TEMPERATURE=0.7
 LLM_TOP_P=1.0
 LLM_MAX_TOKENS=300
 
-# --- Connexion PostgreSQL ---
-POSTGRES_HOST=# ⚠️ à remplacer par votre host
+POSTGRES_HOST=           # ⚠️ à remplacer par votre host
 POSTGRES_PORT=5432
-POSTGRES_DATABASE= # ⚠️ à remplacer par votre db
-POSTGRES_USER= # ⚠️ à remplacer par votre identifiant
-POSTGRES_PASSWORD= # ⚠️ à remplacer par votre mot de passe
+POSTGRES_DATABASE=       # ⚠️ à remplacer par votre db
+POSTGRES_USER=           # ⚠️ à remplacer par votre identifiant
+POSTGRES_PASSWORD=       # ⚠️ à remplacer par votre mot de passe
 POSTGRES_SCHEMA=projetGPT
 ````
 
 
-
 ### **4- Initialiser la base**
+
  Crée le schéma et les tables :
 
 ```python
 python data/init_db.py
 ````
-Si tout est correct tu devrai voir,  Base/Schéma initialisés dans `projetGPT`
+Si tout est correct tu devrai voir,  "Base/Schéma initialisés dans `projetGPT`"
 
 ### **5(facultatif)- remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
 
 ```python
 python data/pop_db.py
 ````
-A VENIR : personnages IA
 
-### **6. Lancer l’application CLI**
-Démarre l’interface en ligne de commande (menus, inscription, chat IA, etc.) :
+### **6. Lancer l’application**
+
+Démarre l’interface en ligne de commande :
 
 ```python
 python src/main.py
-
 ````
-
-
-Documentation interactive :  
-- [http://localhost:9876/docs](http://localhost:9876/docs)  
-- [http://localhost:9876/redoc](http://localhost:9876/redoc)  
-
-Endpoints principaux :  
-- `GET /utilisateur`  
-- `GET /utilisateur/{id}`  
-- `POST /utilisateur/`  
-- `PUT /utilisateur/{id}`  
-- `DELETE /utilisateur/{id}`  
 
 ---
 
 ## **Tests unitaires**
+
 Exécuter :  
 
 ```python
@@ -271,7 +214,6 @@ Exemple de log :
 07/08/2024 09:07:08 - INFO - utilisateurDao.se_connecter('a', '*****') - FIN
 07/08/2024 09:07:08 - INFO - └─> Sortie : utilisateur(a, 20 ans)
 
-yyy
 ---
 
 
