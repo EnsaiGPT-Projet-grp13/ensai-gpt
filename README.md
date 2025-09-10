@@ -102,11 +102,13 @@ Tests unitaires avec Pytest.
 Notes et rendus hebdomadaires du projet.  
 - **`2025.XX.XX-semaineX.md`** : avancées, blocages, décisions.
 
-### Dossier `logs`
+### doc/logs
 Fichiers de logs générés automatiquement.  
 - **`my_application.log`** : trace des actions exécutées.
-- 
--
+
+### doc/digrammes
+Diagrammes d'organisation denotre projet
+
 ### Fichiers racine
 | Fichier                   | Description                                                                 |
 | -------------------------- | --------------------------------------------------------------------------- |
