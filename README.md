@@ -1,4 +1,4 @@
-# **Projet Informatique 2A ENSAI – Application Utilisateurs & Chat IA**
+# **Projet Informatique 2A ENSAI – EnsaiGPT (Grp13)**
 
 ## **Description**
 Ce projet est réalisé dans le cadre du **Projet Informatique de 2ème année à l’ENSAI**.  
