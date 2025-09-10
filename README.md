@@ -140,6 +140,7 @@ Tests unitaires avec Pytest.
 
 ---
 
+
 ## 🔁 **Flux typiques**
 
 - **Connexion** : `ConnexionVue` → `AuthService.se_connecter()` → `UtilisateurDao.find_by_mail()` → mot de passe vérifié → retour `MenuUtilisateurVue`.  
