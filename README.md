@@ -198,9 +198,12 @@ python data/init_db.py
 ````
 Si tout est correct tu devrai voir,  Base/Schéma initialisés dans `projetGPT`
 
-### **5- remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
+### **5(facultatif)- remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
 
-A VENIR 
+```python
+python data/pop_db.py
+````
+A VENIR : personnages IA
 
 ### **6. Lancer l’application CLI**
 Démarre l’interface en ligne de commande (menus, inscription, chat IA, etc.) :

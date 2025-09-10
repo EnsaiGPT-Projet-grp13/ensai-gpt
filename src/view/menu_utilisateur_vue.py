@@ -2,6 +2,7 @@ from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
+from view.chatIA_new import ChatNew
 
 
 class MenuUtilisateurVue(VueAbstraite):
@@ -41,8 +42,6 @@ class MenuUtilisateurVue(VueAbstraite):
             return MenuUtilisateurVue(Session().afficher())
 
         if choix == "Démarrer un chat":
-            # ⬇️ Import local pour éviter import circulaire
-            from view.chatIA_new import ChatNew
             text = inquirer.text(message="Que veux-tu savoir ?").execute()
             return ChatNew(text)
 

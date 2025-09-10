@@ -18,12 +18,12 @@ class Utilisateur:
         adresse mail de l'utilisateur
     """
 
-    def __init__(self, prenom, nom, naiss, mail, mdp=None, id_utilisateur=None):
+    def __init__(self, prenom, nom, naiss, mail, mdp_hash=None, id_utilisateur=None):
         """Constructeur"""
         self.id_utilisateur = id_utilisateur
         self.prenom = prenom
         self.nom = nom
-        self.mdp = mdp
+        self.mdp_hash = mdp_hash
         self.naiss = naiss
         self.mail = mail
 
