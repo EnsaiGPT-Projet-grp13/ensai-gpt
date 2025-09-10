@@ -8,6 +8,13 @@ from utils.reset_database import ResetDatabase
 class AccueilVue(VueAbstraite):
     """Vue d'accueil de l'application"""
 
+    def __init__(self, message: str = "") -> None:
+        self.message = message
+
+    def afficher(self):
+        if self.message:
+            print(self.message)
+
     def choisir_menu(self):
         """Choix du menu suivant"""
         print("\n" + "-" * 50 + "\nAccueil\n" + "-" * 50 + "\n")
@@ -28,32 +35,19 @@ class AccueilVue(VueAbstraite):
                 return  # fin
 
             case "Se connecter":
-                # --- Mode sans base : on mock l'authentification ---
-                email = inquirer.text(message="Email :").execute()
-                _ = inquirer.secret(message="Mot de passe :").execute()
-
-                # On remplit la session avec un utilisateur factice
-                s = Session()
-                s.utilisateur = {
-                    "id_utilisateur": -1,
-                    "prenom": (email.split("@")[0] or "User").capitalize(),
-                    "nom": "",
-                    "mail": email,
-                }
-                s.session = None  # pas de session DB
-
-                from view.menu_utilisateur_vue import MenuUtilisateurVue
-                return MenuUtilisateurVue(f"Connecté (mode sans base) : {email}")
+                # ➜ Router vers la vue de connexion (DB)
+                from view.accueil.connexion_vue import ConnexionVue  # import local
+                return ConnexionVue()
 
             case "Créer un compte":
-                # En mode sans base, on redirige vers une 'connexion' simple
-                from view.accueil.accueil_vue import AccueilVue
-                return AccueilVue("Création de compte indisponible sans base. Utilisez 'Se connecter'.")
+                # ➜ Router vers la vue d'inscription (DB)
+                from view.accueil.inscription_vue import InscriptionVue  # import local
+                return InscriptionVue()
 
             case "Infos de session":
                 return AccueilVue(Session().afficher())
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
-                message = f"Ré-initilisation de la base de données - {'SUCCES' if succes else 'ECHEC'}"
+                message = f"Ré-initialisation de la base de données — {'SUCCÈS' if succes else 'ÉCHEC'}"
                 return AccueilVue(message)

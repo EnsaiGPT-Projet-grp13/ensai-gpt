@@ -21,64 +21,113 @@ Un module de **Chat IA** est intégré grâce à l’API :
 
 ### **1. Dossier `data`**
 Contient les scripts SQL de gestion de la base.  
-- **`init_db.sql`** : création des tables.  
-- **`pop_db.sql`** 
-- **`pop_db_test.sql`** 
+- **`init_db.py`** : création du schéma et des tables (utilisateur, personage, session, messages, settings).  
+- **`pop_db.sql`** : jeu de données de démonstration (utilisateurs + personnages IA).  
+- **`pop_db_test.sql`** : données isolées pour les tests DAO (schéma `projet_test_dao`).  
+
+---
 
 ### **2. Dossier `doc/suivi`**
 Notes et rendus hebdomadaires du projet.  
-- **`2025.XX.XX-semaineX.md`**  
+- **`2025.XX.XX-semaineX.md`** : avancées, blocages, décisions.
+
+---
 
 ### **3. Dossier `logs`**
 Fichiers de logs générés automatiquement.  
-- **`my_application.log`** : trace des actions exécutées.  
+- **`my_application.log`** : trace des actions exécutées.
+
+---
 
 ### **4. Dossier `src/business_object`**
-Objets métiers représentant les entités du projet.  
-- **`utilisateur.py`** : classe `Utilisateur` avec ses attributs et méthodes.  
+Objets métiers représentant les entités du projet (dataclasses simples, sans logique technique).  
+- **`utilisateur.py`** → `Utilisateur`  
+- **`personage.py`** → `Personage`  
+- **`chat.py`** → `ChatSession`, `ChatMessage`  
+- **`settings.py`** → `UserSettings`
+
+---
 
 ### **5. Dossier `src/dao`**
-Accès aux données (Data Access Object).  
-- **`db_connection.py`** : gestion de la connexion PostgreSQL.  
-- **`utilisateur_dao.py`**  
+Accès aux données (Data Access Object, SQL uniquement).  
+- **`db_connection.py`** → `DBConnection` (connexion PostgreSQL)  
+- **`utilisateur_dao.py`** → `UtilisateurDao`  
+- **`persona_dao.py`** → `PersonaDao`  
+- **`chat_session_dao.py`** → `ChatSessionDao`  
+- **`chat_message_dao.py`** → `ChatMessageDao`  
+- **`settings_dao.py`** → `UserSettingsDao`
+
+---
 
 ### **6. Dossier `src/service`**
-Logique applicative entre DAO et vues.  
-- **`utilisateur_service.py`** : création, authentification, modification et suppression des utilisateurs.  
+Logique applicative (utilise les DAO, sans SQL direct).  
+- **`auth_service.py`** → `AuthService` (connexion, inscription)  
+- **`utilisateur_service.py`** → `UtilisateurService` (profil utilisateur)  
+- **`persona_service.py`** → `PersonaService` (gestion des personnages IA)  
+- **`chat_service.py`** → `ChatService` (nouvelle session, messages, export, suppression)  
+- **`settings_service.py`** → `SettingsService` (préférences utilisateur)  
+- **`search_service.py`** → `SearchService` (recherche dans l’historique)  
+- **`stats_service.py`** → `StatsService` (statistiques utilisateur et usage IA)
+
+---
 
 ### **7. Dossier `src/view`**
-Interface CLI avec InquirerPy.  
-- **`accueil_vue.py`** : menu d’accueil.  
-- **`connexion_vue.py`** : vue de connexion.  
-- **`inscription_vue.py`** : vue d’inscription.  
-- **`menu_utilisateur_vue.py`** : menu principal utilisateur.  
-- **`session.py`** : gestion de la session courante.  
-- **`vue_abstraite.py`** : classe de base pour les vues.  
+Interface CLI avec InquirerPy. Chaque vue **retourne** la vue suivante.  
+
+- **`vue_abstraite.py`** → `VueAbstraite`  
+- **`session.py`** → `Session` (utilisateur + session courante)  
+- **`menu_utilisateur_vue.py`** → `MenuUtilisateurVue`  
+- **`chatIA_new.py`** → `ChatNew` (chat avec l’API ensai-GPT)  
+- **`historique_vue.py`** → `HistoriqueVue`  
+- **`parametres_vue.py`** → `ParametresVue`  
+- **`personas_vue.py`** → `PersonasVue`
+
+Sous-dossier **`view/accueil`** :  
+- **`accueil_vue.py`** → `AccueilVue` (menu initial : Se connecter, Créer un compte, etc.)  
+- **`connexion_vue.py`** → `ConnexionVue` (connexion avec mail/mdp)  
+- **`inscription_vue.py`** → `InscriptionVue` (création d’un compte utilisateur)
+
+---
 
 ### **8. Dossier `src/ChatIA`**
-Gestion du module de Chat IA.  
-- **`ia_client.py`** (à créer)
+Client API pour l’IA.  
+- **`ia_client.py`** → `IAClient` (appel HTTP `POST /generate` à l’API ENSAI-GPT)
+
+---
 
 ### **9. Dossier `src/utilisateur`**
- 
+Optionnel : peut contenir les vues liées uniquement au profil utilisateur.  
+- **`profil_vue.py`** → affichage et modification du profil.  
+
+---
 
 ### **10. Dossier `src/utils`**
 Outils techniques transverses.  
-- **`log_init.py`** : configuration des logs.  
-- **`log_decorator.py`** : décorateur pour tracer entrées/sorties.  
-- **`reset_database.py`** : réinitialisation de la base.  
-- **`securite.py`** : gestion du hash des mots de passe.  
-- **`singleton.py`** : implémentation du pattern Singleton.  
+- **`log_init.py`** : initialisation des logs  
+- **`log_decorator.py`** : décorateur de traçage  
+- **`reset_database.py`** : réinitialisation de la base  
+- **`securite.py`** : gestion du hashage des mots de passe  
+- **`singleton.py`** : pattern Singleton pour DB  
+- **`validators.py`** : fonctions de validation (mails, titres…)  
+- **`export.py`** : export d’une conversation (JSON, Markdown)
+
+---
 
 ### **11. Dossier `src`**
 Fichiers principaux de l’application.  
-- **`main.py`** : lance l’application 
-- **`app.py`**  
+- **`main.py`** : application CLI (enchaîne les vues)  
+- **`app.py`** : webservice FastAPI (routes REST : utilisateurs, sessions, messages, stats)
+
+---
 
 ### **12. Dossier `tests`**
 Tests unitaires avec Pytest.  
-- **`test_dao/test_utilisateur_dao.py`** : tests sur la DAO.  
-- **`test_service/test_utilisateur_service.py`** : tests sur la logique métier.  
+- **`test_dao/test_utilisateur_dao.py`**  
+- **`test_service/test_chat_service.py`**  
+- **`test_service/test_auth_service.py`**  
+- **`conftest.py`** : fixtures (connexion test, nettoyage schéma)
+
+---
 
 ### **13. Fichiers racine**
 | Fichier                   | Description                                                                 |
@@ -87,9 +136,20 @@ Tests unitaires avec Pytest.
 | `requirements.txt`         | Dépendances Python nécessaires.                                             |
 | `logging_config.yml`       | Configuration YAML pour les logs.                                           |
 | `.coveragerc`              | Configuration Coverage pour les tests.                                      |
-| `.github/workflows/ci.yml` | Pipeline CI : tests, analyse avec pylint, build automatique.                 |
+| `.github/workflows/ci.yml` | Pipeline CI (tests, analyse pylint, build auto).                            |
 
 ---
+
+## 🔁 **Flux typiques**
+
+- **Connexion** : `ConnexionVue` → `AuthService.se_connecter()` → `UtilisateurDao.find_by_mail()` → mot de passe vérifié → retour `MenuUtilisateurVue`.  
+- **Nouveau Chat** : `MenuUtilisateurVue` → `PersonasVue` → `ChatService.start_session()` → `ChatNew` → `IAClient.generate()` → `ChatMessageDao.append()`.  
+- **Historique** : `HistoriqueVue` → `SearchService.search_messages()` → affichage → supprimer/télécharger via `ChatService`.  
+- **Paramètres** : `ParametresVue` → `SettingsService.set_user_prefs()` (tokens, température, profil).  
+- **Statistiques** : `StatsService` → nombre de chats, durée moyenne, personnages IA les plus utilisés.  
+
+---
+
 
 
 ## **Préparer l’environnement virtuel**

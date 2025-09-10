@@ -1,0 +1,113 @@
+09/09/2025 19:37:21 - INFO     - --------------------------------------------------
+09/09/2025 19:37:21 - INFO     - Lancement Application                           
+09/09/2025 19:37:21 - INFO     - --------------------------------------------------
+09/09/2025 19:37:21 - INFO     - AccueilVue
+09/09/2025 19:37:27 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 44, in main
+    vue_courante = vue_courante.choisir_menu()
+  File "/home/onyxia/work/ensai-gpt/src/view/accueil/accueil_vue.py", line 45, in choisir_menu
+    from view.menu_utilisateur_vue import MenuUtilisateurVue
+  File "/home/onyxia/work/ensai-gpt/src/view/menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+09/09/2025 19:39:40 - INFO     - --------------------------------------------------
+09/09/2025 19:39:40 - INFO     - Lancement Application                           
+09/09/2025 19:39:40 - INFO     - --------------------------------------------------
+09/09/2025 19:39:40 - INFO     - AccueilVue
+09/09/2025 19:39:43 - ERROR    - ModuleNotFoundError : No module named 'view.chatIA_old'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 44, in main
+    vue_courante = vue_courante.choisir_menu()
+  File "/home/onyxia/work/ensai-gpt/src/view/accueil/accueil_vue.py", line 45, in choisir_menu
+    from view.menu_utilisateur_vue import MenuUtilisateurVue
+  File "/home/onyxia/work/ensai-gpt/src/view/menu_utilisateur_vue.py", line 6, in <module>
+    from view.chatIA_old import OldChat
+ModuleNotFoundError: No module named 'view.chatIA_old'
+09/09/2025 19:39:43 - INFO     - AccueilVue
+09/09/2025 19:56:08 - INFO     - Fin de l'application
+09/09/2025 19:56:11 - INFO     - --------------------------------------------------
+09/09/2025 19:56:11 - INFO     - Lancement Application                           
+09/09/2025 19:56:11 - INFO     - --------------------------------------------------
+09/09/2025 19:56:11 - INFO     - AccueilVue
+09/09/2025 19:56:25 - ERROR    - AttributeError : 'ChatNew' object has no attribute 'message'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 41, in main
+    vue_courante.afficher()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/onyxia/work/ensai-gpt/src/view/vue_abstraite.py", line 22, in afficher
+    print(self.message)
+          ^^^^^^^^^^^^
+AttributeError: 'ChatNew' object has no attribute 'message'
+09/09/2025 19:56:25 - INFO     - AccueilVue
+09/09/2025 20:02:49 - ERROR    - AttributeError : 'ChatNew' object has no attribute 'message'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 41, in main
+    vue_courante.afficher()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/onyxia/work/ensai-gpt/src/view/vue_abstraite.py", line 22, in afficher
+    print(self.message)
+          ^^^^^^^^^^^^
+AttributeError: 'ChatNew' object has no attribute 'message'
+09/09/2025 20:02:49 - INFO     - AccueilVue
+09/09/2025 20:02:52 - INFO     - Fin de l'application
+09/09/2025 20:02:55 - INFO     - --------------------------------------------------
+09/09/2025 20:02:55 - INFO     - Lancement Application                           
+09/09/2025 20:02:55 - INFO     - --------------------------------------------------
+09/09/2025 20:02:55 - INFO     - AccueilVue
+09/09/2025 20:03:03 - ERROR    - AttributeError : 'ChatNew' object has no attribute 'message'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 41, in main
+    vue_courante.afficher()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/onyxia/work/ensai-gpt/src/view/vue_abstraite.py", line 22, in afficher
+    print(self.message)
+          ^^^^^^^^^^^^
+AttributeError: 'ChatNew' object has no attribute 'message'
+09/09/2025 20:03:03 - INFO     - AccueilVue
+09/09/2025 20:06:52 - INFO     - Fin de l'application
+09/09/2025 20:06:55 - INFO     - --------------------------------------------------
+09/09/2025 20:06:55 - INFO     - Lancement Application                           
+09/09/2025 20:06:55 - INFO     - --------------------------------------------------
+09/09/2025 20:06:55 - INFO     - AccueilVue
+09/09/2025 20:07:03 - ERROR    - AttributeError : 'ChatNew' object has no attribute 'message'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 41, in main
+    vue_courante.afficher()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/onyxia/work/ensai-gpt/src/view/vue_abstraite.py", line 22, in afficher
+    print(self.message)
+          ^^^^^^^^^^^^
+AttributeError: 'ChatNew' object has no attribute 'message'
+09/09/2025 20:07:03 - INFO     - AccueilVue
+09/09/2025 20:14:06 - INFO     - Fin de l'application
+09/09/2025 20:14:17 - INFO     - --------------------------------------------------
+09/09/2025 20:14:17 - INFO     - Lancement Application                           
+09/09/2025 20:14:17 - INFO     - --------------------------------------------------
+09/09/2025 20:14:17 - INFO     - AccueilVue
+09/09/2025 20:14:27 - ERROR    - AttributeError : 'ChatNew' object has no attribute 'message'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 41, in main
+    vue_courante.afficher()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/onyxia/work/ensai-gpt/src/view/vue_abstraite.py", line 22, in afficher
+    print(self.message)
+          ^^^^^^^^^^^^
+AttributeError: 'ChatNew' object has no attribute 'message'
+09/09/2025 20:14:27 - INFO     - AccueilVue
+09/09/2025 20:22:19 - INFO     - Fin de l'application
+09/09/2025 20:22:21 - INFO     - --------------------------------------------------
+09/09/2025 20:22:21 - INFO     - Lancement Application                           
+09/09/2025 20:22:21 - INFO     - --------------------------------------------------
+09/09/2025 20:22:21 - INFO     - AccueilVue
+09/09/2025 20:22:32 - ERROR    - AttributeError : 'ChatNew' object has no attribute 'message'
+Traceback (most recent call last):
+  File "/home/onyxia/work/ensai-gpt/src/main.py", line 41, in main
+    vue_courante.afficher()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/onyxia/work/ensai-gpt/src/view/vue_abstraite.py", line 22, in afficher
+    print(self.message)
+          ^^^^^^^^^^^^
+AttributeError: 'ChatNew' object has no attribute 'message'
+09/09/2025 20:22:32 - INFO     - AccueilVue
+09/09/2025 20:30:24 - INFO     - Fin de l'application

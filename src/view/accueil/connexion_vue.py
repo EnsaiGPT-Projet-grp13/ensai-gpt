@@ -1,35 +1,30 @@
 from InquirerPy import inquirer
-
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
-from service.utilisateur_service import UtilisateurService
+from service.auth_service import AuthService
 
 
 class ConnexionVue(VueAbstraite):
-    """Vue de Connexion (saisie de mail et mdp)"""
+    """Vue de Connexion (DB)"""
 
     def choisir_menu(self):
-        # Saisie
-        mail = inquirer.text(message="Entrez votre e-mail : ").execute()
-        mdp = inquirer.secret(message="Entrez votre mot de passe : ").execute()
+        mail = inquirer.text(message="Email :").execute()
+        mdp  = inquirer.secret(message="Mot de passe :").execute()
 
-        # Auth via service
-        utilisateur = UtilisateurService().se_connecter(mail, mdp)
+        user = AuthService().se_connecter(mail, mdp)
+        if not user:
+            from view.accueil.accueil_vue import AccueilVue
+            return AccueilVue("Identifiants invalides ou utilisateur inconnu.")
 
-        if utilisateur:
-            # Remplir la Session
-            s = Session()
-            s.utilisateur = {
-                "id_utilisateur": utilisateur.id_utilisateur,
-                "prenom": utilisateur.prenom,
-                "nom": utilisateur.nom,
-                "mail": utilisateur.mail,
-            }
-            # ⚠️ On RETOURNE la vue suivante, on ne l'exécute pas ici
-            from view.menu_utilisateur_vue import MenuUtilisateurVue  # import local pour éviter les cycles
-            message = f"Vous êtes connecté en tant que {utilisateur.prenom} {utilisateur.nom}"
-            return MenuUtilisateurVue(message)
+        # Remplir la Session
+        s = Session()
+        s.utilisateur = {
+            "id_utilisateur": user.id_utilisateur,
+            "prenom": user.prenom,
+            "nom": user.nom,
+            "mail": user.mail,
+        }
+        s.session = None
 
-        # Échec : retour accueil avec message
-        from view.accueil.accueil_vue import AccueilVue
-        return AccueilVue("Erreur de connexion (e-mail ou mot de passe invalide)")
+        from view.menu_utilisateur_vue import MenuUtilisateurVue
+        return MenuUtilisateurVue(f"Bienvenue {user.prenom} !")
