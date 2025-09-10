@@ -1,28 +1,26 @@
+# src/view/vue_abstraite.py
 import logging
-
 from abc import ABC, abstractmethod
-
 
 class VueAbstraite(ABC):
     """Modèle de Vue"""
 
-    def __init__(self, message=""):
+    def __init__(self, message: str = ""):
         self.message = message
         logging.info(type(self).__name__)
 
     def nettoyer_console(self):
-        """Insérer des lignes vides pour simuler un nettoyage"""
         for _ in range(30):
             print("")
 
     def afficher(self) -> None:
-        """Echappe un grand espace dans le terminal pour simuler
-        le changement de page de l'application"""
+        """Affiche le message si présent, sans planter si absent."""
         self.nettoyer_console()
-        print(self.message)
-        print()
+        msg = getattr(self, "message", "")
+        if msg:
+            print(msg)
+            print()
 
     @abstractmethod
     def choisir_menu(self):
-        """Choix du menu suivant de l'utilisateur"""
         pass
