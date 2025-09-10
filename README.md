@@ -77,7 +77,7 @@ Interface CLI avec InquirerPy. Chaque vue **retourne** la vue suivante.
 - **`vue_abstraite.py`** → `VueAbstraite`  
 - **`session.py`** → `Session` (utilisateur + session courante)  
 - **`menu_utilisateur_vue.py`** → `MenuUtilisateurVue`  
-- **`chatIA_new.py`** → `ChatNew` (chat avec l’API ensai-GPT)  
+- **`reponseIA_vue.py`** → `ChatNew` (chat avec l’API ensai-GPT)  
 - **`historique_vue.py`** → `HistoriqueVue`  
 - **`parametres_vue.py`** → `ParametresVue`  
 - **`personas_vue.py`** → `PersonasVue`
