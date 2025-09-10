@@ -18,13 +18,17 @@ Un module de **Chat IA** est intégré grâce à l’API :
 ---
 
 ## **Structure du Projet**
+### Dossier `data`
+Contient les scripts SQL de gestion de la base.  
+- **`init_db.py`** : création du schéma et des tables (utilisateur, personage, session, messages, settings).  
+- **`pop_db.sql`** : jeu de données de démonstration (utilisateurs + personnages IA).  
+- **`pop_db_test.sql`** : données isolées pour les tests DAO (schéma `projet_test_dao`).  
 
-## src  
+
+### Dossier `src`  
 Contient tout le code source de l’application (logique métier, DAO, services, vues, utilitaires).
 
----
-
-## src/business_object  
+#### src/business_object  
 Définit les objets métiers (entités simples, sans logique technique).  
 
 - **`utilisateur.py`** → classe `Utilisateur`  
@@ -32,9 +36,7 @@ Définit les objets métiers (entités simples, sans logique technique).
 - **`chat.py`** → classes `ChatSession`, `ChatMessage`  
 - **`settings.py`** → classe `UserSettings`
 
----
-
-## src/dao  
+#### src/dao  
 Gère l’accès à la base de données (requêtes SQL, connexions, DAO).  
 
 - **`db_connection.py`** → classe `DBConnection` (connexion PostgreSQL)  
@@ -44,9 +46,7 @@ Gère l’accès à la base de données (requêtes SQL, connexions, DAO).
 - **`chat_message_dao.py`** → `ChatMessageDao`  
 - **`settings_dao.py`** → `UserSettingsDao`
 
----
-
-## src/service  
+#### src/service  
 Implémente la logique applicative (utilise les DAO, pas de SQL direct).  
 
 - **`auth_service.py`** → `AuthService` (connexion, inscription)  
@@ -57,9 +57,7 @@ Implémente la logique applicative (utilise les DAO, pas de SQL direct).
 - **`search_service.py`** → `SearchService` (recherche historique)  
 - **`stats_service.py`** → `StatsService` (statistiques)
 
----
-
-## src/view  
+#### src/view  
 Interface CLI (menus interactifs avec InquirerPy).  
 Chaque vue affiche et retourne la vue suivante.  
 
@@ -74,9 +72,7 @@ Chaque vue affiche et retourne la vue suivante.
 - **`parametres_vue.py`** → `ParametresVue` (modifier préférences)  
 - **`personages_vue.py`** → `PersonasVue` (choisir/créer un personnage IA)
 
----
-
-## src/utils  
+#### src/utils  
 Outils techniques et fonctions transverses.  
 
 - **`log_init.py`** → initialisation des logs  
@@ -86,18 +82,32 @@ Outils techniques et fonctions transverses.
 - **`singleton.py`** → pattern Singleton (connexion DB)  
 - **`ia_client.py`** → `IAClient` (appels API `POST /generate` à ensai-GPT)
 
----
-
-## src (fichiers racine)  
+#### src (fichiers racine)  
 Point d’entrée de l’application et webservice.  
 
 - **`main.py`** → lance l’application CLI (enchaîne les vues)  
 - **`app.py`** → webservice FastAPI (routes REST : utilisateurs, sessions, messages, stats)
 
----
+### Dossier `tests`
+Tests unitaires avec Pytest.  
+- **`test_dao/test_utilisateur_dao.py`**  
+- **`test_service/test_chat_service.py`**  
+- **`test_service/test_auth_service.py`**  
+- **`conftest.py`** : fixtures (connexion test, nettoyage schéma)
 
 
-### **Fichiers racine**
+### Dossier `doc`
+
+#### doc/suivi
+Notes et rendus hebdomadaires du projet.  
+- **`2025.XX.XX-semaineX.md`** : avancées, blocages, décisions.
+
+### Dossier `logs`
+Fichiers de logs générés automatiquement.  
+- **`my_application.log`** : trace des actions exécutées.
+- 
+-
+### Fichiers racine
 | Fichier                   | Description                                                                 |
 | -------------------------- | --------------------------------------------------------------------------- |
 | `.env`                     | Variables d’environnement (PostgreSQL + API IA).                           |
