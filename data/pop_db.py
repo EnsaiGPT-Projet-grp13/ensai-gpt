@@ -33,5 +33,7 @@ def main():
         conn.commit()
     print(f"{len(USERS)} utilisateurs insérés.")
 
+    
+
 if __name__ == "__main__":
     main()

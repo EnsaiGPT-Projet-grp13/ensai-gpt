@@ -1,28 +1,20 @@
 from InquirerPy import inquirer
-
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
-from view.chatIA_new import ChatNew
-
 
 class MenuUtilisateurVue(VueAbstraite):
-    """
-    Menu principal Utilisateur
-    """
+    """Menu principal Utilisateur"""
 
     def __init__(self, message: str = "") -> None:
         self.message = message
 
     def afficher(self):
-        # optionnel mais utile si ton main appelle afficher()
         if self.message:
             print(self.message)
 
     def choisir_menu(self):
-        # En-tête
         print("\n" + "-" * 50 + "\nMenu Utilisateur\n" + "-" * 50 + "\n")
 
-        # Choix utilisateur
         choix = inquirer.select(
             message="Faites votre choix : ",
             choices=[
@@ -42,14 +34,13 @@ class MenuUtilisateurVue(VueAbstraite):
             return MenuUtilisateurVue(Session().afficher())
 
         if choix == "Démarrer un chat":
-            text = inquirer.text(message="Que veux-tu savoir ?").execute()
-            return ChatNew(text)
+            if choix == "Démarrer un chat":
+                from view.reponseIA_vue import ReponseIAVue  # import local pour éviter les imports circulaires
+                text = inquirer.text(message="Que veux-tu savoir ?").execute()
+                return ReponseIAVue(text)
+
 
         if choix == "Reprendre un chat":
-            # Si tu n'as pas encore implémenté cette vue, laisse un message, sinon importe-la localement
-            # from view.reprendre_chat_vue import ReprendreChatVue
-            # return ReprendreChatVue()
             return MenuUtilisateurVue("Reprendre un chat est indisponible pour le moment.")
 
-        # Sécurité : reboucle
         return MenuUtilisateurVue()

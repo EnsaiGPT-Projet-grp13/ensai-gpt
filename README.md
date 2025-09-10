@@ -155,6 +155,10 @@ Tests unitaires avec Pytest.
 
 ## **Préparer l’environnement virtuel**
 
+sur oxyxia,
+lancer vs code
+lancer postgresql
+lancer cloubesver
 
 ### **1- Cloner le projet dans ton Datalab (VSCode-python).**
 
@@ -178,17 +182,25 @@ pip install -r requirements.txt
 
 ## **Configurer la base de données**
 
-Dans Onyxia, lance aussi un service PostgreSQL.
-Un README est généré automatiquement avec tes informations de connexion.
-Exemple :
-POSTGRES_HOST=postgresql-753783.user-toto
-POSTGRES_PORT=5432
-POSTGRES_DATABASE=defaultdb
-POSTGRES_USER=user-toto
-POSTGRES_PASSWORD=motdepassefourni
-POSTGRES_SCHEMA=projetGPT
+ creer un fichier .env à la racine du projet et copier les lignes suivantes :
 
- Copie ces lignes dans un fichier .env à la racine du projet.
+```python
+# --- API ENSAI GPT ---
+WEBSERVICE_HOST=https://ensai-gpt-109912438483.europe-west4.run.app
+LLM_TEMPERATURE=0.7
+LLM_TOP_P=1.0
+LLM_MAX_TOKENS=300
+
+# --- Connexion PostgreSQL ---
+POSTGRES_HOST=# ⚠️ à remplacer par votre host
+POSTGRES_PORT=5432
+POSTGRES_DATABASE= # ⚠️ à remplacer par votre db
+POSTGRES_USER= # ⚠️ à remplacer par votre identifiant
+POSTGRES_PASSWORD= # ⚠️ à remplacer par votre mot de passe
+POSTGRES_SCHEMA=projetGPT
+````
+
+
 
 ### **4- Initialiser la base**
  Crée le schéma et les tables :
