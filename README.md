@@ -163,10 +163,10 @@ git clone https://github.com/EnsaiGPT-Projet-grp13/ensai-gpt
 ````
 
 ### **2- Créer et activer un environnement virtuel :**
-
+dans la racine du projet
 ```python
 python -m venv .venv
-source ~/work/ensai-gpt/src/.venv/bin/activate
+source ~/work/ensai-gpt/.venv/bin/activate
 ````
 
 ### **3- Installer les dépendances :**
