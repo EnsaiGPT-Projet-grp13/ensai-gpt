@@ -138,6 +138,7 @@ git clone https://github.com/EnsaiGPT-Projet-grp13/ensai-gpt
 Dans la racine du projet :
 
 ```python
+cd ensai-gpt\
 python -m venv .venv
 source ~/work/.venv/bin/activate
 ````
