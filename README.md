@@ -21,8 +21,8 @@ Un module de **Chat IA** est intégré grâce à l’API :
 ### Dossier `data`
 Contient les scripts SQL de gestion de la base.  
 - **`init_db.py`** : création du schéma et des tables (utilisateur, personage, session, messages, settings).  
-- **`pop_db.sql`** : jeu de données de démonstration (utilisateurs + personnages IA).  
-- **`pop_db_test.sql`** : données isolées pour les tests DAO (schéma `projet_test_dao`).  
+- **`pop_db.py`** : jeu de données de démonstration (utilisateurs + personnages IA).  
+- **`test_api.py`** : tests appel API.  
 
 
 ### Dossier `src`  
