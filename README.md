@@ -139,7 +139,7 @@ Dans la racine du projet :
 
 ```python
 python -m venv .venv
-source ~/work/ensai-gpt/.venv/bin/activate
+source ~/work/.venv/bin/activate
 ````
 
 ### **3- Installer les dépendances :**
