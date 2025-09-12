@@ -1,5 +1,6 @@
 import os
 import requests
+
 class IAClient:
     def __init__(self, system_prompt: str):
         self.api_url = os.getenv(

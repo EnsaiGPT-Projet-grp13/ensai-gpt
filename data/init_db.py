@@ -2,6 +2,7 @@
 import os
 import psycopg2
 
+
 try:
     import dotenv
     dotenv.load_dotenv(override=True)
