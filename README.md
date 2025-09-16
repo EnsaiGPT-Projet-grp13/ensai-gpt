@@ -21,8 +21,8 @@ Un module de **Chat IA** est intégré grâce à l’API :
 ### Dossier `data`
 Contient les scripts SQL de gestion de la base.  
 - **`init_db.py`** : création du schéma et des tables (utilisateur, personage, session, messages, settings).  
-- **`pop_db.sql`** : jeu de données de démonstration (utilisateurs + personnages IA).  
-- **`pop_db_test.sql`** : données isolées pour les tests DAO (schéma `projet_test_dao`).  
+- **`pop_db.py`** : jeu de données de démonstration (utilisateurs + personnages IA).  
+- **`test_api.py`** : tests appel API.  
 
 
 ### Dossier `src`  
@@ -138,6 +138,7 @@ git clone https://github.com/EnsaiGPT-Projet-grp13/ensai-gpt
 Dans la racine du projet :
 
 ```python
+cd ensai-gpt/
 python -m venv .venv
 source ~/work/ensai-gpt/.venv/bin/activate
 ````

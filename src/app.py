@@ -4,8 +4,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
-from service.utilisateur_service import UtilisateurService
-from utils.log_init import initialiser_logs
+from src.service.utilisateur_service import UtilisateurService
+from src.utils.log_init import initialiser_logs
 
 app = FastAPI(title="Mon webservice (Utilisateurs)")
 
