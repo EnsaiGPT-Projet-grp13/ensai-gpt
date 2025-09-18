@@ -18,105 +18,95 @@ Un module de **Chat IA** est intégré grâce à l’API :
 ---
 
 ## **Structure du Projet**
-### Dossier `data`
-Contient les scripts SQL de gestion de la base.  
-- **`init_db.py`** : création du schéma et des tables (utilisateur, personage, session, messages, settings).  
-- **`pop_db.py`** : jeu de données de démonstration (utilisateurs + personnages IA).  
-- **`test_api.py`** : tests appel API.  
 
 
-### Dossier `src`  
-Contient tout le code source de l’application (logique métier, DAO, services, vues, utilitaires).
-
-#### src/business_object  
-Définit les objets métiers (entités simples, sans logique technique).  
-
-- **`utilisateur.py`** → classe `Utilisateur`  
-- **`personageIA.py`** → classe `PersonageIA`  
-- **`chat.py`** → classes `ChatSession`, `ChatMessage`  
-- **`settings.py`** → classe `UserSettings`
-
-#### src/dao  
-Gère l’accès à la base de données (requêtes SQL, connexions, DAO).  
-
-- **`db_connection.py`** → classe `DBConnection` (connexion PostgreSQL)  
-- **`utilisateur_dao.py`** → `UtilisateurDao` (CRUD utilisateurs)  
-- **`persona_dao.py`** → `PersonaDao` (CRUD personnages IA)  
-- **`chat_session_dao.py`** → `ChatSessionDao`  
-- **`chat_message_dao.py`** → `ChatMessageDao`  
-- **`settings_dao.py`** → `UserSettingsDao`
-
-#### src/service  
-Implémente la logique applicative (utilise les DAO, pas de SQL direct).  
-
-- **`auth_service.py`** → `AuthService` (connexion, inscription)  
-- **`utilisateur_service.py`** → `UtilisateurService` (profil)  
-- **`persona_service.py`** → `PersonaService` (personnages IA)  
-- **`chat_service.py`** → `ChatService` (sessions de chat, messages)  
-- **`settings_service.py`** → `SettingsService` (préférences utilisateur)  
-- **`search_service.py`** → `SearchService` (recherche historique)  
-- **`stats_service.py`** → `StatsService` (statistiques)
-
-#### src/view  
-Interface CLI (menus interactifs avec InquirerPy).  
-Chaque vue affiche et retourne la vue suivante.  
-
-- **`vue_abstraite.py`** → classe de base `VueAbstraite`  
-- **`session.py`** → `Session` (utilisateur + session courante)  
-- **`accueil_vue.py`** → `AccueilVue` (menu principal : connexion, inscription, reset)  
-- **`connexion_vue.py`** → `ConnexionVue` (authentification)  
-- **`inscription_vue.py`** → `InscriptionVue` (création compte)  
-- **`menu_utilisateur_vue.py`** → `MenuUtilisateurVue` (après connexion)  
-- **`reponseIA_vue.py`** → `ReponseIAVue` (chat avec ensai-GPT)  
-- **`historique_vue.py`** → `HistoriqueVue` (liste conversations passées)  
-- **`parametres_vue.py`** → `ParametresVue` (modifier préférences)  
-- **`personages_vue.py`** → `PersonasVue` (choisir/créer un personnage IA)
-
-#### src/utils  
-Outils techniques et fonctions transverses.  
-
-- **`log_init.py`** → initialisation des logs  
-- **`log_decorator.py`** → décorateur pour tracer les appels  
-- **`reset_database.py`** → réinitialisation de la base  
-- **`securite.py`** → hashage et vérification mots de passe  
-- **`singleton.py`** → pattern Singleton (connexion DB)  
-- **`ia_client.py`** → `IAClient` (appels API `POST /generate` à ensai-GPT)
-
-#### src (fichiers racine)  
-Point d’entrée de l’application et webservice.  
-
-- **`main.py`** → lance l’application CLI (enchaîne les vues)  
-- **`app.py`** → webservice FastAPI (routes REST : utilisateurs, sessions, messages, stats)
-
-### Dossier `tests`
-Tests unitaires avec Pytest.  
-- **`test_dao/test_utilisateur_dao.py`**  
-- **`test_service/test_chat_service.py`**  
-- **`test_service/test_auth_service.py`**  
-- **`conftest.py`** : fixtures (connexion test, nettoyage schéma)
-
-
-### Dossier `doc`
-
-#### doc/suivi
-Notes et rendus hebdomadaires du projet.  
-- **`2025.XX.XX-semaineX.md`** : avancées, blocages, décisions.
-
-### doc/logs
-Fichiers de logs générés automatiquement.  
-- **`my_application.log`** : trace des actions exécutées.
-
-### doc/digrammes
-Diagrammes d'organisation denotre projet
-
-### Fichiers racine
-| Fichier                   | Description                                                                 |
-| -------------------------- | --------------------------------------------------------------------------- |
-| `.env`                     | Variables d’environnement (PostgreSQL + API IA).                           |
-| `requirements.txt`         | Dépendances Python nécessaires.                                             |
-| `logging_config.yml`       | Configuration YAML pour les logs.                                           |
-| `.coveragerc`              | Configuration Coverage pour les tests.                                      |
-| `.github/workflows/ci.yml` | Pipeline CI (tests, analyse pylint, build auto).                            |
+.
+├── data/                               # Scripts et données pour la BDD
+│   ├── init_db.py                      # Création du schéma et tables
+│   ├── pop_db.py                       # Jeu de données exemple
+│   └── sql/                            # (Optionnel) Scripts SQL
+│       ├── schema.sql
+│       └── seed.sql
+│
+├── doc/                                # Documentation du projet
+│   ├── suivi/                          # Notes d’avancement hebdo
+│   ├── logs/                           # Logs générés automatiquement
+│   ├── diagrammes/                     # Diagrammes UML, schémas
+│   └── README_DOC.md
+│
+├── ensai-gpt/                          # Dossier principal de l’application
+│   ├── __init__.py
+│
+│   ├── business_object/                # Objets métiers (simples POJO)
+│   │   ├── utilisateur.py              # Classe Utilisateur
+│   │   ├── personnage_ia.py            # Classe PersonnageIA (prof, cuisinier, jardinier…)
+│   │   ├── chat.py                     # ChatSession, ChatMessage
+│   │   ├── settings.py                 # UserSettings (température, style…)
+│   │   └── stats.py                    # Statistiques utilisateur
+│
+│   ├── dao/                            # Accès à la base (CRUD)
+│   │   ├── db_connection.py            # Connexion PostgreSQL (singleton)
+│   │   ├── utilisateur_dao.py          # CRUD utilisateurs
+│   │   ├── personnage_dao.py           # CRUD personnages IA
+│   │   ├── chat_session_dao.py         # CRUD sessions
+│   │   ├── chat_message_dao.py         # CRUD messages
+│   │   ├── settings_dao.py             # CRUD préférences
+│   │   └── stats_dao.py                # Calculs/statistiques
+│
+│   ├── service/                        # Logique applicative
+│   │   ├── auth_service.py             # Inscription / Connexion
+│   │   ├── utilisateur_service.py      # Gestion du profil
+│   │   ├── personnage_service.py       # Gestion des personnages IA
+│   │   ├── chat_service.py             # Gestion des sessions de chat
+│   │   ├── settings_service.py         # Gestion des préférences
+│   │   ├── search_service.py           # Recherche historique
+│   │   ├── stats_service.py            # Statistiques globales
+│   │   └── export_service.py           # Export carnet de bord (PDF/CSV)
+│
+│   ├── view/                           # Interface CLI (InquirerPy)
+│   │   ├── vue_abstraite.py            # Classe de base Vue
+│   │   ├── session.py                  # Session (utilisateur courant)
+│   │   ├── accueil_vue.py              # Accueil : connexion/inscription
+│   │   ├── connexion_vue.py            # Connexion
+│   │   ├── inscription_vue.py          # Inscription
+│   │   ├── menu_utilisateur_vue.py     # Menu utilisateur (après login)
+│   │   ├── reponseIA_vue.py            # Chat avec IA
+│   │   ├── historique_vue.py           # Historique conversations
+│   │   ├── parametres_vue.py           # Modification préférences
+│   │   ├── personnages_vue.py          # Choix/Création personnages
+│   │   └── stats_vue.py                # Vue statistiques utilisateur
+│
+│   ├── utils/                          # Outils techniques
+│   │   ├── log_init.py                 # Initialisation logs
+│   │   ├── log_decorator.py            # Décorateurs de logs
+│   │   ├── reset_database.py           # Reset BDD
+│   │   ├── securite.py                 # Hashage/vérification mots de passe
+│   │   ├── singleton.py                # Pattern Singleton
+│   │   └── ia_client.py                # Client API ENSAI-GPT (/generate)
+│
+│   ├── main.py                         # Point d’entrée CLI
+│   └── app.py                          # Webservice FastAPI
+│
+├── tests/                              # Tests unitaires (pytest)
+│   ├── test_dao/
+│   │   ├── test_utilisateur_dao.py
+│   │   ├── test_personnage_dao.py
+│   │   ├── test_chat_dao.py
+│   │   └── test_settings_dao.py
+│   ├── test_service/
+│   │   ├── test_auth_service.py
+│   │   ├── test_chat_service.py
+│   │   └── test_stats_service.py
+│   └── conftest.py
+│
+├── .github/workflows/ci.yml            # CI/CD (tests, lint, build)
+├── .coveragerc                         # Config coverage
+├── .gitignore
+├── LICENSE
+├── README.md                           # Présentation projet
+├── requirements.txt                    # Dépendances Python
+├── logging_config.yml                  # Config logs
+└── .env                                # Variables d’environnement
 
 ---
 
