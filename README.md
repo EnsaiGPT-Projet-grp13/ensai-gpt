@@ -30,8 +30,8 @@ Contient tout le code source de l’application.
 #### `src/objects`
 Entités (dataclasses)
 
-- `user.py` → `class User`
-- `user_session.py` → `class UserSession`
+- `utilisateur.py` → `class User`
+- `utilisateur_session.py` → `class UserSession`
 - `settings.py` → `class UserSettings`
 - `persona.py` → `class Persona`
 - `conversation.py` → `class Conversation`
@@ -39,63 +39,47 @@ Entités (dataclasses)
 
 #### `src/dao`
 Accès **pur** base de données, via une connexion unique.
-- `db.py`
-  - `class DB` → `DBConnection()`
-- `user_dao.py`
-  - `class UserDao` → `find_by_email(email)`, `create(email, hash, display_name)`, `update_email(user_id, new_email)`, `get_password_hash(user_id)`, `update_password_hash(user_id, new_hash)`
-- `user_session_dao.py`
-  - `class UserSessionDao` → `start(user_id, ip, ua)`, `end(session_id)`
-- `settings_dao.py`
-  - `class SettingsDao` → `get(user_id)`, `upsert(user_id, **kwargs)`
-- `persona_dao.py`
-  - `class PersonaDao` → `list_for_user(user_id)`, `list_public()`, `insert(name, temperature, prompt)`, `update(persona_id, **fields)`, `get(persona_id)`
-- `conversation_dao.py`
-  - `class ConversationDao` →  
-    `insert(owner_user_id,  **params)`,  
-    `save_token(conversation_id, token, is_public)`,  
-    `update_title(conversation_id, title)`,  
-    `get(conversation_id)`, 
-    `delete(conversation_id)`,  
-    `search_by_user_and_title(user_id, query|None)`,  
-    `change_snapshot_persona(conversation_id, persona_prompt, **params)`,  
-    `get_by_token(token)`
-- `message_dao.py`
-  - `class MessageDao` → `save(conversation_id, role, content, author_user_id|None)`, `list(conversation_id)`, `history(conversation_id)`
-- `stats_dao.py`
-  - `class StatsDao` → `messages_count_by_user(user_id)`, `conversations_count_by_user(user_id)`, `session_durations(user_id)`...ect
+
+- `db.py` → `DB`
+  - connexion unique (singleton), curseur, helpers transaction (begin/commit/rollback)
+
+- `utilisateur_dao.py` → `UserDao` (find_by_email, create, update_email, get_password_hash, update_password_hash)
+
+- `utilisateur_session_dao.py` → `UserSessionDao` (start, end)
+
+- `settings_dao.py` → `SettingsDao` (get, upsert)
+
+- `persona_dao.py` → `PersonaDao` (list_for_user, list_public, insert, update, get)
+
+- `conversation_dao.py` → `ConversationDao` (insert, save_toke, update_title, get, delete, search_by_user_and_title, maj prompt, get_by_token)
+
+- `message_dao.py` → `MessageDao` (save                        *(user/assistant/system), list, history, fts_search)
+  
+- `stats_dao.py` → `StatsDao` (messages_count_by_user, conversations_count_by_user, session_durations)
 
 #### `src/service`
 Communication avec l'API.
 
-- `auth_service.py`
-  - `class AuthService` → `login(email, password, ip, ua) -> (user_id, session_id)`, `register(email, password, display_name) -> user_id`, `update_email(user_id, new_email)`, `change_password(user_id, old_pwd, new_pwd)`
-- `session_service.py`
-  - `class SessionService` → `start(user_id, ip, ua) -> session_id`, `end(session_id)`
-- `settings_service.py`
-  - `class SettingsService` → `get_user_settings(user_id)`, `upsert_user_settings(user_id, **payload)`
-- `persona_service.py`
-  - `class PersonaService` → `list_personas(user_id)`, `create_persona(user_id, name, system_prompt, **params) -> persona_id`, `update_persona(user_id, persona_id, **payload)`, `get_persona(persona_id)`
-- `conversation_service.py`
-  - `class ConversationService` →  
-    `create_conversation(user_id, persona_id|None, custom_system|None, temperature|None, top_p|None, max_tokens|None, visibility) -> dict{id, token?}`,  
-    `join_by_token(user_id, token) -> conversation_id`,  
-    `update_title(conversation_id, title)`,  
-    `change_persona(conversation_id, persona_id)`,  
-    `get_snapshot(conversation_id)`,  
-    `delete_conversation(user_id, conversation_id)`,  
-    `list_conversations(user_id, title_query|None)`
-- `message_service.py`
-  - `class MessageService` → `save_user_message(conversation_id, content, author_user_id)`, `generate_reply(conversation_id) -> assistant_content`, `list_messages(conversation_id)`
-- `search_service.py`
-  - `class SearchService` → `search_in_conversation(conversation_id, q)`
-- `export_service.py`
-  - `class ExportService` → `export_conversation(conversation_id, fmt) -> bytes`  *(fmt: json/csv/txt)*
-- `stats_service.py`
-  - `class StatsService` → `user_dashboard(user_id) -> dict`
-- `clients/ia_client.py`
-  - `generate(history: list[dict], temperature|None, top_p|None, max_tokens|None) -> str`  *(POST `/generate`)*
-- `clients/security.py`
-  - `hash_password(plain) -> str`, `verify_password(plain, hashed) -> bool`
+- `auth_service.py` → `AuthService` (login, register, update email, change password)
+
+- `session_service.py` → `SessionService` (start / end)
+
+- `settings_service.py` → `SettingsService` (get defaults / update defaults (température))
+
+- `persona_service.py` → `PersonaService` (list (public + mes personas), create / update / get)
+  
+- `utilisateur_service.py` → `UtilisateurService` (list, create, update, get)
+
+- `conversation_service.py` → `ConversationService` (create (snapshot + token si public), join by token, rename title / change persona (met à jour le snapshot), delete / list (historique), get snapshot)
+
+- `message_service.py` → `MessageService` (list messages, save user message + generate reply (appelle l’IA))
+
+- `search_service.py` → `SearchService` (search in conversation)
+
+- `export_service.py` → `ExportService` (export conversation)
+
+- `stats_service.py` → `StatsService` a voir
+
 
 ### `src/view`
 Interface CLI (menus). Chaque vue a surtout **`run()`** et délègue aux services.
@@ -233,7 +217,6 @@ Il est possible de générer un rapport de couverture avec :
 coverage run -m pytest
 coverage report -m
 coverage html
-
 
 -> Ouvrir `coverage_report/index.html` pour un rapport détaillé.  
 
