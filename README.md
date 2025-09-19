@@ -59,12 +59,10 @@ Accès **pur** base de données, via une connexion unique.
     `search_by_user_and_title(user_id, query|None)`,  
     `change_snapshot_persona(conversation_id, persona_prompt, **params)`,  
     `get_by_token(token)`
-- `conversation_member_dao.py`
-  - `class ConversationMemberDao` → `add_member(conversation_id, user_id, role="collaborator")`
 - `message_dao.py`
-  - `class MessageDao` → `save(conversation_id, role, content, author_user_id|None)`, `list(conversation_id)`, `history_for_llm(conversation_id)`, `fts_search(conversation_id, q)`
+  - `class MessageDao` → `save(conversation_id, role, content, author_user_id|None)`, `list(conversation_id)`, `history(conversation_id)`
 - `stats_dao.py`
-  - `class StatsDao` → `messages_count_by_user(user_id)`, `conversations_count_by_user(user_id)`, `session_durations(user_id)`
+  - `class StatsDao` → `messages_count_by_user(user_id)`, `conversations_count_by_user(user_id)`, `session_durations(user_id)`...ect
 
 #### `src/service`
 Communication avec l'API.
