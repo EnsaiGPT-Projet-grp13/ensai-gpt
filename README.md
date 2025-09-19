@@ -23,8 +23,6 @@ Un module de **Chat IA** est intégré grâce à l’API :
 Contient les scripts SQL et utilitaires de base de données.
 - `init_db.py` → création du schéma et des tables (utilisateur, personnage, session, messages, settings).
 - `pop_db.py` → jeu de données de démonstration (utilisateurs + personnages IA).
-- `sql/schema.sql` → script SQL du schéma (optionnel si tu préfères tout en Python).
-- `sql/seed.sql` → données de seed (optionnel).
 
 ---
 ## Dossier `src`
@@ -33,7 +31,8 @@ Contient tout le code source de l’application, réorganisé selon **api/**, **
 ---
 
 ### `src/objects`
-Entités (dataclasses) et schémas API (Pydantic). **Pas de logique** ici.
+Entités (dataclasses) et schémas API (Pydantic). 
+
 - `user.py` → `class User`
 - `user_session.py` → `class UserSession`
 - `settings.py` → `class UserSettings`
