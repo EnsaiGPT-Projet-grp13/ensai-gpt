@@ -19,19 +19,16 @@ Un module de **Chat IA** est intégré grâce à l’API :
 
 ## **Structure du Projet**
 
-## Dossier `data`
+### Dossier `data`
 Contient les scripts SQL et utilitaires de base de données.
 - `init_db.py` → création du schéma et des tables (utilisateur, personnage, session, messages, settings).
-- `pop_db.py` → jeu de données de démonstration (utilisateurs + personnages IA).
+- `pop_db.py` → jeu de données de démonstration (utilisateurs + personnages IA
 
----
-## Dossier `src`
-Contient tout le code source de l’application, réorganisé selon **api/**, **dao/**, **objects/**, **service/**, **view/**, avec **main.py** (CLI) et **app.py** (FastAPI).
+### Dossier `src`
+Contient tout le code source de l’application.
 
----
-
-### `src/objects`
-Entités (dataclasses) et schémas API (Pydantic). 
+#### `src/objects`
+Entités (dataclasses)
 
 - `user.py` → `class User`
 - `user_session.py` → `class UserSession`
@@ -39,19 +36,11 @@ Entités (dataclasses) et schémas API (Pydantic).
 - `persona.py` → `class Persona`
 - `conversation.py` → `class Conversation`
 - `message.py` → `class ChatMessage`
-- `schemas.py` → Pydantic DTO
-  - `class LoginIn`, `class RegisterIn`
-  - `class ConversationCreateIn`, `class ConversationRenameIn`, `class ConversationPersonaIn`
-  - `class MessageIn`
-  - `class PersonaIn`, `class PersonaUpdateIn`
-  - `class UserSettingsIn`, `class UpdateEmailIn`, `class UpdatePasswordIn`
 
----
-
-### `src/dao`
-Accès **pur** base de données (SQL/CRUD), via une connexion unique.
+#### `src/dao`
+Accès **pur** base de données, via une connexion unique.
 - `db.py`
-  - `class DB` → `connection()`, helpers transaction
+  - `class DB` → `DBConnection()`
 - `user_dao.py`
   - `class UserDao` → `find_by_email(email)`, `create(email, hash, display_name)`, `update_email(user_id, new_email)`, `get_password_hash(user_id)`, `update_password_hash(user_id, new_hash)`
 - `user_session_dao.py`
@@ -59,13 +48,13 @@ Accès **pur** base de données (SQL/CRUD), via une connexion unique.
 - `settings_dao.py`
   - `class SettingsDao` → `get(user_id)`, `upsert(user_id, **kwargs)`
 - `persona_dao.py`
-  - `class PersonaDao` → `list_for_user(user_id)`, `list_public()`, `insert(owner_user_id|None, name, system_prompt, **params)`, `update(persona_id, **fields)`, `get(persona_id)`
+  - `class PersonaDao` → `list_for_user(user_id)`, `list_public()`, `insert(name, temperature, prompt)`, `update(persona_id, **fields)`, `get(persona_id)`
 - `conversation_dao.py`
   - `class ConversationDao` →  
-    `insert(owner_user_id, snapshot_system|None, **params)`,  
+    `insert(owner_user_id,  **params)`,  
     `save_token(conversation_id, token, is_public)`,  
     `update_title(conversation_id, title)`,  
-    `get(conversation_id)`, `get_snapshot(conversation_id)`,  
+    `get(conversation_id)`, 
     `delete(conversation_id)`,  
     `search_by_user_and_title(user_id, query|None)`,  
     `change_snapshot_persona(conversation_id, persona_prompt, **params)`,  
@@ -77,10 +66,9 @@ Accès **pur** base de données (SQL/CRUD), via une connexion unique.
 - `stats_dao.py`
   - `class StatsDao` → `messages_count_by_user(user_id)`, `conversations_count_by_user(user_id)`, `session_durations(user_id)`
 
----
+#### `src/service`
+Logique applicative (orchestration, règles métier).
 
-### `src/service`
-Logique applicative (orchestration, règles métier). **Aucun SQL direct**.
 - `auth_service.py`
   - `class AuthService` → `login(email, password, ip, ua) -> (user_id, session_id)`, `register(email, password, display_name) -> user_id`, `update_email(user_id, new_email)`, `change_password(user_id, old_pwd, new_pwd)`
 - `session_service.py`
@@ -111,47 +99,10 @@ Logique applicative (orchestration, règles métier). **Aucun SQL direct**.
 - `clients/security.py`
   - `hash_password(plain) -> str`, `verify_password(plain, hashed) -> bool`
 
----
+### `src/view`
+Interface utilisateur (menus).
 
-### `src/api`
-Routes **FastAPI** (validation I/O, délègue au *service*).
-- `router.py` → compose tous les routers (tags/prefix)
-- `auth_api.py`
-  - `POST /auth/login` → `login(payload: LoginIn)`
-  - `POST /auth/register` → `register(payload: RegisterIn)`
-  - `POST /auth/logout` → `logout(session_id: str)`
-- `conversations_api.py`
-  - `POST /conversations` → `create_conversation(payload: ConversationCreateIn)` *(snapshot + token si public)*
-  - `POST /conversations/join` → `join_by_token(token: str)` *(collaboratif)*
-  - `GET  /conversations/{id}` → `get_conversation(id: str)` *(messages via messages_api ou direct list)*
-  - `PATCH /conversations/{id}/title` → `rename(id: str, payload: ConversationRenameIn)`
-  - `PATCH /conversations/{id}/persona` → `change_persona(id: str, payload: ConversationPersonaIn)` *(snapshot MAJ)*
-  - `GET  /conversations/{id}/search` → `search_in_conversation(id: str, q: str)`
-  - `DELETE /conversations/{id}` → `delete_conversation(id: str)`
-- `messages_api.py`
-  - `POST /messages` → `post_user_message(payload: MessageIn)` *(save user msg → generate reply)*
-  - `GET  /messages/{conversation_id}` → `list_messages(conversation_id: str)`
-- `history_api.py`
-  - `GET /history` → `list_history(title_query: str|None)` *(liste des conversations d’un user)*
-- `personas_api.py`
-  - `GET  /personas` → `list_personas()`
-  - `POST /personas` → `create_persona(payload: PersonaIn)`
-  - `PATCH /personas/{id}` → `update_persona(id: str, payload: PersonaUpdateIn)`
-- `settings_api.py`
-  - `GET  /settings` → `get_user_settings()`
-  - `PATCH /settings/user` → `update_user_settings(payload: UserSettingsIn)` *(temp/top_p/max_tokens/style)*
-  - `PATCH /settings/account/email` → `update_email(payload: UpdateEmailIn)`
-  - `PATCH /settings/account/password` → `update_password(payload: UpdatePasswordIn)`
-- `export_api.py`
-  - `GET /export/conversation/{id}` → `export_conversation(id: str, fmt="json")`
-- `stats_api.py`
-  - `GET /stats/me` → `my_stats()`
-
----
-
-### `src/view` (CLI InquirerPy)
-Interface utilisateur (menus). **Appelle l’API**, jamais les DAO.
-- `base.py` → `class VueAbstraite` *(helpers menu / navigation)*
+- `base.py` → `class VueAbstraite`
 - `session_ctx.py` → `class Session` *(user_id, session_id, persona selection, conversation courante)*
 - `accueil.py` → `class AccueilVue` *(menu: Connexion, Inscription, Quitter)* → `run()`
 - `connexion.py` → `class ConnexionVue` *(email+mdp → /auth/login)* → `run()`
@@ -164,36 +115,28 @@ Interface utilisateur (menus). **Appelle l’API**, jamais les DAO.
 - `historique.py` → `class HistoriqueVue` *(lister/rechercher par titre, **ouvrir**, **supprimer**, **exporter**, **renommer**, **changer persona**, **recherche interne**)* → `run()`
 - `parametres.py` → `class ParametresVue` *(compte email/mdp + préférences + édition personas)* → `run()`
 
----
-
-### `src` (fichiers racine)
+#### `src` (fichiers racine)
 Points d’entrées.
 - `main.py` → lance le **CLI** (enchaîne les vues)
 - `app.py` → instancie **FastAPI** + inclut `api/router.py`
 
----
-
-## Dossier `tests`
+### Dossier `tests`
 Unit tests **pytest** (à minima).
 - `test_dao/test_user_dao.py`, `test_dao/test_persona_dao.py`, `test_dao/test_conversation_dao.py`, `test_dao/test_message_dao.py`, `test_dao/test_settings_dao.py`
 - `test_service/test_auth_service.py`, `test_service/test_conversation_service.py`, `test_service/test_message_service.py`, `test_service/test_stats_service.py`
-- `conftest.py` → fixtures (DB test, nettoyage schéma)
+- `conftest.py` → fixtures (DB tests)...
 
----
-
-## Dossier `doc`
+### Dossier `doc`
 - `doc/suivi/` (hebdo), `doc/diagrammes/` (Mermaid), `doc/logs/`
-- `README_DOC.md` (install, décisions d’archi)
-
----
+- `README_DOC.md`
 
 ## Fichiers racine
-- `.env` (PostgreSQL + URL API ENSAI-GPT + params défaut)
+- `.env` (PostgreSQL + URL API ENSAI-GPT + paramètres pars défaut)
 - `requirements.txt` (FastAPI, psycopg, pydantic, InquirerPy, etc.)
 - `logging_config.yml`, `.coveragerc`, `.github/workflows/ci.yml`
 - `LICENSE`, `README.md`
 
-
+---
 
 ## **Préparer l’environnement virtuel**
 
@@ -252,7 +195,7 @@ python data/init_db.py
 ````
 Si tout est correct tu devrai voir,  "Base/Schéma initialisés dans `projetGPT`"
 
-### **5(facultatif)- remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
+### **5(facultatif)- Remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
 
 ```python
 python data/pop_db.py
@@ -276,7 +219,6 @@ Exécuter :
 pytest -v
 ````
 
-
 ### Couverture des tests
 Il est possible de générer un rapport de couverture avec :  
 
@@ -293,14 +235,5 @@ coverage html
 - Configurés via `src/utils/log_init.py` et `logging_config.yml`.  
 - Stockés dans `logs/my_application.log`.  
 
-Exemple de log :  
-
-07/08/2024 09:07:07 - INFO - ConnexionVue
-07/08/2024 09:07:08 - INFO - utilisateurService.se_connecter('a', '') - DEBUT
-07/08/2024 09:07:08 - INFO - utilisateurDao.se_connecter('a', '') - DEBUT
-07/08/2024 09:07:08 - INFO - utilisateurDao.se_connecter('a', '*****') - FIN
-07/08/2024 09:07:08 - INFO - └─> Sortie : utilisateur(a, 20 ans)
-
----
 
 
