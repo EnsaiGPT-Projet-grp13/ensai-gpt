@@ -67,7 +67,7 @@ Accès **pur** base de données, via une connexion unique.
   - `class StatsDao` → `messages_count_by_user(user_id)`, `conversations_count_by_user(user_id)`, `session_durations(user_id)`
 
 #### `src/service`
-Logique applicative (orchestration, règles métier).
+Communication avec l'API.
 
 - `auth_service.py`
   - `class AuthService` → `login(email, password, ip, ua) -> (user_id, session_id)`, `register(email, password, display_name) -> user_id`, `update_email(user_id, new_email)`, `change_password(user_id, old_pwd, new_pwd)`
@@ -100,20 +100,30 @@ Logique applicative (orchestration, règles métier).
   - `hash_password(plain) -> str`, `verify_password(plain, hashed) -> bool`
 
 ### `src/view`
-Interface utilisateur (menus).
+Interface CLI (menus). Chaque vue a surtout **`run()`** et délègue aux services.
 
-- `base.py` → `class VueAbstraite`
-- `session_ctx.py` → `class Session` *(user_id, session_id, persona selection, conversation courante)*
-- `accueil.py` → `class AccueilVue` *(menu: Connexion, Inscription, Quitter)* → `run()`
-- `connexion.py` → `class ConnexionVue` *(email+mdp → /auth/login)* → `run()`
-- `inscription.py` → `class InscriptionVue` → `run()`
-- `chat_hub.py` → `class ChatHubVue` *(**Rejoindre via token**, **Historique**, **Nouvelle conversation**)* → `run()`
-  - `prompt_token()`, `go_historique()`, `go_new_conversation()`
-- `personas.py` → `class PersonasVue` *(lister/créer/éditer)* → `run()`
-- `reponse_ia.py` → `class ReponseIAVue` *(boucle chat)* → `run()`
-  - `send_user_message()`, `show_assistant_reply()`
-- `historique.py` → `class HistoriqueVue` *(lister/rechercher par titre, **ouvrir**, **supprimer**, **exporter**, **renommer**, **changer persona**, **recherche interne**)* → `run()`
-- `parametres.py` → `class ParametresVue` *(compte email/mdp + préférences + édition personas)* → `run()`
+**Menus**
+- `vue_abstraite.py` → `VueAbstraite` (helpers UI de base)
+- `accueil_vue.py` → `AccueilVue` (menu: Connexion / Inscription / Chat rapide / Quitter)
+- `connexion_vue.py` → `ConnexionVue` (email+mdp → login)
+- `inscription_vue.py` → `InscriptionVue` (création de compte)
+- `menu_utilisateur_vue.py` → `MenuUtilisateurVue` (après login : Chat / Historique / Paramètres / Déconnexion)
+
+**Chat**
+- `chat_menu_vue.py` → `MenuChatVue` (Rejoindre via token / Nouvelle conversation / Historique / Chat rapide)
+- `token_join_vue.py` → `TokenJoinVue` (saisir token → rejoindre conv)
+- `nouvelle_conversation_vue.py` → `NouvelleConversationVue` (choisir persona → privé/public(+token) → titre → ouvre le chat)
+- `chat_rapide_vue.py` → `ChatRapideVue` (conv privée immédiate, prompt par défaut)
+- `reponse_ia_vue.py` → `ReponseIAVue` (boucle chat : envoyer → générer réponse)
+
+**Historique & Paramètres**
+- `historique_vue.py` → `HistoriqueVue` (lister/rechercher par titre, ouvrir/renommer/changer persona/supprimer/exporter)
+- `parametres_vue.py` → `ParametresVue` (Compte / Préférences / Personas)
+- `parametres_compte_vue.py` → `ParametresCompteVue` (changer email/mdp)
+- `preferences_vue.py` → `PreferencesVue` (température par défaut)
+- `personas_vue.py` → `PersonasVue` (lister / créer / éditer / supprimer)
+- `stats_vue.py` → `StatsVue` (quelques stats utilisateur)
+
 
 #### `src` (fichiers racine)
 Points d’entrées.
