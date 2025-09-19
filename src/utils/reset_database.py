@@ -6,7 +6,7 @@ from unittest import mock
 
 from utils.log_decorator import log
 from utils.singleton import Singleton
-from dao.db_connection import DBConnection
+from dao.db import DBConnection
 
 from service.utilisateur_service import UtilisateurService
 

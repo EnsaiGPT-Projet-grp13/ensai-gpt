@@ -1,4 +1,4 @@
-# src/view/reponseIA_vue.py
+# src/view/reponse_ia_vue.py
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from utils.ia_client import IAClient

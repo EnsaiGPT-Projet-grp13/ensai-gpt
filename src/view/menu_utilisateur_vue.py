@@ -33,7 +33,7 @@ class MenuUtilisateurVue(VueAbstraite):
                 return MenuUtilisateurVue(Session().afficher())
 
             if choix == "Démarrer un chat":
-                from view.reponseIA_vue import ReponseIAVue  # import local
+                from view.reponse_ia_vue import ReponseIAVue  # import local
                 text = inquirer.text(message="Que veux-tu savoir ?").execute()
                 return ReponseIAVue(text)
 

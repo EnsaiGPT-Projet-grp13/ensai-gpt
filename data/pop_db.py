@@ -4,7 +4,7 @@ import os
 # Permet d'importer src/ depuis data/
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from src.dao.db_connection import DBConnection
+from src.dao.db import DBConnection
 from src.utils.securite import hash_pwd
 
 USERS = [
