@@ -3,6 +3,7 @@ from view.vue_abstraite import VueAbstraite
 from view.session import Session
 from service.auth_service import AuthService
 
+
 class ConnexionVue(VueAbstraite):
     """Vue de Connexion (DB)"""
 
@@ -14,7 +15,7 @@ class ConnexionVue(VueAbstraite):
             user = auth.find_user(mail)
 
             if not user:
-                from view.accueil.accueil_vue import AccueilVue
+                from view.accueil_vue import AccueilVue
                 return AccueilVue("Aucun compte ne correspond à cet email. Créez un compte.")
 
             # 3 essais pour le mot de passe
@@ -38,11 +39,11 @@ class ConnexionVue(VueAbstraite):
                 if i < MAX_TRIES:
                     print("Mot de passe incorrect. Réessayez.")
                 else:
-                    from view.accueil.accueil_vue import AccueilVue
+                    from view.accueil_vue import AccueilVue
                     return AccueilVue("Mot de passe incorrect (3 tentatives).")
 
         except Exception as e:
             # log console pour éviter le retour silencieux
             print("[ConnexionVue] Exception:", repr(e))
-            from view.accueil.accueil_vue import AccueilVue
+            from view.accueil_vue import AccueilVue
             return AccueilVue("Erreur technique pendant la connexion (voir terminal).")

@@ -1,6 +1,6 @@
 from typing import Optional
-from business_object.utilisateur import Utilisateur
-from dao.db_connection import DBConnection
+from objects.utilisateur import Utilisateur
+from dao.db import DBConnection
 
 class UtilisateurDao:
     def find_by_mail(self, mail: str) -> Optional[Utilisateur]:

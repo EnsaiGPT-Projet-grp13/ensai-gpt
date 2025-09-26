@@ -3,6 +3,7 @@ from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
 
+
 class MenuUtilisateurVue(VueAbstraite):
     def __init__(self, message: str = "") -> None:
         self.message = message
@@ -26,7 +27,7 @@ class MenuUtilisateurVue(VueAbstraite):
 
             if choix == "Se déconnecter":
                 Session().deconnexion()
-                from view.accueil.accueil_vue import AccueilVue
+                from view.accueil_vue import AccueilVue
                 return AccueilVue("Déconnecté. À bientôt !")
 
             if choix == "Infos de session":
@@ -45,5 +46,5 @@ class MenuUtilisateurVue(VueAbstraite):
         except Exception as e:
             print("\n[MenuUtilisateurVue] Exception :", repr(e))
             print(traceback.format_exc())
-            from view.accueil.accueil_vue import AccueilVue
+            from view.accueil_vue import AccueilVue
             return AccueilVue("Erreur dans le menu utilisateur (voir terminal).")

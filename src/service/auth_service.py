@@ -1,8 +1,9 @@
 from typing import Optional
 from datetime import date
-from src.dao.utilisateur_dao import UtilisateurDao
-from src.utils.securite import hash_pwd
-from src.business_object.utilisateur import Utilisateur
+from dao.utilisateur_dao import UtilisateurDao
+from utils.securite import hash_pwd
+from objects.utilisateur import Utilisateur
+
 
 class AuthService:
     def __init__(self):

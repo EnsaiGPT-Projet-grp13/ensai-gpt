@@ -5,7 +5,7 @@ from tabulate import tabulate
 from utils.log_decorator import log
 from utils.securite import hash_password  # compat: voir utils/securite.py plus bas
 
-from business_object.utilisateur import Utilisateur
+from objects.utilisateur import Utilisateur
 from dao.utilisateur_dao import UtilisateurDao
 
 

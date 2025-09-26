@@ -6,7 +6,7 @@ from src.utils.reset_database import ResetDatabase
 from src.utils.securite import hash_password
 
 from src.dao.utilisateur_dao import UtilisateurDao
-from src.business_object.utilisateur import Utilisateur
+from src.objects.utilisateur import Utilisateur
 
 
 @pytest.fixture(scope="session", autouse=True)

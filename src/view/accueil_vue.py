@@ -36,12 +36,12 @@ class AccueilVue(VueAbstraite):
 
             case "Se connecter":
                 # ➜ Router vers la vue de connexion (DB)
-                from view.accueil.connexion_vue import ConnexionVue  # import local
+                from view.connexion_vue import ConnexionVue  # import local
                 return ConnexionVue()
 
             case "Créer un compte":
                 # ➜ Router vers la vue d'inscription (DB)
-                from view.accueil.inscription_vue import InscriptionVue  # import local
+                from view.inscription_vue import InscriptionVue  # import local
                 return InscriptionVue()
 
             case "Infos de session":
