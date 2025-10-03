@@ -1,5 +1,6 @@
 # init_db.py — corrige les références vers personageIA(id_personageIA)
 import os
+
 import psycopg2
 
 
