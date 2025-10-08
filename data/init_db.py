@@ -30,48 +30,111 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     mdp              TEXT NOT NULL,
     naiss            DATE NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    temperature      REAL,
+    top_p            REAL,
+    max_tokens       INTEGER NOT NULL    
 );
 
--- Personnage IA (gardons ton nom de table/colonnes)
-CREATE TABLE IF NOT EXISTS personageIA (
-    id_personageIA VARCHAR(64) PRIMARY KEY,
+-- Personna IA 
+CREATE TABLE IF NOT EXISTS personnageIA (
+    id_personnageIA SERIAL PRIMARY KEY,
     name           VARCHAR(100) NOT NULL UNIQUE,
-    system_prompt  TEXT NOT NULL
+    system_prompt  TEXT NOT NULL,
+    created_by     INTEGER REFERENCES utilisateur(id_utilisateur),
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Session de chat
-CREATE TABLE IF NOT EXISTS chat_session (
+-- Session
+CREATE TABLE IF NOT EXISTS session (
     id_session       SERIAL PRIMARY KEY,
     id_utilisateur   INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
-    id_personageIA   VARCHAR(64) REFERENCES personageIA(id_personageIA),
     started_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     ended_at         TIMESTAMPTZ NULL
 );
 
--- Messages
-CREATE TABLE IF NOT EXISTS chat_message (
-    id_message  SERIAL PRIMARY KEY,
-    id_session  INTEGER NOT NULL REFERENCES chat_session(id_session) ON DELETE CASCADE,
-    sender      VARCHAR(16) NOT NULL CHECK (sender IN ('user','ai','system')),
-    content     TEXT NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- Conversation
+CREATE TABLE IF NOT EXISTS conversation (
+    id_conversation       SERIAL PRIMARY KEY,
+    id_proprio            INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
+    id_personnageIA       INTEGER NOT NULL REFERENCES personnageIA(id_personnageIA),
+    titre                 VARCHAR(64),
+    created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    temperature           REAL,
+    top_p                 REAL,
+    max_tokens            INTEGER NOT NULL,
+    is_collab             BOOLEAN,
+    token_collab          VARCHAR(16)
 );
 
--- Index
+-- Messages
+CREATE TABLE IF NOT EXISTS message (
+    id_message       SERIAL PRIMARY KEY,
+    id_conversation  INTEGER NOT NULL REFERENCES conversation(id_conversation) ON DELETE CASCADE,
+    expediteur       VARCHAR(16) NOT NULL CHECK (expediteur IN ('utilisateur','IA')),
+    id_utilisateur   INTEGER REFERENCES utilisateur(id_utilisateur),
+    contenu          TEXT NOT NULL,
+    created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Conversations utilisateurs, table d'association
+CREATE TABLE IF NOT EXISTS conv_utilisateur (
+    id_utilisateur   INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
+    id_conversation  INTEGER NOT NULL REFERENCES conversation(id_conversation) ON DELETE CASCADE,
+    PRIMARY KEY (id_utilisateur, id_conversation)
+);
+
+-- Personnages IA utilisateurs, table d'association
+CREATE TABLE IF NOT EXISTS persoIA_utilisateur (
+    id_utilisateur   INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
+    id_personnageIA  INTEGER NOT NULL REFERENCES personnageIA(id_personnageIA) ON DELETE CASCADE,
+    PRIMARY KEY (id_utilisateur, id_personnageIA)
+);
+
+-- Index, permet à la db de retrouver plus vite certains éléments 
+-- sans devoir parcourir toute la table
+-- Pour l'authentification et vérifier l'unicité du mail
 DROP INDEX IF EXISTS idx_utilisateur_mail;
 CREATE INDEX idx_utilisateur_mail ON utilisateur(mail);
 
+-- Pour retrouver toutes les sessions d'un utilisateur
 DROP INDEX IF EXISTS idx_session_user;
-CREATE INDEX idx_session_user ON chat_session(id_utilisateur);
+CREATE INDEX idx_session_user ON session(id_utilisateur);
 
-DROP INDEX IF EXISTS idx_session_personageIA;
-CREATE INDEX idx_session_personageIA ON chat_session(id_personageIA);
+-- Pour retrouver toutes les conversations d'un personnageIA
+DROP INDEX IF EXISTS idx_conversation_personnageIA;
+CREATE INDEX idx_conversation_personnageIA ON conversation(id_personnageIA);
 
-DROP INDEX IF EXISTS idx_message_session_time;
-CREATE INDEX idx_message_session_time ON chat_message(id_session, created_at);
+-- Pour retrouver tous les personnages IA d'un utilisateur
+DROP INDEX IF EXISTS idx_utilisateur_personnageIA;
+CREATE INDEX idx_utilisateur_personnageIA ON personnageIA(id_personnageIA);
 
--- Trigger de mise à jour du updated_at
+-- Pour obtenir les message d'une conversation dans l'ordre
+DROP INDEX IF EXISTS idx_message_conversation_time;
+CREATE INDEX idx_message_conversation_time ON message(id_conversation, created_at);
+
+-- Pour retrouver les conversations dont un utilisateur est propriétaire
+DROP INDEX IF EXISTS idx_conversation_proprio;
+CREATE INDEX idx_conversation_proprio ON conversation(id_proprio);
+
+-- Table d'association : pour rechercher rapidement par utilisateur ou par conversation
+DROP INDEX IF EXISTS idx_conv_utilisateur_user;
+CREATE INDEX idx_conv_utilisateur_user ON conv_utilisateur(id_utilisateur);
+
+DROP INDEX IF EXISTS idx_conv_utilisateur_conversation;
+CREATE INDEX idx_conv_utilisateur_conversation ON conv_utilisateur(id_conversation);
+
+-- Table d'association : pour rechercher rapidement par utilisateur ou par personnage IA
+DROP INDEX IF EXISTS idx_persoIA_utilisateur_user;
+CREATE INDEX idx_persoIA_utilisateur_user ON persoIA_utilisateur(id_utilisateur);
+
+DROP INDEX IF EXISTS idx_persoIA_utilisateur_perso;
+CREATE INDEX idx_persoIA_utilisateur_perso ON persoIA_utilisateur(id_personnageIA);
+
+-- Trigger : permet d'automatiser certaines actions dans la db
+-- Trigger de mise à jour du updated_at, à chaque modification la date change automatiquement
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -83,6 +146,16 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS utilisateur_set_updated_at ON utilisateur;
 CREATE TRIGGER utilisateur_set_updated_at
 BEFORE UPDATE ON utilisateur
+FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
+
+DROP TRIGGER IF EXISTS conversation_set_updated_at ON conversation;
+CREATE TRIGGER conversation_set_updated_at
+BEFORE UPDATE ON conversation
+FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
+
+DROP TRIGGER IF EXISTS personnageIA_set_updated_at ON personnageIA;
+CREATE TRIGGER personnageIA_set_updated_at
+BEFORE UPDATE ON personnageIA
 FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
 """
 
