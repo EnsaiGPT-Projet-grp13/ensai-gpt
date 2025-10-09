@@ -5,7 +5,7 @@ import sys
 
 from data import init_db
 
-class TestInitDB():
+class TestStructureDB():
     @classmethod
     def setup_class(cls):
         """Créé une connexion unique qui sera utilisée par tous les tests"""
@@ -125,3 +125,27 @@ class TestInitDB():
         attendues = {'id_utilisateur', 'id_personnageia'}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans persoIA_utilisateur : {manquantes}"
+
+    def test_idex_existent(self):
+        """Vérifie que tous les index attendus ont été créés"""
+        index_attendus = {
+            'idx_utilisateur_mail',
+            'idx_session_user',
+            'idx_conversation_personnageia',
+            'idx_utilisateur_personnageia',
+            'idx_message_conversation_time',
+            'idx_conversation_proprio',
+            'idx_conv_utilisateur_user',
+            'idx_conv_utilisateur_conversation',
+            'idx_persoia_utilisateur_user',
+            'idx_persoia_utilisateur_perso'
+        }
+
+        self.cur.execute("""
+            SELECT indexname 
+            FROM pg_indexes 
+            WHERE schemaname = 'projetgpt';
+        """)
+        index_existants = {index[0] for index in self.cur.fetchall()}
+        manquants = index_attendus - index_existants
+        assert not manquants, f"Ils manquent les index suivants : {manquants}"
