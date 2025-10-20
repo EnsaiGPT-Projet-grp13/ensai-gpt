@@ -67,6 +67,17 @@ class TestStructureDB():
         manquants = index_attendus - index_existants
         assert not manquants, f"Ils manquent les index suivants : {manquants}"
 
+    def test_triggers_existent(self):
+        """Vérifie que tous les triggers 'set_updated_at' existent"""
+        tables = ['utilisateur', 'conversation', 'personnageIA']
+        for table in tables:
+            self.cur.execute(f"""
+                SELECT trigger_name
+                FROM information_schema.triggers
+                WHERE event_object_schema='projetgpt' AND event_object_table='{table.lower()}';
+            """)
+            triggers_existants = {trigger[0] for trigger in self.cur.fetchall()}
+            assert any('set_updated_at' in trig for trig in triggers_existants), f"Le trigger set_updated_at est manquant dans la table {table}"
 
     def test_colonnes_utilisateur(self):
         """Vérifie que les colonnes importantes de 'utilisateur' existent"""

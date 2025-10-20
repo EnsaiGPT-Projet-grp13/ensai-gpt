@@ -28,12 +28,12 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     nom              VARCHAR(100) NOT NULL,
     mail             VARCHAR(255) NOT NULL UNIQUE,
     mdp              TEXT NOT NULL,
-    naiss            DATE NOT NULL,
+    naiss            DATE,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature      REAL,
     top_p            REAL,
-    max_tokens       INTEGER NOT NULL    
+    max_tokens       INTEGER NOT NULL DEFAULT 150    
 );
 
 -- Personna IA 
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS conversation (
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature           REAL,
     top_p                 REAL,
-    max_tokens            INTEGER NOT NULL,
+    max_tokens            INTEGER NOT NULL DEFAULT 150,
     is_collab             BOOLEAN,
     token_collab          VARCHAR(16)
 );

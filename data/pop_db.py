@@ -1,7 +1,6 @@
 import sys
 import os
 
-# Permet d'importer src/ depuis data/
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from src.dao.db import DBConnection
@@ -19,19 +18,19 @@ USERS = [
 def main():
     conn = DBConnection().connection
     with conn.cursor() as cur:
-        cur.execute("SET search_path TO projetGPT;")  # ⚠️ tu peux remplacer par os.getenv("POSTGRES_SCHEMA")
-        for prenom, nom, mail, pwd, naiss in USERS:
-            hashed = hash_pwd(pwd)
+        cur.execute("SET search_path TO projetgpt;") 
+        for prenom, nom, mail, mdp, naiss in USERS:
+            mdp_hache = hash_pwd(mdp, mail)
             cur.execute(
                 """
                 INSERT INTO utilisateur (prenom, nom, mail, mdp, naiss)
                 VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (mail) DO NOTHING;
                 """,
-                (prenom, nom, mail, hashed, naiss),
+                (prenom, nom, mail, mdp_hache, naiss),
             )
         conn.commit()
-    print(f"{len(USERS)} utilisateurs insérés.")
+    print(f"{len(USERS)} utilisateurs ont été insérés dans la database utilisateur.")
 
     
 
