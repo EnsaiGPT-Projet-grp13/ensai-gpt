@@ -140,7 +140,7 @@ class TestContraintesDB():
         """Vérification qu'une modification met bien à jour le trigger updated_at"""
         # Creation d'un personnage IA
         self.cur.execute(f"""
-            INSERT INTO {self.schema}.personnageIA (id_personnageIA, name, system_prompt) VALUES (1,"Cuisinier","Test") RETURNING id_personnageIA, updated_at;
+            INSERT INTO {self.schema}.personnageIA (id_personnageIA, name, system_prompt) VALUES (1,'Cuisinier','Test') RETURNING id_personnageIA, updated_at;
         """)
         id_personnageIA, premier_temps = self.cur.fetchone()
 

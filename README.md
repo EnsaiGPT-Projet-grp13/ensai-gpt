@@ -185,7 +185,7 @@ POSTGRES_SCHEMA=projetGPT
 ```python
 python data/init_db.py
 ````
-Si tout est correct tu devrai voir,  "Base/Schéma initialisés dans `projetGPT`"
+Si tout est correct tu devrais voir,  "Base/Schéma initialisés dans `projetGPT`"
 
 ### **5(facultatif)- Remplir la Base de données (quelques utilisateurs et quelques personnages IA)**
 
