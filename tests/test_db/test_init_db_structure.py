@@ -25,6 +25,7 @@ class TestStructureDB():
         cls.cur.close()
         cls.conn.close()
 
+    ### Tests d'existence
     def test_schema_existe(self):
         """Vérifie que le schéma projetGPT existe bien"""
         self.cur.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name='projetgpt';")
@@ -41,6 +42,30 @@ class TestStructureDB():
         tables_existantes = {table[0] for table in self.cur.fetchall()}
         manquantes = tables_attendues - tables_existantes
         assert not manquantes, f"Il manque les tables suivantes : {manquantes}"
+
+    def test_idex_existent(self):
+        """Vérifie que tous les index attendus ont été créés"""
+        index_attendus = {
+            'idx_utilisateur_mail',
+            'idx_session_user',
+            'idx_conversation_personnageia',
+            'idx_utilisateur_personnageia',
+            'idx_message_conversation_time',
+            'idx_conversation_proprio',
+            'idx_conv_utilisateur_user',
+            'idx_conv_utilisateur_conversation',
+            'idx_persoia_utilisateur_user',
+            'idx_persoia_utilisateur_perso'
+        }
+
+        self.cur.execute("""
+            SELECT indexname 
+            FROM pg_indexes 
+            WHERE schemaname = 'projetgpt';
+        """)
+        index_existants = {index[0] for index in self.cur.fetchall()}
+        manquants = index_attendus - index_existants
+        assert not manquants, f"Ils manquent les index suivants : {manquants}"
 
 
     def test_colonnes_utilisateur(self):
@@ -126,26 +151,4 @@ class TestStructureDB():
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans persoIA_utilisateur : {manquantes}"
 
-    def test_idex_existent(self):
-        """Vérifie que tous les index attendus ont été créés"""
-        index_attendus = {
-            'idx_utilisateur_mail',
-            'idx_session_user',
-            'idx_conversation_personnageia',
-            'idx_utilisateur_personnageia',
-            'idx_message_conversation_time',
-            'idx_conversation_proprio',
-            'idx_conv_utilisateur_user',
-            'idx_conv_utilisateur_conversation',
-            'idx_persoia_utilisateur_user',
-            'idx_persoia_utilisateur_perso'
-        }
-
-        self.cur.execute("""
-            SELECT indexname 
-            FROM pg_indexes 
-            WHERE schemaname = 'projetgpt';
-        """)
-        index_existants = {index[0] for index in self.cur.fetchall()}
-        manquants = index_attendus - index_existants
-        assert not manquants, f"Ils manquent les index suivants : {manquants}"
+    
