@@ -1,11 +1,10 @@
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.dao.db import DBConnection
 from src.utils.securite import hash_pwd
-
 USERS = [
     ("John", "Beau", "john.beau@gmail.com", "JohnBeau5", "2000-01-01"),
     ("Alice", "Martin", "alice.martin@example.com", "Alice123", "1998-05-20"),

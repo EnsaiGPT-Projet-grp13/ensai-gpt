@@ -1,4 +1,3 @@
-# src/utils/securite.py
 import hashlib
 
 def _sha256(s: str) -> str:
@@ -8,10 +7,10 @@ def hash_password(pwd: str, sel: str | None = None) -> str:
     """
     Hash le mot de passe. Par défaut SANS sel (compatibilité avec la base existante).
     Tu peux activer un sel (par ex. email) à terme :
-      hash_password(mdp, salt=mail)
+      hash_password(mdp, sel=mail)
     """
-    if salt:
-        return _sha256(pwd + ":" + salt)
+    if sel:
+        return _sha256(pwd + ":" + sel)
     return _sha256(pwd)
 
 # alias compat si le reste du code appelle encore hash_pwd
