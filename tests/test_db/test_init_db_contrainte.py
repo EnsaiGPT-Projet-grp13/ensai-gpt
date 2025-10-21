@@ -1,6 +1,7 @@
 import pytest
 import psycopg2
 import datetime
+import time
 
 from data import init_db
 
@@ -76,8 +77,15 @@ class TestContraintesDB():
         """, (id_user,))
 
         self.cur.execute(f"""
-            INSERT INTO {self.schema}.conversation (id_proprio) VALUES (%s);
-        """, (id_user,))
+            INSERT INTO {self.schema}.personnageIA (name, system_prompt) 
+            VALUES ('Cuisinier', 'Tu es comme un chef')
+            RETURNING id_personnageIA;
+        """)
+        id_persoIA = self.cur.fetchone()[0]
+
+        self.cur.execute(f"""
+            INSERT INTO {self.schema}.conversation (id_proprio, id_personnageia) VALUES (%s, %s);
+        """, (id_user, id_persoIA))
 
         # Suppression de l'utilisateur
         self.cur.execute(f"""
@@ -93,73 +101,97 @@ class TestContraintesDB():
 
     ### Tests des triggers 
     def test_trigger_updates_timestamp_utilisateur(self):
-        """Vérification qu'une modification met bien à jour le trigger updated_at"""
-        # Creation d'un utilisateur
+        """Vérifie que le trigger updated_at se déclenche sur utilisateur"""
+        # Création d'un utilisateur
         self.cur.execute(f"""
-            INSERT INTO {self.schema}.utilisateur (prenom, nom, mail, mdp) VALUES ('Clara','C','clara.C@mail.com', 'mdp') RETURNING id_utilisateur, updated_at;
+            INSERT INTO {self.schema}.utilisateur (prenom, nom, mail, mdp) 
+            VALUES ('Clara', 'C', 'clara.C@mail.com', 'mdp')
+            RETURNING id_utilisateur, updated_at;
         """)
         id_utilisateur, premier_temps = self.cur.fetchone()
 
-        # Attente que le temps passe un peu
-        import time; time.sleep(1)
+        # Attente pour garantir un timestamp différent
+        time.sleep(1)
 
-        # Mise à jour du mail
-        self.cur.execute("""
-            UPDATE projetGPT.utilisateur
-            SET mail='clara.C2@mail.com'
-            WHERE id_utilisateur=%s
+        # Mise à jour du mail (avec valeur unique)
+        nouveau_mail = f"clara{int(time.time())}@mail.com"
+        self.cur.execute(f"""
+            UPDATE {self.schema}.utilisateur
+            SET mail = %s
+            WHERE id_utilisateur = %s
             RETURNING updated_at;
-        """, (id_utilisateur,))
+        """, (nouveau_mail, id_utilisateur))
         deuxieme_temps = self.cur.fetchone()[0]
 
-        assert premier_temps > deuxieme_temps, "Attention le trigger 'set_updated_at' ne met pas à jour le timestamp."
+        assert deuxieme_temps > premier_temps, "Trigger 'set_updated_at' non exécuté sur utilisateur."
+
 
     def test_trigger_updates_timestamp_conversation(self):
-        """Vérification qu'une modification met bien à jour le trigger updated_at"""
-        # Creation d'une conversation
+        """Vérifie que le trigger updated_at se déclenche sur conversation"""
+        # Création d’un personnage IA (clé étrangère requise)
         self.cur.execute(f"""
-            INSERT INTO {self.schema}.conversation (id_conversation, id_proprio, id_personnageIA) VALUES (1,1,1) RETURNING id_conversation, updated_at;
+            INSERT INTO {self.schema}.personnageIA (name, system_prompt)
+            VALUES ('Cuisinier', 'Je réponds comme un chef')
+            RETURNING id_personnageIA;
         """)
+        id_perso = self.cur.fetchone()[0]
+
+        # Création d’un utilisateur (clé étrangère pour conversation)
+        self.cur.execute(f"""
+            INSERT INTO {self.schema}.utilisateur (prenom, nom, mail, mdp)
+            VALUES ('Alice', 'A', 'alice{int(time.time())}@mail.com', 'mdp')
+            RETURNING id_utilisateur;
+        """)
+        id_user = self.cur.fetchone()[0]
+
+        # Création d'une conversation
+        self.cur.execute(f"""
+            INSERT INTO {self.schema}.conversation (id_proprio, id_personnageIA)
+            VALUES (%s, %s)
+            RETURNING id_conversation, updated_at;
+        """, (id_user, id_perso))
         id_conversation, premier_temps = self.cur.fetchone()
 
-        # Attente que le temps passe un peu
-        import time; time.sleep(1)
+        time.sleep(1)
 
-        # Mise à jour du personnage IA
-        self.cur.execute("""
-            UPDATE projetgpt.conversation
-            SET id_personnageIA = 2
-            WHERE id_conversation=%s
+        # Mise à jour de la conversation
+        self.cur.execute(f"""
+            UPDATE {self.schema}.conversation
+            SET titre = 'Nouvelle conversation test'
+            WHERE id_conversation = %s
             RETURNING updated_at;
         """, (id_conversation,))
         deuxieme_temps = self.cur.fetchone()[0]
 
-        assert premier_temps > deuxieme_temps, "Attention le trigger 'set_updated_at' ne met pas à jour le timestamp."
+        assert deuxieme_temps > premier_temps, "Trigger 'set_updated_at' non exécuté sur conversation."
+
 
     def test_trigger_updates_timestamp_personnageIA(self):
-        """Vérification qu'une modification met bien à jour le trigger updated_at"""
-        # Creation d'un personnage IA
+        """Vérifie que le trigger updated_at se déclenche sur personnageIA"""
+        # Création d'un personnage IA
         self.cur.execute(f"""
-            INSERT INTO {self.schema}.personnageIA (id_personnageIA, name, system_prompt) VALUES (1,'Cuisinier','Test') RETURNING id_personnageIA, updated_at;
+            INSERT INTO {self.schema}.personnageIA (name, system_prompt)
+            VALUES ('Cuisinier', 'Test')
+            RETURNING id_personnageIA, updated_at;
         """)
         id_personnageIA, premier_temps = self.cur.fetchone()
 
-        # Attente que le temps passe un peu
-        import time; time.sleep(1)
+        time.sleep(1)
 
-        # Mise à jour du personnage IA
-        self.cur.execute("""
-            UPDATE projetgpt.id_personnageIA
-            SET name = "professeur"
-            WHERE id_conversation=%s
+        # Mise à jour du nom
+        self.cur.execute(f"""
+            UPDATE {self.schema}.personnageIA
+            SET name = 'Professeur'
+            WHERE id_personnageIA = %s
             RETURNING updated_at;
         """, (id_personnageIA,))
         deuxieme_temps = self.cur.fetchone()[0]
 
-        assert premier_temps > deuxieme_temps, "Attention le trigger 'set_updated_at' ne met pas à jour le timestamp."
+        assert deuxieme_temps > premier_temps, "Trigger 'set_updated_at' non exécuté sur personnageIA."
 
     def test_default_timestamps(self):
-        """Vérification que created_at et updated_at sont bien initialisés automatiquement"""
+        """Vérification que created_at et updated_at de la table utilisateur 
+        sont bien initialisés automatiquement"""
         self.cur.execute("""
             INSERT INTO projetGPT.utilisateur (prenom, nom, mail, mdp)
             VALUES ('Clara', 'C', 'default@mail.com', 'mdp')

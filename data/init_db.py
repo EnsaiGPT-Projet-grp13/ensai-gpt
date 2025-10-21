@@ -146,17 +146,20 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS utilisateur_set_updated_at ON utilisateur;
 CREATE TRIGGER utilisateur_set_updated_at
 BEFORE UPDATE ON utilisateur
-FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
+FOR EACH ROW
+EXECUTE PROCEDURE set_updated_at();
 
 DROP TRIGGER IF EXISTS conversation_set_updated_at ON conversation;
 CREATE TRIGGER conversation_set_updated_at
 BEFORE UPDATE ON conversation
-FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
+FOR EACH ROW
+EXECUTE PROCEDURE set_updated_at();
 
 DROP TRIGGER IF EXISTS personnageIA_set_updated_at ON personnageIA;
 CREATE TRIGGER personnageIA_set_updated_at
 BEFORE UPDATE ON personnageIA
-FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
+FOR EACH ROW
+EXECUTE PROCEDURE set_updated_at();
 """
 
 def main():
