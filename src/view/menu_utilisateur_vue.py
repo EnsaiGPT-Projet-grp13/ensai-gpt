@@ -3,7 +3,6 @@ from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from view.session import Session
 
-
 class MenuUtilisateurVue(VueAbstraite):
     def __init__(self, message: str = "") -> None:
         self.message = message
@@ -34,9 +33,24 @@ class MenuUtilisateurVue(VueAbstraite):
                 return MenuUtilisateurVue(Session().afficher())
 
             if choix == "Démarrer un chat":
-                from view.reponse_ia_vue import ReponseIAVue  # import local
-                text = inquirer.text(message="Que veux-tu savoir ?").execute()
-                return ReponseIAVue(text)
+                sous = inquirer.select(
+                    message="Choisir une option :",
+                    choices=[
+                        "Choisir un personnage",
+                        "Créer un personnage",
+                        "Annuler",
+                    ],
+                ).execute()
+
+                if sous == "Choisir un personnage":
+                    from view.choisir_personnage_vue import ChoisirPersonnageVue
+                    return ChoisirPersonnageVue()
+
+                if sous == "Créer un personnage":
+                    from view.creer_personnage_vue import CreerPersonnageVue
+                    return CreerPersonnageVue()
+
+                return MenuUtilisateurVue("Opération annulée.")
 
             if choix == "Reprendre un chat":
                 return MenuUtilisateurVue("Reprendre un chat est indisponible pour le moment.")

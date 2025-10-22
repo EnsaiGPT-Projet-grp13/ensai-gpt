@@ -84,7 +84,7 @@ class TestContraintesDB():
         id_persoIA = self.cur.fetchone()[0]
 
         self.cur.execute(f"""
-            INSERT INTO {self.schema}.conversation (id_proprio, id_personnageia) VALUES (%s, %s);
+            INSERT INTO {self.schema}.conversation (id_proprio, id_personnageIA) VALUES (%s, %s);
         """, (id_user, id_persoIA))
 
         # Suppression de l'utilisateur
