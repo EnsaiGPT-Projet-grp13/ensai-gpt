@@ -9,8 +9,8 @@ class ConnexionVue(VueAbstraite):
 
     def choisir_menu(self):
         try:
-            mail = inquirer.text(message="Email :").execute()
-
+            # dans ConnexionVue
+            mail = inquirer.text(message="Email :").execute().strip().lower()
             auth = AuthService()
             user = auth.find_user(mail)
 
