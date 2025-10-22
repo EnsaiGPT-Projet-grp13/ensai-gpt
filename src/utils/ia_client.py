@@ -22,7 +22,7 @@ class IAClient:
         r.raise_for_status()
         data = r.json()
 
-        # ✅ Extraire uniquement le texte de la réponse
+        # Extraire uniquement le texte de la réponse
         try:
             content = data["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError):
