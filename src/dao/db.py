@@ -1,7 +1,10 @@
 import os
+import sys
 import psycopg2
 from psycopg2 import extras
 from psycopg2.extras import RealDictCursor
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from dotenv import load_dotenv, find_dotenv
 from src.utils.singleton import Singleton
