@@ -38,7 +38,6 @@ class ConversationDao:
             )
             row = cur.fetchone()
         self.conn.commit()
-        # On reconstruit l'objet avec les clés alignées sur la dataclass
         return Conversation(**row)
 
     def find_by_id(self, cid: int) -> Optional[Conversation]:
@@ -90,3 +89,12 @@ class ConversationDao:
             )
             rows = cur.fetchall() or []
         return [Conversation(**r) for r in rows]
+
+    def touch(self, cid: int) -> None:
+        """Met à jour updated_at pour refléter la nouvelle activité de la conv."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                f'UPDATE {SCHEMA}.conversation SET titre = titre WHERE id_conversation = %s',
+                (cid,),
+            )
+        self.conn.commit()

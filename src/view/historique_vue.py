@@ -19,7 +19,7 @@ class HistoriqueVue(VueAbstraite):
             return
 
         # entêtes
-        headers = ["ID", "Titre", "PersonnageID", "Créée", "MAJ"]
+        headers = ["Titre", "PersonnageID", "Créée", "MAJ"]
         # largeurs colonnes minimales
         w_id, w_titre, w_perso, w_created, w_updated = 6, 32, 12, 19, 19
 

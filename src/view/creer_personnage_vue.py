@@ -5,9 +5,6 @@ from src.dao.personnage_ia_dao import PersonnageIADao
 from src.objects.personnage_ia import PersonnageIA
 
 class CreerPersonnageVue(VueAbstraite):
-    """
-    Crée un nouveau personnage IA (lié à l'utilisateur connecté).
-    """
     def __init__(self, message: str = ""):
         self.message = message
 
@@ -19,7 +16,7 @@ class CreerPersonnageVue(VueAbstraite):
         s = Session()
         uid = s.utilisateur.get("id_utilisateur")
 
-        name = inquirer.text(message="Nom du personnage (ex: Jardinier expert balcon) :").execute().strip()
+        name = inquirer.text(message="Nom du personnage :").execute().strip()
         if not name:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Nom invalide.")
@@ -39,15 +36,17 @@ class CreerPersonnageVue(VueAbstraite):
             created_by=uid
         ))
 
-        # On sélectionne ce nouveau personnage pour la session
         s.personnage = {
             "id_personnageIA": perso.id_personnageIA,
             "name": perso.name,
             "system_prompt": perso.system_prompt,
         }
 
+        default_title = f"Chat avec {perso.name}"
+        titre = inquirer.text(message="Titre de la conversation :", default=default_title).execute().strip()
+        s.conversation_title = titre or default_title
+
         # Première question
-        from InquirerPy import inquirer as iq
-        texte = iq.text(message=f"[{perso.name}] Première question ?").execute()
+        texte = inquirer.text(message=f"[{perso.name}] Première question ?").execute()
         from view.reponse_ia_vue import ReponseIAVue
         return ReponseIAVue(texte)

@@ -19,7 +19,7 @@ class MenuUtilisateurVue(VueAbstraite):
                 choices=[
                     "Démarrer un chat",
                     "Historique",
-                    "Statistiques"
+                    "Statistiques",
                     "Paramètres",
                     "Se déconnecter",
                 ],
