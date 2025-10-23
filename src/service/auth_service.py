@@ -20,18 +20,22 @@ class AuthService:
     def find_user(self, mail: str) -> Optional[Utilisateur]:
         return self.dao.find_by_mail(mail)
 
-    def check_password(self, user: Utilisateur, mdp: str) -> bool:
-        return user.mdp_hash == hash_pwd(mdp)
+    def check_password(self, user, mdp: str) -> bool:
+        # important: utiliser le même email normalisé que lors de l'insertion
+        mail_norm = (user.mail or "").strip().lower()
+        return user.mdp_hash == hash_pwd(mdp, mail_norm)
+
 
     def inscrire(self, prenom: str, nom: str, mail: str, mdp: str, naiss: date) -> Utilisateur:
         if "@" not in mail:
             raise ValueError("Email invalide")
         if self.dao.exists_mail(mail):
             raise ValueError("Un compte existe déjà avec cet email")
+        mail_norm = mail.strip().lower()
         u = Utilisateur(
             id_utilisateur=None,
             prenom=prenom, nom=nom, mail=mail,
-            mdp_hash=hash_pwd(mdp),
+            mdp_hash = hash_pwd(mdp, mail_norm),
             naiss=naiss,
         )
         return self.dao.create(u)
