@@ -55,11 +55,10 @@ PERSONNAGES = [
 def insert_users(conn):
     inserted = 0
     with conn.cursor() as cur:
-        # Si tu as déjà le search_path via DBConnection(options), tu peux commenter la ligne suivante
         cur.execute("SET search_path TO projetgpt;")
         for prenom, nom, mail, mdp, naiss in USERS:
             mail_norm = (mail or "").strip().lower()
-            mdp_hache = hash_pwd(mdp, mail_norm)  # même sel que côté login !
+            mdp_hache = hash_pwd(mdp, mail_norm)  # même sel que côté login
             cur.execute(
                 """
                 INSERT INTO utilisateur (prenom, nom, mail, mdp, naiss)

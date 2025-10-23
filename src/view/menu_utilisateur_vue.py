@@ -18,8 +18,9 @@ class MenuUtilisateurVue(VueAbstraite):
                 message="Faites votre choix : ",
                 choices=[
                     "Démarrer un chat",
-                    "Reprendre un chat",
-                    "Infos de session",
+                    "Historique",
+                    "Statistiques"
+                    "Paramètres",
                     "Se déconnecter",
                 ],
             ).execute()
@@ -29,8 +30,19 @@ class MenuUtilisateurVue(VueAbstraite):
                 from view.accueil_vue import AccueilVue
                 return AccueilVue("Déconnecté. À bientôt !")
 
-            if choix == "Infos de session":
-                return MenuUtilisateurVue(Session().afficher())
+            if choix == "Paramètres":
+                pass
+                # from view.parametres_vue import ParametresVue
+                # return ParametresVue
+            
+            if choix == "Historique":
+                from view.historique_vue import HistoriqueVue
+                return HistoriqueVue()
+
+            if choix == "Statistiques":
+                pass
+                # from view.statistiques_vue import StatistiquesVue
+                # return HistoriqueVue()
 
             if choix == "Démarrer un chat":
                 sous = inquirer.select(
@@ -53,7 +65,9 @@ class MenuUtilisateurVue(VueAbstraite):
                 return MenuUtilisateurVue("Opération annulée.")
 
             if choix == "Reprendre un chat":
-                return MenuUtilisateurVue("Reprendre un chat est indisponible pour le moment.")
+                from view.reprendre_chat_vue import ReprendreChatVue
+                return ReprendreChatVue()
+
 
             return MenuUtilisateurVue()
 
