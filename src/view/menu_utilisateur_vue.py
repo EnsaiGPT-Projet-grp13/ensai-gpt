@@ -17,7 +17,8 @@ class MenuUtilisateurVue(VueAbstraite):
             choix = inquirer.select(
                 message="Faites votre choix : ",
                 choices=[
-                    "Démarrer un chat",
+                    "Démarrer une conversation",
+                    "Joindre une conversation",
                     "Historique",
                     "Statistiques",
                     "Paramètres",
@@ -34,17 +35,18 @@ class MenuUtilisateurVue(VueAbstraite):
                 pass
                 # from view.parametres_vue import ParametresVue
                 # return ParametresVue
-            
+
             if choix == "Historique":
-                from view.historique_vue import HistoriqueVue
-                return HistoriqueVue()
+                pass
+                # from view.historique_vue import HistoriqueVue
+                # return HistoriqueVue()
 
             if choix == "Statistiques":
                 pass
                 # from view.statistiques_vue import StatistiquesVue
-                # return HistoriqueVue()
+                # return StatistiquesVue()
 
-            if choix == "Démarrer un chat":
+            if choix == "Démarrer une conversation":
                 sous = inquirer.select(
                     message="Choisir une option :",
                     choices=[
@@ -64,10 +66,9 @@ class MenuUtilisateurVue(VueAbstraite):
 
                 return MenuUtilisateurVue("Opération annulée.")
 
-            if choix == "Reprendre un chat":
-                from view.reprendre_chat_vue import ReprendreChatVue
-                return ReprendreChatVue()
-
+            if choix == "Joindre une conversation":
+                from view.joindre_conversation_vue import JoindreConversationVue
+                return JoindreConversationVue()
 
             return MenuUtilisateurVue()
 

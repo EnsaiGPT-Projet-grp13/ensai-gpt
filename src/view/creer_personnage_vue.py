@@ -46,7 +46,12 @@ class CreerPersonnageVue(VueAbstraite):
         titre = inquirer.text(message="Titre de la conversation :", default=default_title).execute().strip()
         s.conversation_title = titre or default_title
 
-        # Première question
+        mode = inquirer.select(
+            message="Voulez-vous un chat privé ou collaboratif ?",
+            choices=["Privé", "Collaboratif"],
+        ).execute()
+        s.conversation_is_collab = (mode == "Collaboratif")
+
         texte = inquirer.text(message=f"[{perso.name}] Première question ?").execute()
         from view.reponse_ia_vue import ReponseIAVue
         return ReponseIAVue(texte)

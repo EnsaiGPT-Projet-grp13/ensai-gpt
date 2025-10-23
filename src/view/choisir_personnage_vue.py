@@ -16,7 +16,6 @@ class ChoisirPersonnageVue(VueAbstraite):
         uid = s.utilisateur.get("id_utilisateur")
         dao = PersonnageIADao()
         persos = dao.list_for_user(uid)
-
         if not persos:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
@@ -35,6 +34,12 @@ class ChoisirPersonnageVue(VueAbstraite):
         default_title = f"Chat avec {perso.name}"
         titre = inquirer.text(message="Titre de la conversation :", default=default_title).execute().strip()
         s.conversation_title = titre or default_title
+
+        mode = inquirer.select(
+            message="Voulez-vous un chat privé ou collaboratif ?",
+            choices=["Privé", "Collaboratif"],
+        ).execute()
+        s.conversation_is_collab = (mode == "Collaboratif")
 
         # Première question
         texte = inquirer.text(message=f"[{perso.name}] Première question ?").execute()
