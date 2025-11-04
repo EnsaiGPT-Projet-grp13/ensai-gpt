@@ -36,9 +36,8 @@ class MenuUtilisateurVue(VueAbstraite):
                 return ParametresVue().choisir_menu()
 
             if choix == "Historique":
-                pass
-                # from view.historique_vue import HistoriqueVue
-                # return HistoriqueVue()
+                from view.historique_vue import HistoriqueVue
+                return HistoriqueVue()
 
             if choix == "Statistiques":
                 pass

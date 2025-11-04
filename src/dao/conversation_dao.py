@@ -101,8 +101,8 @@ class ConversationDao:
             )
         self.conn.commit()
 
-    def list_by_user(self, uid: int, limit: int = 25) -> List[Conversation]:
-        """Conversations DONT l’utilisateur est propriétaire (pour compat historique simple)."""
+    def list_by_user(self, id_utilisateur: int, limite: int = 25) -> List[Conversation]:
+        """Renvoie les conversations dont l’utilisateur est propriétaire."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
@@ -123,76 +123,54 @@ class ConversationDao:
                 ORDER BY updated_at DESC
                 LIMIT %s
                 """,
-                (uid, limit),
+                (id_utilisateur, limite),
             )
             rows = cur.fetchall() or []
         return [Conversation(**r) for r in rows]
 
-    def list_accessible_by_user(self, uid: int, limit: int = 50) -> List[Conversation]:
-        """Conversations accessibles = propriétaire OU membre conv_utilisateur."""
+    def list_accessible_by_user(self, id_utilisateur: int, limite: int = 50) -> List[Conversation]:
+        """Renvoie les conversations accessibles, à la fois propriétaire ou simple membre."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
                 SELECT
-                  c.id_conversation AS "id_conversation",
-                  c.id_proprio,
-                  c.id_personnageIA AS "id_personnageIA",
-                  c.titre,
-                  c.created_at,
-                  c.updated_at,
-                  c.temperature,
-                  c.top_p,
-                  c.max_tokens,
-                  c.is_collab,
-                  c.token_collab
+                  *
                 FROM {SCHEMA}.conversation c
                 WHERE c.id_proprio = %s
                 UNION
                 SELECT
-                  c.id_conversation AS "id_conversation",
-                  c.id_proprio,
-                  c.id_personnageIA AS "id_personnageIA",
-                  c.titre,
-                  c.created_at,
-                  c.updated_at,
-                  c.temperature,
-                  c.top_p,
-                  c.max_tokens,
-                  c.is_collab,
-                  c.token_collab
+                  *
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
                 WHERE cu.id_utilisateur = %s
                 ORDER BY updated_at DESC
                 LIMIT %s
                 """,
-                (uid, uid, limit),
+                (id_utilisateur, id_utilisateur, limite),
             )
             rows = cur.fetchall() or []
         return [Conversation(**r) for r in rows]
 
-    def list_summaries_by_user(self, uid: int, limit: int = 25) -> List[Dict[str, Any]]:
-        """Résumé propriétaire uniquement (titre + nom perso)."""
+    def list_summaries_by_user(self, id_utilisateur: int, limite: int = 25) -> List[Dict[str, Any]]:
+        """Renvoie un résumé des conversations (titre + nom personnageIA) dont l’utilisateur est propriétaire."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
                 SELECT
                   c.titre,
-                  p.name AS "personnage_name",
-                  c.created_at,
-                  c.updated_at
+                  p.name AS "personnageIA_name"
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
                 WHERE c.id_proprio = %s
                 ORDER BY c.updated_at DESC
                 LIMIT %s
                 """,
-                (uid, limit),
+                (id_utilisateur, limite),
             )
             return cur.fetchall() or []
 
-    def list_summaries_accessible(self, uid: int, limit: int = 50) -> List[Dict[str, Any]]:
-        """Résumé propriétaire + membres (sans ID conv)."""
+    def list_summaries_accessible(self, id_utilisateur: int, limite: int = 50) -> List[Dict[str, Any]]:
+        """Renvoie un résumé des conversations (titre + nom personnageIA) dont l’utilisateur a l'accès."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
@@ -217,7 +195,7 @@ class ConversationDao:
                 ORDER BY updated_at DESC
                 LIMIT %s
                 """,
-                (uid, uid, limit),
+                (id_utilisateur, id_utilisateur, limite),
             )
             return cur.fetchall() or []
 
