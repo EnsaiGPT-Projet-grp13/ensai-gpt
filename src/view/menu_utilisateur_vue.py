@@ -33,8 +33,8 @@ class MenuUtilisateurVue(VueAbstraite):
 
             if choix == "Paramètres":
                 pass
-                # from view.parametres_vue import ParametresVue
-                # return ParametresVue
+                from view.parametres_vue import ParametresVue
+                return ParametresVue
 
             if choix == "Historique":
                 pass

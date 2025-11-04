@@ -31,3 +31,13 @@ class UtilisateurDao:
             u.id_utilisateur = cur.fetchone()["id_utilisateur"]
         conn.commit()
         return u
+    def update_mot_de_passe(self, id_utilisateur: int, nouveau_hash: str) -> None:
+        """Met à jour le mot de passe d'un utilisateur."""
+        conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE utilisateur
+                SET mdp = %s
+                WHERE id_utilisateur = %s
+            """, (nouveau_hash, id_utilisateur))
+        conn.commit()

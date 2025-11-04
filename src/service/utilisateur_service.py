@@ -114,3 +114,27 @@ class UtilisateurService:
     def mail_deja_utilise(self, mail: str) -> bool:
         """Retourne True si un utilisateur existe déjà avec ce mail."""
         return self.dao.exists_mail(mail)
+    @log
+    def changer_mot_de_passe(self, id_utilisateur: int, ancien_mdp: str, nouveau_mdp: str) -> bool:
+        """
+        Change le mot de passe d'un utilisateur :
+        - Vérifie que l'ancien mot de passe est correct.
+        - Hash le nouveau mot de passe et met à jour la BDD.
+        Retourne True si tout s'est bien passé, False sinon.
+        """
+        # Récupère l'utilisateur
+        u = self.dao.find_by_id(id_utilisateur)
+        if not u:
+            return False
+
+        # Vérifie l'ancien mot de passe
+        if u.mdp_hash != hash_password(ancien_mdp):
+            return False
+
+        # Hash le nouveau mot de passe
+        nouveau_hash = hash_password(nouveau_mdp)
+
+        # Mise à jour directe en base (via ta méthode ajoutée dans le DAO)
+        self.dao.update_mot_de_passe(id_utilisateur, nouveau_hash)
+        return True
+
