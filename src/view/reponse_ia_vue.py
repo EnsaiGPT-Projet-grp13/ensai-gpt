@@ -38,7 +38,7 @@ class ReponseIAVue(VueAbstraite):
             print("====================================")
             print("  Conversation COLLABORATIVE")
             print(f"  Token : {s.conversation_token}")
-            print("  Partagez ce token pour rejoindre.")
+            print("  Partagez ce token pour inviter d'autres utilisateurs à rejoindre cette conversation collaborative.")
             print("====================================\n")
 
     def choisir_menu(self):

@@ -25,7 +25,6 @@ class AccueilVue(VueAbstraite):
                 "Se connecter",
                 "Créer un compte",
                 "Ré-initialiser la base de données",
-                "Infos de session",
                 "Quitter",
             ],
         ).execute()
@@ -43,9 +42,6 @@ class AccueilVue(VueAbstraite):
                 # ➜ Router vers la vue d'inscription (DB)
                 from view.inscription_vue import InscriptionVue  # import local
                 return InscriptionVue()
-
-            case "Infos de session":
-                return AccueilVue(Session().afficher())
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()

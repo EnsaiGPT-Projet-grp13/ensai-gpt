@@ -11,7 +11,10 @@ class ChoisirPersonnageVue(VueAbstraite):
         if self.message:
             print(self.message)
 
+
+
     def choisir_menu(self):
+
         s = Session()
         uid = s.utilisateur.get("id_utilisateur")
         dao = PersonnageIADao()
@@ -35,11 +38,19 @@ class ChoisirPersonnageVue(VueAbstraite):
         titre = inquirer.text(message="Titre de la conversation :", default=default_title).execute().strip()
         s.conversation_title = titre or default_title
 
+        import secrets  # pour générer le token
+
         mode = inquirer.select(
             message="Voulez-vous un chat privé ou collaboratif ?",
             choices=["Privé", "Collaboratif"],
         ).execute()
+
         s.conversation_is_collab = (mode == "Collaboratif")
+
+        if s.conversation_is_collab:
+            s.conversation_token = secrets.token_urlsafe(16)
+        else:
+            s.conversation_token = None
 
         # Première question
         texte = inquirer.text(message=f"[{perso.name}] Première question ?").execute()
