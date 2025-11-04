@@ -4,7 +4,7 @@ from view.vue_abstraite import VueAbstraite
 from view.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.utilisateur_service import UtilisateurService
-from dao.personnageIA_dao import PersonnageIADao  # ← si ce n’est pas déjà importé ailleurs
+from src.dao.personnage_ia_dao import PersonnageIADao
 
 
 class ParametresVue(VueAbstraite):
@@ -32,7 +32,17 @@ class ParametresVue(VueAbstraite):
                 return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
 
             choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
-            label = inquirer.select(message="Choisir un personnage :", choices=choices).execute()
+            choices.append("Annuler")  # ✅ ajoute une option d’annulation
+
+            label = inquirer.select(
+                message="Choisir un personnage :",
+                choices=choices
+            ).execute()
+
+            # Si l'utilisateur choisit "Annuler", on retourne simplement au menu principal
+            if label == "Annuler":
+                return MenuUtilisateurVue("Retour au menu des paramètres.")
+
             pid = int(label.split("#")[-1].rstrip(")"))
             perso = next(p for p in persos if p.id_personnageIA == pid)
 

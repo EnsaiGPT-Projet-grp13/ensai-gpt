@@ -32,9 +32,8 @@ class MenuUtilisateurVue(VueAbstraite):
                 return AccueilVue("Déconnecté. À bientôt !")
 
             if choix == "Paramètres":
-                pass
                 from view.parametres_vue import ParametresVue
-                return ParametresVue
+                return ParametresVue().choisir_menu()
 
             if choix == "Historique":
                 pass
