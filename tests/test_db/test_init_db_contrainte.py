@@ -65,7 +65,7 @@ class TestContraintesDB():
 
     ### Tests des ON DELETE CASCADE sur les clés étrangères
     def test_fk_on_delete_cascade(self):
-        '''Vérification que ci l'on supprime un utlisateur ses conversations et sessions sont aussi supprimés'''
+        '''Vérification que si l'on supprime un utlisateur ses conversations et sessions sont aussi supprimés'''
         # Création de l'utilisateur et d'une conversation et session
         self.cur.execute(f"""
             INSERT INTO {self.schema}.utilisateur (prenom, nom, mail, mdp) VALUES ('Clara','C','clara.C@mail.com', 'mdp') RETURNING id_utilisateur;
@@ -123,7 +123,7 @@ class TestContraintesDB():
         """, (nouveau_mail, id_utilisateur))
         deuxieme_temps = self.cur.fetchone()[0]
 
-        assert deuxieme_temps > premier_temps, "Trigger 'set_updated_at' non exécuté sur utilisateur."
+        assert deuxieme_temps > premier_temps, "Le trigger 'set_updated_at' n'a pas été exécuté sur utilisateur."
 
 
     def test_trigger_updates_timestamp_conversation(self):
@@ -163,7 +163,7 @@ class TestContraintesDB():
         """, (id_conversation,))
         deuxieme_temps = self.cur.fetchone()[0]
 
-        assert deuxieme_temps > premier_temps, "Trigger 'set_updated_at' non exécuté sur conversation."
+        assert deuxieme_temps > premier_temps, "Le trigger 'set_updated_at' n'a pas été exécuté sur conversation."
 
 
     def test_trigger_updates_timestamp_personnageIA(self):
@@ -187,7 +187,7 @@ class TestContraintesDB():
         """, (id_personnageIA,))
         deuxieme_temps = self.cur.fetchone()[0]
 
-        assert deuxieme_temps > premier_temps, "Trigger 'set_updated_at' non exécuté sur personnageIA."
+        assert deuxieme_temps > premier_temps, "Le trigger 'set_updated_at' n'a pas été exécuté sur personnageIA."
 
     def test_default_timestamps(self):
         """Vérification que created_at et updated_at de la table utilisateur 
@@ -200,3 +200,4 @@ class TestContraintesDB():
         created_at, updated_at = self.cur.fetchone()
         assert created_at and updated_at, "Les champs created_at / updated_at n'ont pas été remplis automatiquement."
         assert isinstance(created_at, datetime.datetime)
+        assert isinstance(updated_at,datetime.datatime)
