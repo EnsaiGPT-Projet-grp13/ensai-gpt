@@ -70,21 +70,21 @@ class ConversationService:
     def get(self, cid: int) -> Optional[Conversation]:
         return self.conv_dao.find_by_id(cid)
 
-    def list_for_user(self, uid: int, limit: int = 25):
-        """Conversations dont l'utilisateur est **propriétaire**."""
-        return self.conv_dao.list_by_user(uid, limit=limit)
+    def liste_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25):
+        """Liste des conversations dont l'utilisateur est propriétaire."""
+        return self.conv_dao.liste_proprietaire_pour_utilisateur(id_utilisateur, limite=limite)
 
-    def list_accessible_for_user(self, uid: int, limit: int = 50):
-        """Conversations **accessibles** (proprio + celles rejointes)."""
-        return self.conv_dao.list_accessible_by_user(uid, limit=limit)
+    def liste_accessible_pour_utilisateur(self, id_utilisateur: int, limite: int = 50):
+        """Liste des conversations accessibles."""
+        return self.conv_dao.liste_accessible_pour_utilisateur(id_utilisateur, limite=limite)
 
-    def list_summaries_for_user(self, uid: int, limit: int = 25):
-        """Résumés propriétaire uniquement (titre + nom personnage)."""
-        return self.conv_dao.list_summaries_by_user(uid, limit=limit)
+    def liste_resumee_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25):
+        """Liste résumée (titre + nom personnage) des conversations dont l'utilisateur est propriétaire."""
+        return self.conv_dao.liste_resumee_proprietaire_pour_utilisateur(id_utilisateur, limite=limite)
 
-    def list_summaries_accessible_for_user(self, uid: int, limit: int = 50):
-        """Résumés accessibles (titre + nom personnage)."""
-        return self.conv_dao.list_summaries_accessible(uid, limit=limit)
+    def liste_resumee_accessible_pour_utilisateur(self, id_utilisateur: int, limite: int = 50):
+        """Liste résumée (titre + nom personnage) des conversations auxquelles l'utilisateur a accès."""
+        return self.conv_dao.liste_resumee_accessible_pour_utilisateur(id_utilisateur, limite=limite)
 
     # -------------------------------------------------------------------------
     # Historique / payload

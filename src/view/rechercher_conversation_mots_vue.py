@@ -1,0 +1,19 @@
+from InquirerPy import inquirer
+
+from view.vue_abstraite import VueAbstraite
+
+
+
+class RechercheConversationMotsVue(VueAbstraite):
+    """Vue des options au sujet de l'historique de l'application"""
+
+    def __init__(self, message: str = "") -> None:
+        self.message = message
+
+    def afficher(self):
+        if self.message:
+            print(self.message)
+
+    def choisir_menu(self):
+        """Insertion des mots recherchés"""
+        print("\n" + "-" * 50 + "\nHistorique\n" + "-" * 50 + "\n")
