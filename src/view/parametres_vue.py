@@ -1,7 +1,7 @@
 import traceback
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
-from view.session import Session
+from objects.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.utilisateur_service import UtilisateurService
 from src.dao.personnage_ia_dao import PersonnageIADao

@@ -1,7 +1,7 @@
 import traceback
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
-from view.session import Session
+from objects.session import Session
 
 class MenuUtilisateurVue(VueAbstraite):
     def __init__(self, message: str = "") -> None:
