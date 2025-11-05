@@ -87,15 +87,19 @@ class ConversationService:
         return self.conv_dao.find_by_id(cid)
 
     def list_for_user(self, uid: int, limit: int = 25):
+        """Conversations dont l'utilisateur est **propriétaire**."""
         return self.conv_dao.list_by_user(uid, limit=limit)
 
     def list_accessible_for_user(self, uid: int, limit: int = 50):
+        """Conversations **accessibles** (proprio + celles rejointes)."""
         return self.conv_dao.list_accessible_by_user(uid, limit=limit)
 
     def list_summaries_for_user(self, uid: int, limit: int = 25):
+        """Résumés propriétaire uniquement (titre + nom personnage)."""
         return self.conv_dao.list_summaries_by_user(uid, limit=limit)
 
     def list_summaries_accessible_for_user(self, uid: int, limit: int = 50):
+        """Résumés accessibles (titre + nom personnage)."""
         return self.conv_dao.list_summaries_accessible(uid, limit=limit)
 
     # --------------------------------------------------------------------- #

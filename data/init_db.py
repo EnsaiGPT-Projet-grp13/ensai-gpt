@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature      REAL,
     top_p            REAL,
-    max_tokens       INTEGER NOT NULL DEFAULT 150    
+    max_tokens       INTEGER NOT NULL DEFAULT 300    
 );
 
 -- Personna IA 
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS conversation (
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature           REAL,
     top_p                 REAL,
-    max_tokens            INTEGER NOT NULL DEFAULT 150,
+    max_tokens            INTEGER NOT NULL DEFAULT 300,
     is_collab             BOOLEAN,
     token_collab          VARCHAR(16)
 );
