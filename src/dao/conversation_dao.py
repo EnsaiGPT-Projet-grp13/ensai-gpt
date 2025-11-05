@@ -201,7 +201,7 @@ class ConversationDao:
             )
             return cur.fetchall() or []
     
-    def recherche_mots_titre (self, id_utilisateur: int, mots: str, limite: int = 50) -> List[Dict[str, Any]]:
+    def recherche_mots_titre(self, id_utilisateur: int, mots: str, limite: int = 50) -> List[Dict[str, Any]]:
         """Recherche une suite de caractères dans le titre des conversations d'un utilisateur et renvoie les conversations associées"""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
@@ -213,11 +213,11 @@ class ConversationDao:
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
                 WHERE cu.id_utilisateur = %s
-                WHERE c.titre LIKE "%%s%"
+                    AND c.titre LIKE %s
                 ORDER BY updated_at DESC
                 LIMIT %s
                 """,
-                (id_utilisateur, mots, limite),
+                (id_utilisateur, f'%{mots}%', limite),
             )
             return cur.fetchall() or []
 
