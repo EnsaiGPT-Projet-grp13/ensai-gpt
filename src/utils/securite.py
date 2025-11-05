@@ -12,6 +12,3 @@ def hash_password(pwd: str, sel: str | None = None) -> str:
     if sel:
         return _sha256(pwd + ":" + sel)
     return _sha256(pwd)
-
-# alias compat si le reste du code appelle encore hash_pwd
-hash_pwd = hash_password

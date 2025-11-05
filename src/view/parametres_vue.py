@@ -70,15 +70,15 @@ class ParametresVue(VueAbstraite):
             choix = inquirer.select(
                 message="Faites votre choix : ",
                 choices=[
-                    "Gérer paramètres utilisateur",
-                    "Gérer paramètres personnages IA"
+                    "Paramètres utilisateur",
+                    "Paramètres personnages IA"
                 ],
             ).execute()
 
             # -----------------------------
             # Paramètres utilisateur
             # -----------------------------
-            if choix == "Gérer paramètres utilisateur":
+            if choix == "Paramètres utilisateur":
                 sous = inquirer.select(
                     message="Choisir une option :",
                     choices=[
@@ -98,7 +98,7 @@ class ParametresVue(VueAbstraite):
             # -----------------------------
             # Paramètres Personnages IA
             # -----------------------------
-            if choix == "Gérer paramètres personnages IA":
+            if choix == "aramètres personnages IA":
                 return self.choisir_persoIA()
 
             return MenuUtilisateurVue()
