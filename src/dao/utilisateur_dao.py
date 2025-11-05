@@ -41,3 +41,13 @@ class UtilisateurDao:
                 WHERE id_utilisateur = %s
             """, (nouveau_hash, id_utilisateur))
         conn.commit()
+
+    def delete(self, id_utilisateur: int) -> None:
+        """Supprime un utilisateur de la base de données."""
+        conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
+        with conn.cursor() as cur:
+            cur.execute("""
+                DELETE FROM utilisateur
+                WHERE id_utilisateur = %s
+            """, (id_utilisateur,))
+        conn.commit()

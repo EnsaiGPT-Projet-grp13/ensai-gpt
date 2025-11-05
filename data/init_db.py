@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS personnageIA (
     id_personnageIA SERIAL PRIMARY KEY,
     name           VARCHAR(100) NOT NULL,
     system_prompt  TEXT NOT NULL,
-    created_by     INTEGER REFERENCES utilisateur(id_utilisateur),
+    created_by     INTEGER REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
