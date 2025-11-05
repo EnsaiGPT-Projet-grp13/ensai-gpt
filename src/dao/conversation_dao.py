@@ -159,6 +159,7 @@ class ConversationDao:
                 SELECT
                   c.id_conversation
                   c.titre,
+                  c.updated_at,
                   p.name AS "personnageIA_name"
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
@@ -176,16 +177,18 @@ class ConversationDao:
             cur.execute(
                 f"""
                 SELECT
-                  c.id_conversation
+                  c.id_conversation,
                   c.titre,
+                  c.updated_at,
                   p.name AS "personnage_name"
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
                 WHERE c.id_proprio = %s
                 UNION
                 SELECT
-                  c.id_conversation
+                  c.id_conversation,
                   c.titre,
+                  c.updated_at,
                   p.name AS "personnage_name"
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA

@@ -16,4 +16,5 @@ class RechercheConversationTitreVue(VueAbstraite):
 
     def choisir_menu(self):
         """Insertion du titre recherché"""
-        print("\n" + "-" * 50 + "\nHistorique\n" + "-" * 50 + "\n")
+        print("\n" + "-" * 50 + "\nRecherhce conversation titre\n" + "-" * 50 + "\n")
+        
