@@ -1,7 +1,7 @@
 import traceback
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
-from view.session import Session
+from objects.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.utilisateur_service import UtilisateurService
 from src.dao.personnage_ia_dao import PersonnageIADao
@@ -70,15 +70,15 @@ class ParametresVue(VueAbstraite):
             choix = inquirer.select(
                 message="Faites votre choix : ",
                 choices=[
-                    "Gérer paramètres utilisateur",
-                    "Gérer paramètres personnages IA"
+                    "Paramètres utilisateur",
+                    "Paramètres personnages IA"
                 ],
             ).execute()
 
             # -----------------------------
             # Paramètres utilisateur
             # -----------------------------
-            if choix == "Gérer paramètres utilisateur":
+            if choix == "Paramètres utilisateur":
                 sous = inquirer.select(
                     message="Choisir une option :",
                     choices=[
@@ -98,7 +98,7 @@ class ParametresVue(VueAbstraite):
             # -----------------------------
             # Paramètres Personnages IA
             # -----------------------------
-            if choix == "Gérer paramètres personnages IA":
+            if choix == "aramètres personnages IA":
                 return self.choisir_persoIA()
 
             return MenuUtilisateurVue()

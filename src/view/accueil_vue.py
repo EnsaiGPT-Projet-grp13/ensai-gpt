@@ -1,7 +1,7 @@
 from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite
-from view.session import Session
+from objects.session import Session
 from utils.reset_database import ResetDatabase
 
 
@@ -34,12 +34,10 @@ class AccueilVue(VueAbstraite):
                 return  # fin
 
             case "Se connecter":
-                # ➜ Router vers la vue de connexion (DB)
                 from view.connexion_vue import ConnexionVue  # import local
                 return ConnexionVue()
 
             case "Créer un compte":
-                # ➜ Router vers la vue d'inscription (DB)
                 from view.inscription_vue import InscriptionVue  # import local
                 return InscriptionVue()
 

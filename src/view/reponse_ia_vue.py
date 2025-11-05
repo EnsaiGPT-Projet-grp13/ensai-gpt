@@ -1,10 +1,11 @@
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
-from view.session import Session
-from src.service.conversation_service import ConversationService
+from objects.session import Session
+from service.conversation_service import ConversationService
 import traceback
 
 class ReponseIAVue(VueAbstraite):
+
     def __init__(self, first_user_message: str | None = None):
         super().__init__(message="")
         self._first = (first_user_message or "").strip()
@@ -95,3 +96,6 @@ class ReponseIAVue(VueAbstraite):
             print(traceback.format_exc())
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Erreur dans le chat (voir terminal).")
+
+    def afficher(self):
+        return self.choisir_menu()

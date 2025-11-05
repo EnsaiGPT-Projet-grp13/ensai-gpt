@@ -1,6 +1,6 @@
 # src/service/message_service.py
 from __future__ import annotations
-from src.utils.ia_client import call_ensai_gpt
+from utils. import api call_ensai_gpt
 
 class ChatService:
     """
