@@ -13,6 +13,18 @@ class UtilisateurDao:
             """, (mail,))
             row = cur.fetchone()
         return Utilisateur(**row) if row else None
+    
+        def find_by_id(self, mail: str) -> Optional[Utilisateur]:
+        conn = DBConnection().connection
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
+                FROM utilisateur
+                WHERE mail = %s
+            """, (mail,))
+            row = cur.fetchone()
+        return Utilisateur(**row) if row else None
+
 
     def exists_mail(self, mail: str) -> bool:
         conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
@@ -31,6 +43,7 @@ class UtilisateurDao:
             u.id_utilisateur = cur.fetchone()["id_utilisateur"]
         conn.commit()
         return u
+
     def update_mot_de_passe(self, id_utilisateur: int, nouveau_hash: str) -> None:
         """Met à jour le mot de passe d'un utilisateur."""
         conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
