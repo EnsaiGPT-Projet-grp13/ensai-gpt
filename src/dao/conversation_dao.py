@@ -209,15 +209,27 @@ class ConversationDao:
                 SELECT
                   c.id_conversation,
                   c.titre,
-                  c.updated_at
+                  c.updated_at,
+                  p.name AS "personnage_name"
                 FROM {SCHEMA}.conversation c
+                JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
+                WHERE c.id_proprio = %s
+                    AND c.titre LIKE %s
+                UNION
+                SELECT
+                  c.id_conversation,
+                  c.titre,
+                  c.updated_at,
+                  p.name AS "personnage_name"
+                FROM {SCHEMA}.conversation c
+                JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
                 JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
                 WHERE cu.id_utilisateur = %s
                     AND c.titre LIKE %s
                 ORDER BY updated_at DESC
                 LIMIT %s
                 """,
-                (id_utilisateur, f'%{mots}%', limite),
+                (id_utilisateur, f'%{mots}%', id_utilisateur, f'%{mots}%', limite),
             )
             return cur.fetchall() or []
 

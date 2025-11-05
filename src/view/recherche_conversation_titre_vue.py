@@ -1,7 +1,7 @@
 from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite
-from view.session import Session
+from objects.session import Session
 from src.service.conversation_service import ConversationService
 
 
@@ -18,7 +18,7 @@ class RechercheConversationTitreVue(VueAbstraite):
 
     def choisir_menu(self):
         """Insertion du titre recherché"""
-        print("\n" + "-" * 50 + "\nRecherhce conversation titre\n" + "-" * 50 + "\n")
+        print("\n" + "-" * 50 + "\nRecherche conversation titre\n" + "-" * 50 + "\n")
         s = Session()
         id_utilisateur = s.utilisateur.get("id_utilisateur")
         service = ConversationService()
@@ -26,8 +26,12 @@ class RechercheConversationTitreVue(VueAbstraite):
         if not conversations:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
+
         mots = inquirer.text(message="Quel titre recherchez vous ? :").execute().strip().lower()
-        listes_titres = ConversationService.recherche_mots_titre(id_utilisateur, mots)
+        listes_titres = service.recherche_mots_titre(id_utilisateur, mots)
+        if not listes_titres:
+            from view.historique_vue import HistoriqueVue
+            return HistoriqueVue("Aucune conversation ne contient ces mots")
 
         choix = [f"{c.get('titre')} avec {c.get('personnage_name')} (id_conversation#{c.get('id_conversation')})" for c in listes_titres] + ["Retour"]
         label = inquirer.select(message="Quelle conversation voulez-vous ?", choices=choix).execute()

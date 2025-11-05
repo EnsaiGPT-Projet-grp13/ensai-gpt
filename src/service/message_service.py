@@ -17,3 +17,7 @@ class ChatService:
         answer = call_ensai_gpt(self.history)
         self.history.append({"role": "assistant", "content": answer})
         return answer
+
+    def recherche_mots_message(self, id_utilisateur: int, mots: str, limite: int = 5):
+        """Renvoie la liste des messages dans lesquels mots est présent"""
+        return self.conv_dao.recherche_mots_message(id_utilisateur, mots, limite=limite)

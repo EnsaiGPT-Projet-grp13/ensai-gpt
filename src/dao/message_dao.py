@@ -47,3 +47,24 @@ class MessageDao:
             )
             rows = cur.fetchall() or []
         return [Message(**r) for r in rows]
+
+    def recherche_mots_message(self, id_utilisateur: int, mots: str, limite: int = 5) -> List[Dict[str, Any]]:
+        """Recherche une suite de caractères dans les messages d'un utilisateur et renvoie les messages associés"""
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                f"""
+                SELECT
+                  m.id_message,
+                  m.id_conversation,
+                  m.expediteur,
+                  m.contenu,
+                  m.id_utilisateur,
+                  m.create_at
+                FROM {SCHEMA}.message m
+                WHERE m.id_utilisateur = %s
+                ORDER BY create_at DESC
+                LIMIT %s
+                """,
+                (id_utilisateur, limite),
+            )
+            return cur.fetchall() or []
