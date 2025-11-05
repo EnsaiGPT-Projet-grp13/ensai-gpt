@@ -40,9 +40,8 @@ class MenuUtilisateurVue(VueAbstraite):
                 return HistoriqueVue()
 
             if choix == "Statistiques":
-                pass
-                # from view.statistiques_vue import StatistiquesVue
-                # return StatistiquesVue()
+                from view.statistiques_vue import StatistiquesVue
+                return StatistiquesVue().choisir_menu()
 
             if choix == "Démarrer une conversation":
                 sous = inquirer.select(
