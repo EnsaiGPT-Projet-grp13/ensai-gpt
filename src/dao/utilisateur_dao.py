@@ -3,8 +3,9 @@ from objects.utilisateur import Utilisateur
 from dao.db import DBConnection
 
 class UtilisateurDao:
+    
     def find_by_mail(self, mail: str) -> Optional[Utilisateur]:
-        conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
+        conn = DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
@@ -15,6 +16,7 @@ class UtilisateurDao:
         return Utilisateur(**row) if row else None
 
     def find_by_id(self, id_utilisateur: int) -> Optional[Utilisateur]:
+<<<<<<< HEAD
         conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("""
@@ -24,15 +26,29 @@ class UtilisateurDao:
             """, (id_utilisateur,))
             row = cur.fetchone()
         return Utilisateur(**row) if row else None
+=======
+        """Trouver un utilisateur par son ID."""
+        with DBConnection().connection as conn:  # Connexion à la base de données
+            with conn.cursor() as cur:  # Curseur pour exécuter la requête
+                cur.execute("""
+                    SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
+                    FROM utilisateur
+                    WHERE id_utilisateur = %s
+                """, (id_utilisateur,))
+                row = cur.fetchone()
+                
+        # Si un utilisateur est trouvé, on retourne un objet Utilisateur
+        return Utilisateur(**row) if row else None   
+>>>>>>> c43230d355247244636d6f61b131821d31723386
 
     def exists_mail(self, mail: str) -> bool:
-        conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
+        conn = DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM utilisateur WHERE mail = %s", (mail,))
             return cur.fetchone() is not None
 
     def create(self, u: Utilisateur) -> Utilisateur:
-        conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
+        conn = DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO utilisateur (prenom, nom, mail, mdp, naiss)
@@ -42,9 +58,10 @@ class UtilisateurDao:
             u.id_utilisateur = cur.fetchone()["id_utilisateur"]
         conn.commit()
         return u
+        
     def update_mot_de_passe(self, id_utilisateur: int, nouveau_hash: str) -> None:
         """Met à jour le mot de passe d'un utilisateur."""
-        conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
+        conn = DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("""
                 UPDATE utilisateur

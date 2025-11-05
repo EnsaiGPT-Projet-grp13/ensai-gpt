@@ -5,7 +5,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.dao.db import DBConnection
-from src.utils.securite import hash_pwd
+from src.utils.securite import hash_password
 
 USERS = [
     ("John", "Beau",   "john.beau@gmail.com",            "JohnBeau5", "2000-01-01"),
@@ -58,7 +58,7 @@ def insert_users(conn):
         cur.execute("SET search_path TO projetgpt;")
         for prenom, nom, mail, mdp, naiss in USERS:
             mail_norm = (mail or "").strip().lower()
-            mdp_hache = hash_pwd(mdp, mail_norm)  # même sel que côté login
+            mdp_hache = hash_password(mdp, mail_norm)  # même sel que côté login
             cur.execute(
                 """
                 INSERT INTO utilisateur (prenom, nom, mail, mdp, naiss)
