@@ -1,7 +1,7 @@
 from datetime import date
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
-from service.auth_service import AuthService
+from service.auth_service import is_valid_email
 
 
 class InscriptionVue(VueAbstraite):
@@ -11,6 +11,12 @@ class InscriptionVue(VueAbstraite):
         prenom = inquirer.text(message="Prénom :").execute()
         nom = inquirer.text(message="Nom :").execute()
         mail = inquirer.text(message="Email :").execute()
+
+        try:
+            is_valid_email(mail)
+        except ValueError as e:
+            print(e)
+
         mdp = inquirer.secret(message="Mot de passe :").execute()
         naiss_str = inquirer.text(message="Date de naissance (YYYY-MM-DD) :").execute()
 

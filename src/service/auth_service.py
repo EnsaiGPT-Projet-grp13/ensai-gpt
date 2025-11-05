@@ -1,8 +1,10 @@
+import re
 from typing import Optional
 from datetime import date
 from dao.utilisateur_dao import UtilisateurDao
 from utils.securite import hash_pwd
 from objects.utilisateur import Utilisateur
+
 
 
 class AuthService:
@@ -25,10 +27,13 @@ class AuthService:
         mail_norm = (user.mail or "").strip().lower()
         return user.mdp_hash == hash_pwd(mdp, mail_norm)
 
+    def is_valid_email(email: str):
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(pattern, email):
+            raise ValueError("Email invalide.")
+
 
     def inscrire(self, prenom: str, nom: str, mail: str, mdp: str, naiss: date) -> Utilisateur:
-        if "@" not in mail:
-            raise ValueError("Email invalide")
         if self.dao.exists_mail(mail):
             raise ValueError("Un compte existe déjà avec cet email")
         mail_norm = mail.strip().lower()
