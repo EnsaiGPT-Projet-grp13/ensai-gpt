@@ -16,7 +16,7 @@ class UtilisateurDao:
         return Utilisateur(**row) if row else None
 
     def find_by_id(self, id_utilisateur: int) -> Optional[Utilisateur]:
-<<<<<<< HEAD
+
         conn = DBConnection.get_conn() if hasattr(DBConnection, "get_conn") else DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("""
@@ -26,7 +26,7 @@ class UtilisateurDao:
             """, (id_utilisateur,))
             row = cur.fetchone()
         return Utilisateur(**row) if row else None
-=======
+
         """Trouver un utilisateur par son ID."""
         with DBConnection().connection as conn:  # Connexion à la base de données
             with conn.cursor() as cur:  # Curseur pour exécuter la requête
@@ -39,7 +39,7 @@ class UtilisateurDao:
                 
         # Si un utilisateur est trouvé, on retourne un objet Utilisateur
         return Utilisateur(**row) if row else None   
->>>>>>> c43230d355247244636d6f61b131821d31723386
+
 
     def exists_mail(self, mail: str) -> bool:
         conn = DBConnection().connection

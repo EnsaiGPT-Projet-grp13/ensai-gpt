@@ -5,6 +5,20 @@ from dao.utilisateur_dao import UtilisateurDao
 from utils.securite import hash_password
 from objects.utilisateur import Utilisateur
 
+def is_valid_email(email: str):
+    pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+    if not re.match(pattern, email):
+        raise ValueError("Format email invalide.")
+
+def is_valid_password(pwd: str) -> None:
+    if len(pwd) < 8:
+        raise ValueError("Au moins 8 caractères requis.")
+    if not re.search(r"[A-Z]", pwd):
+        raise ValueError("Doit contenir une majuscule.")
+    if not re.search(r"[a-z]", pwd):
+        raise ValueError("Doit contenir une minuscule.")
+    if not re.search(r"\d", pwd):
+        raise ValueError("Doit contenir un chiffre.")
 
 
 class AuthService:
@@ -26,11 +40,6 @@ class AuthService:
         # important: utiliser le même email normalisé que lors de l'insertion
         mail_norm = (user.mail or "").strip().lower()
         return user.mdp_hash == hash_password(mdp, mail_norm)
-
-    def is_valid_email(email: str):
-        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        if not re.match(pattern, email):
-            raise ValueError("Email invalide.")
 
 
     def inscrire(self, prenom: str, nom: str, mail: str, mdp: str, naiss: date) -> Utilisateur:
