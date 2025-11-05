@@ -98,7 +98,7 @@ class ParametresVue(VueAbstraite):
             # -----------------------------
             # Paramètres Personnages IA
             # -----------------------------
-            if choix == "aramètres personnages IA":
+            if choix == "Paramètres personnages IA":
                 return self.choisir_persoIA()
 
             return MenuUtilisateurVue()
