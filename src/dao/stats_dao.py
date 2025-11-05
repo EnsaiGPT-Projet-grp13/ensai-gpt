@@ -1,7 +1,7 @@
+from dao.db import DBConnection
 from src.service.utilisateur_service import UtilisateurService  # Import de la classe UtilisateurService
 from collections import Counter
 import os
-from dao.db import DBConnection
 from objects.session import Session
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "public")
@@ -13,10 +13,11 @@ class StatsDao:
     def nbre_msgs_utilisateur(self):
         """Retourne le nombre de messages envoyés par l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")
-        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        utilisateur_service = UtilisateurService()
+        user = utilisateur_service.trouver_par_id(user_id)   # Appel de la méthode avec le bon paramètre
         if not user:
-            return 0  # Si l'utilisateur n'existe pas dans la DB
+            return 0  # Si l'utilisateur n'existe pas, renvoie 0
 
         query = f"""
         SELECT COUNT(*) AS count
@@ -26,7 +27,7 @@ class StatsDao:
         with self.conn.cursor() as cur:
             cur.execute(query, (user.id_utilisateur,))
             result = cur.fetchone()
-        
+
         if result is None:
             return 0
         return result['count']
@@ -34,10 +35,11 @@ class StatsDao:
     def nbre_conv_utilisateurs(self):
         """Retourne le nombre de conversations pour l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")
-        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        utilisateur_service = UtilisateurService()
+        user = utilisateur_service.trouver_par_id(user_id)
         if not user:
-            return 0  # Si l'utilisateur n'existe pas dans la DB
+            return 0  # Si l'utilisateur n'existe pas, renvoie 0
 
         query = f"""
         SELECT COUNT(*) AS count
@@ -55,10 +57,11 @@ class StatsDao:
     def moyenne_msg_par_conv(self):
         """Retourne la moyenne de messages par conversation pour l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")
-        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        utilisateur_service = UtilisateurService()
+        user = utilisateur_service.trouver_par_id(user_id) 
         if not user:
-            return 0  # Si l'utilisateur n'existe pas dans la DB
+            return 0  # Si l'utilisateur n'existe pas, renvoie 0
 
         query = f"""
         SELECT id_conversation, COUNT(*) as message_count
@@ -81,10 +84,11 @@ class StatsDao:
     def most_used_persona_for_user(self):
         """Retourne le persona le plus utilisé par l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")
-        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        utilisateur_service = UtilisateurService()
+        user = utilisateur_service.trouver_par_id(user_id) 
         if not user:
-            return None  # Si l'utilisateur n'existe pas dans la DB
+            return None  # Si l'utilisateur n'existe pas, renvoie None
 
         query = f"""
         SELECT c.id_personnageIA, p.name
