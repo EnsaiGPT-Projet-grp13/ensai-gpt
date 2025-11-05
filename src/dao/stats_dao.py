@@ -1,7 +1,8 @@
-from src.dao.db import DBConnection
+from src.service.utilisateur_service import UtilisateurService  # Import de la classe UtilisateurService
 from collections import Counter
 import os
-from objects.session import Session  # Assurez-vous que la classe Session est bien importée
+from dao.db import DBConnection
+from objects.session import Session
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "public")
 
@@ -12,52 +13,53 @@ class StatsDao:
     def nbre_msgs_utilisateur(self):
         """Retourne le nombre de messages envoyés par l'utilisateur connecté."""
         s = Session()
-        id_utilisateur = s.utilisateur.get("id_utilisateur")
-        print(f"ID de l'utilisateur connecté : {id_utilisateur}")  # Débogage
+        user_id = s.utilisateur.get("id_utilisateur")
+        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        if not user:
+            return 0  # Si l'utilisateur n'existe pas dans la DB
+
         query = f"""
         SELECT COUNT(*) AS count
         FROM {SCHEMA}.message
         WHERE expediteur = 'utilisateur' AND id_utilisateur = %s
         """
         with self.conn.cursor() as cur:
-            cur.execute(query, (id_utilisateur,))
+            cur.execute(query, (user.id_utilisateur,))
             result = cur.fetchone()
-
-        # Débogage: Afficher le résultat brut
-        print(f"Resultat nbre_msgs_utilisateur: {result}")
-
+        
         if result is None:
             return 0
-
         return result['count']
-
-
 
     def nbre_conv_utilisateurs(self):
         """Retourne le nombre de conversations pour l'utilisateur connecté."""
         s = Session()
-        id_utilisateur = s.utilisateur.get("id_utilisateur")
+        user_id = s.utilisateur.get("id_utilisateur")
+        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        if not user:
+            return 0  # Si l'utilisateur n'existe pas dans la DB
+
         query = f"""
-        SELECT COUNT(*) 
+        SELECT COUNT(*) AS count
         FROM {SCHEMA}.conversation
         WHERE id_proprio = %s
         """
         with self.conn.cursor() as cur:
-            cur.execute(query, (id_utilisateur,))
+            cur.execute(query, (user.id_utilisateur,))
             result = cur.fetchone()
-
-        # Débogage: Afficher le résultat brut
-        print(f"Resultat nbre_conv_utilisateurs: {result}")
 
         if result is None:
             return 0
-
-        return result[0]
+        return result['count']
 
     def moyenne_msg_par_conv(self):
         """Retourne la moyenne de messages par conversation pour l'utilisateur connecté."""
         s = Session()
-        id_utilisateur = s.utilisateur.get("id_utilisateur")
+        user_id = s.utilisateur.get("id_utilisateur")
+        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        if not user:
+            return 0  # Si l'utilisateur n'existe pas dans la DB
+
         query = f"""
         SELECT id_conversation, COUNT(*) as message_count
         FROM {SCHEMA}.message
@@ -65,16 +67,13 @@ class StatsDao:
         GROUP BY id_conversation
         """
         with self.conn.cursor() as cur:
-            cur.execute(query, (id_utilisateur,))
+            cur.execute(query, (user.id_utilisateur,))
             rows = cur.fetchall()
-
-        # Débogage: Afficher les résultats bruts de la requête
-        print(f"Resultat moyenne_msg_par_conv: {rows}")
-
+        
         if len(rows) == 0:
             return 0
 
-        total_messages = sum(row[1] for row in rows)  # row[1] est le compte des messages par conversation
+        total_messages = sum(row['message_count'] for row in rows)
         total_conversations = len(rows)
 
         return total_messages / total_conversations
@@ -82,7 +81,11 @@ class StatsDao:
     def most_used_persona_for_user(self):
         """Retourne le persona le plus utilisé par l'utilisateur connecté."""
         s = Session()
-        id_utilisateur = s.utilisateur.get("id_utilisateur")
+        user_id = s.utilisateur.get("id_utilisateur")
+        user = UtilisateurService.trouver_par_id(user_id)  # Appel direct de la méthode de classe
+        if not user:
+            return None  # Si l'utilisateur n'existe pas dans la DB
+
         query = f"""
         SELECT c.id_personnageIA, p.name
         FROM {SCHEMA}.conversation c
@@ -90,16 +93,13 @@ class StatsDao:
         WHERE c.id_proprio = %s
         """
         with self.conn.cursor() as cur:
-            cur.execute(query, (id_utilisateur,))
+            cur.execute(query, (user.id_utilisateur,))
             rows = cur.fetchall()
-
-        # Débogage: Afficher les résultats bruts de la requête
-        print(f"Resultat most_used_persona_for_user: {rows}")
 
         if len(rows) == 0:
             return None
 
-        persona_ids = [row[0] for row in rows]  # row[0] est l'id_personnageIA
+        persona_ids = [row['id_personnageIA'] for row in rows]
         persona_counts = Counter(persona_ids)
 
         most_common_persona = persona_counts.most_common(1)
@@ -108,8 +108,8 @@ class StatsDao:
 
         most_used_persona_name = None
         for row in rows:
-            if row[0] == most_used_persona_id:
-                most_used_persona_name = row[1]  # row[1] est le nom du persona
+            if row['id_personnageIA'] == most_used_persona_id:
+                most_used_persona_name = row['name']
                 break
 
         return most_used_persona_name

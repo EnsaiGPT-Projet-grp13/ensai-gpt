@@ -16,15 +16,15 @@ class UtilisateurDao:
         return Utilisateur(**row) if row else None
     
         def find_by_id(self, mail: str) -> Optional[Utilisateur]:
-        conn = DBConnection().connection
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
-                FROM utilisateur
-                WHERE mail = %s
-            """, (mail,))
-            row = cur.fetchone()
-        return Utilisateur(**row) if row else None
+            conn = DBConnection().connection
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
+                    FROM utilisateur
+                    WHERE mail = %s
+                """, (mail,))
+                row = cur.fetchone()
+            return Utilisateur(**row) if row else None
 
 
     def exists_mail(self, mail: str) -> bool:
