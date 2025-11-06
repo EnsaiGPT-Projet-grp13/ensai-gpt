@@ -40,6 +40,7 @@ class ParametresVue(VueAbstraite):
                     choices=[
                         "Changer mot de passe",
                         "Changer nom utilisateur",
+                        "Changer e-mail",
                         "Annuler",
                     ],
                 ).execute()
@@ -48,7 +49,9 @@ class ParametresVue(VueAbstraite):
                     return self.changer_mot_de_passe()
 
                 if sous == "Changer nom utilisateur":
-                    return ParametresVue("🚧 Fonctionnalité en cours de développement.")
+                    return self.changer_nom_utilisateur()
+                if sous == "Changer e-mail":
+                    return self.changer_nom_utilisateur ()
 
             # -----------------------------
             # Paramètres Personnages IA
@@ -111,6 +114,51 @@ class ParametresVue(VueAbstraite):
             print("\n[ParametresVue] Erreur :", repr(e))
             print(traceback.format_exc())
             return ParametresVue("Erreur lors du changement de mot de passe.")
+
+    # -------------------------------------------------
+    # Fonctionnalité pour changer le nom utilisateur
+    # -------------------------------------------------
+    
+    def changer_nom_utilisateur(self):
+        """Permet à l'utilisateur connecté de changer son nom d'utilisateur."""
+        try:
+            s = Session()
+            uid = s.utilisateur.get("id_utilisateur")
+
+            nouveau_nom = inquirer.text(message="Nouveau nom d'utilisateur :").execute()
+
+            service = UtilisateurService()
+            if service.changer_nom_utilisateur(uid, nouveau_nom):
+                return ParametresVue(f"Nom d'utilisateur modifié avec succès : {nouveau_nom}")
+            else:
+                return ParametresVue("Erreur lors de la modification du nom d'utilisateur.")
+
+        except Exception as e:
+            print("\n[ParametresVue] Erreur lors du changement de nom d'utilisateur :", repr(e))
+            print(traceback.format_exc())
+            return ParametresVue("Erreur lors du changement du nom d'utilisateur.")    
+    # -------------------------------------------------
+    # Fonctionnalité pour changer l'e-mail
+    # -------------------------------------------------
+
+    def changer_email(self):
+        """Permet à l'utilisateur connecté de changer son e-mail."""
+        try:
+            s = Session()
+            uid = s.utilisateur.get("id_utilisateur")
+
+            nouvel_email = inquirer.text(message="Nouvel e-mail :").execute()
+
+            service = UtilisateurService()
+            if service.changer_email(uid, nouvel_email):
+                return ParametresVue(f"E-mail modifié avec succès : {nouvel_email}")
+            else:
+                return ParametresVue("Erreur lors de la modification de l'e-mail.")
+
+        except Exception as e:
+            print("\n[ParametresVue] Erreur lors du changement d'e-mail :", repr(e))
+            print(traceback.format_exc())
+            return ParametresVue("Erreur lors du changement de l'e-mail.")            
 
     # -------------------------------------------------
     # Afficher la liste des personnages IA
