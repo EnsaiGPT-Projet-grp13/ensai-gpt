@@ -1,4 +1,3 @@
-# view/reponse_ia_vue.py
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from objects.session import Session

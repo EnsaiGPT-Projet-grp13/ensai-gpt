@@ -1,7 +1,5 @@
-# src/service/message_service.py
 from __future__ import annotations
 from src.dao.message_dao import MessageDao
-#from utils. import api call_ensai_gpt
 
 class MessageService:
     """

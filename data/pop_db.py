@@ -1,4 +1,3 @@
-# data/pop_db.py
 import os
 import sys
 

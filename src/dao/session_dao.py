@@ -1,4 +1,3 @@
-# src/dao/session_dao.py
 import os
 from typing import Optional, List, Dict, Any
 from psycopg2.extras import RealDictCursor

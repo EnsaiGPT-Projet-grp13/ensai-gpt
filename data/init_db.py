@@ -1,4 +1,3 @@
-# data/init_db.py (ajout d'un bootstrap DB)
 import os, psycopg2
 
 try:
@@ -166,7 +165,7 @@ def main():
     conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute(DDL)
-        print(f"✅ Base/Schéma initialisés dans `{SCHEMA}` (DB `{PG_DB}`).")
+        print(f"Base/Schéma initialisés dans `{SCHEMA}` (DB `{PG_DB}`).")
     conn.close()
 
 if __name__ == "__main__":

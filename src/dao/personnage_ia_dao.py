@@ -1,4 +1,3 @@
-# dao/personnage_ia_dao.py
 import os
 from typing import Optional, List
 from psycopg2.extras import RealDictCursor
