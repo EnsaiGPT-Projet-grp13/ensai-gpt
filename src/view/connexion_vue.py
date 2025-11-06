@@ -50,3 +50,4 @@ class ConnexionVue(VueAbstraite):
             print("[ConnexionVue] Exception:", repr(e))
             from view.accueil_vue import AccueilVue
             return AccueilVue("Erreur technique pendant la connexion (voir terminal).")
+
