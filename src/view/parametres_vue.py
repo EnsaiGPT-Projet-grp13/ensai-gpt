@@ -141,15 +141,9 @@ class ParametresVue(VueAbstraite):
             pid = int(label.split("#")[-1].rstrip(")"))
             perso = next(p for p in persos if p.id_personnageIA == pid)
 
-            # Afficher la description du personnage (son prompt)
-            # Utilisation de inquirer.text() pour afficher la description en lecture seule
-            inquirer.text(
-                message=f"Description du personnage '{perso.name}':",
-                default=perso.system_prompt,
-                style="bold",
-                multiline=True,  # Permet de voir toute la description
-                validate=lambda x: True  # Empêche toute modification du texte
-            ).execute()
+            # Afficher la description du personnage avec un simple print
+            print(f"\nDescription du personnage '{perso.name}':\n")
+            print(f"{perso.system_prompt}\n")
 
             # Retour à la liste des personnages
             return self.afficher_liste_persoIA()
