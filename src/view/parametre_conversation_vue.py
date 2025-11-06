@@ -1,5 +1,10 @@
 from InquirerPy import inquirer
+from dataclasses import asdict
 
+from objects.session import Session
+from objects.personnage_ia import PersonnageIA
+from src.service.personnage_service import PersonnageService
+from src.service.conversation_service import ConversationService
 from view.vue_abstraite import VueAbstraite
 
 class ParametreConversationVue(VueAbstraite):
@@ -16,6 +21,13 @@ class ParametreConversationVue(VueAbstraite):
         """Choix du menu suivant"""
         print("\n" + "-" * 50 + "\nOptions la conversation\n" + "-" * 50 + "\n")
 
+        s = Session()
+        if s.conversation is None:
+            from view.historique_vue import HistoriqueVue
+            return HistoriqueVue("Aucune conversation sélectionnée.")
+        id_conversation = s.conversation.id_conversation
+        conversation = ConversationService().get(id_conversation)
+
         choix = inquirer.select(
             message="Que voulez vous faire avec cette conversation ?",
             choices=[
@@ -31,9 +43,10 @@ class ParametreConversationVue(VueAbstraite):
         match choix:
             case "Reprendre la conversation":
                 # Reprise de la conversation là où elle a été arrêtée
-                pass
-                """from view.afficher_conversation_vue import AfficherConversationVue
-                return AfficherConversationVue()"""
+                id_personnage = conversation.id_personnageIA
+                s.personnage = asdict(PersonnageService().get_by_id(id_personnage))
+                from view.reponse_ia_vue import ReponseIAVue
+                return ReponseIAVue()
 
             case "Afficher l'entièreté de la conversation":
                 # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie

@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Dict, Any
 from psycopg2.extras import RealDictCursor
 from src.dao.db import DBConnection
 from src.objects.message import Message
@@ -59,10 +59,10 @@ class MessageDao:
                   m.expediteur,
                   m.contenu,
                   m.id_utilisateur,
-                  m.create_at
+                  m.created_at
                 FROM {SCHEMA}.message m
                 WHERE m.id_utilisateur = %s
-                ORDER BY create_at DESC
+                ORDER BY created_at DESC
                 LIMIT %s
                 """,
                 (id_utilisateur, limite),

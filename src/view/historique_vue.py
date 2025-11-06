@@ -42,8 +42,8 @@ class HistoriqueVue(VueAbstraite):
             case "Rechercher une conversation (par mots clés)":
                 # Retroune vers la vue de recherche d'une conversation par son titre
                 pass
-                from view.recherche_conversation_mots_vue import RechercheConversationMotVue 
-                return RechercheConversationMotVue()
+                from view.recherche_conversation_mots_vue import RechercheConversationMotsVue 
+                return RechercheConversationMotsVue()
 
             case "Quitter":
                 # Retourne vers la vue du menue de l'utilisateur
