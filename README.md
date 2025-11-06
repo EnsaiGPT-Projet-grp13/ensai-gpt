@@ -47,9 +47,9 @@ source ~/work/ensai-gpt/.venv/bin/activate
 pip install -r requirements.txt
 ````
 
-## **3-Configurer la base de données**
+## **3- Configurer la base de données**
 
- Créer un fichier .env et copier les lignes suivantes :
+ Dans la racine, créer un fichier .env et copier les lignes suivantes :
 
 ```python
 WEBSERVICE_HOST=https://ensai-gpt-109912438483.europe-west4.run.app
@@ -73,7 +73,7 @@ python data/setup_db.py
 Si tout est correct tu devrais voir,  "Base/Schéma initialisés dans `projetGPT`"
 
 
-### **-> Lancer l’application**
+### **4- Lancer l’application**
 
 Démarre l’interface en ligne de commande :
 
@@ -94,9 +94,11 @@ pytest -v
 ### Couverture des tests
 Il est possible de générer un rapport de couverture avec :  
 
+```python
 coverage run -m pytest
 coverage report -m
 coverage html
+````
 
 -> Ouvrir `coverage_report/index.html` pour un rapport détaillé.  
 
