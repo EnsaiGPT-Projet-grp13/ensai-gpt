@@ -36,7 +36,7 @@ class ConnexionVue(VueAbstraite):
                     }
                     s.session = None
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
-                    return MenuUtilisateurVue(f"Bienvenue {user.nom}!")
+                    return MenuUtilisateurVue(f"Bienvenue {user.prenom} {user.nom}!")
 
                 # mauvais mdp -> si essai restant, on réessaie
                 if i < MAX_TRIES:

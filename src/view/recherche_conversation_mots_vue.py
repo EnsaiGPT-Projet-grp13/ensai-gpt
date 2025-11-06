@@ -3,7 +3,7 @@ from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from objects.session import Session
 from src.service.conversation_service import ConversationService
-from src.service.message_service import ChatService
+from src.service.message_service import MessageService
 
 
 
@@ -29,7 +29,7 @@ class RechercheConversationMotsVue(VueAbstraite):
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
 
         mots = inquirer.text(message="Quel mots clés recherchez vous dans vos anciennes conversations ? :").execute().strip().lower()
-        listes_message = ChatService().recherche_mots_message(id_utilisateur, mots)
+        listes_message = MessageService().recherche_mots_message(id_utilisateur, mots)
         if not listes_message:
             from view.historique_vue import HistoriqueVue
             return HistoriqueVue("Aucune conversation ne contient ces mots")

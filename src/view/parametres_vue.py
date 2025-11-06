@@ -61,7 +61,7 @@ class ParametresVue(VueAbstraite):
                     message="Choisir une option :",
                     choices=[
                         "Créer un nouveau personnage IA",  # Nouvelle option pour créer un personnage
-                        "Voir la liste des personnages IA",  # Option pour afficher la liste des personnages
+                        "Modifier personnages existants",  # Option pour afficher la liste des personnages
                         "Annuler",  # Option pour annuler
                     ],
                 ).execute()
@@ -74,7 +74,7 @@ class ParametresVue(VueAbstraite):
                         perso_svc=None     # Idem
                     )
 
-                if sous == "Voir la liste des personnages IA":
+                if sous == "Modifier personnages existants":
                     # Afficher la liste des personnages IA
                     return self.afficher_liste_persoIA()
 
@@ -178,7 +178,7 @@ class ParametresVue(VueAbstraite):
             choices.append("Retour")  # Option de retour
 
             label = inquirer.select(
-                message="Choisir un personnage pour voir sa description :",
+                message="Choisir un personnage pour le modifier :",
                 choices=choices
             ).execute()
 
