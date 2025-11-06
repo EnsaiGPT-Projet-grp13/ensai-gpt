@@ -81,48 +81,45 @@ class StatsDao:
 
         return total_messages / total_conversations
 
-    def most_used_persona_for_user(self):
-        """Retourne le persona le plus utilisé par l'utilisateur connecté."""
+  
+    def most_used_personas_for_user(self):
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
-        utilisateur_service = UtilisateurService()
-        user = utilisateur_service.trouver_par_id(user_id) 
-        if not user:
-            return None  # Si l'utilisateur n'existe pas, renvoie None
-
-        query = f"""
-        SELECT c.id_personnageIA, p.name
-        FROM {SCHEMA}.conversation c
-        JOIN {SCHEMA}.personnageIA p ON c.id_personnageIA = p.id_personnageIA
-        WHERE c.id_proprio = %s
-        """
-        with self.conn.cursor() as cur:
-            cur.execute(query, (user.id_utilisateur,))
-            rows = cur.fetchall()
-        # print(f"Résultats de la requête: {rows}")
-        # print(type(rows))
-        # results = [PersonnageIA(row) for row in rows]
-        # print(f"row first line: {rows[0]}")
-
-        if len(rows) == 0:
-            return None
+        user_id = s.utilisateur.get("id_utilisateur")
         
-
-        # persona_ids = [perso.id_personnageIA for perso in results]
-        persona_ids = [row["id_personnageia"] for row in rows]
-        persona_counts = Counter(persona_ids)
-
-        most_common_persona = persona_counts.most_common(1)
-
-        most_used_persona_id = most_common_persona[0][0]
-
-        most_used_persona_name = None
+        query = f"""
+            SELECT c.id_personnageIA, p.name, COUNT(c.id_personnageIA) AS count
+            FROM {SCHEMA}.conversation c
+            JOIN {SCHEMA}.personnageIA p ON c.id_personnageIA = p.id_personnageIA
+            WHERE c.id_proprio = %s
+            GROUP BY c.id_personnageIA, p.name
+            HAVING COUNT(c.id_personnageIA) = (
+                SELECT MAX(count)
+                FROM (
+                    SELECT COUNT(c.id_personnageIA) AS count
+                    FROM {SCHEMA}.conversation c
+                    WHERE c.id_proprio = %s
+                    GROUP BY c.id_personnageIA
+                ) AS subquery
+            )
+            ORDER BY count DESC
+        """
+        
+        with self.conn.cursor() as cur:
+            cur.execute(query, (user_id, user_id))
+            rows = cur.fetchall()
+        
+        # Traiter les résultats de la requête
+        most_used_personas = []
         for row in rows:
-            if row['id_personnageia'] == most_used_persona_id:
-                most_used_persona_name = row['name']
-                break
+            most_used_personas.append({
+                "id_personnageia": row["id_personnageia"],
+                "name": row["name"],
+                "count": row["count"]
+            })
+        
+        return most_used_personas
 
-        return most_used_persona_name
+
 
     def nbre_personnages_IA_utilises(self):
         s = Session()
