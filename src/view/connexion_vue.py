@@ -7,6 +7,9 @@ from service.auth_service import AuthService
 class ConnexionVue(VueAbstraite):
     """Vue de Connexion (DB)"""
 
+    def afficher(self):
+        pass
+    
     def choisir_menu(self):
         try:
             # dans ConnexionVue

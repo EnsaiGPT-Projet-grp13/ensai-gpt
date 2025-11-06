@@ -97,5 +97,3 @@ class ReponseIAVue(VueAbstraite):
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Erreur dans le chat (voir terminal).")
 
-    def afficher(self):
-        return self.choisir_menu()

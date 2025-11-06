@@ -12,6 +12,7 @@ class AccueilVue(VueAbstraite):
     def afficher(self):
         if self.message:
             print(self.message)
+            
 
     def choisir_menu(self):
         """Choix du menu suivant"""
@@ -38,3 +39,7 @@ class AccueilVue(VueAbstraite):
                 from view.inscription_vue import InscriptionVue  # import local
                 return InscriptionVue()
 
+            case "Ré-initialiser la base de données":
+                succes = ResetDatabase().lancer()
+                message = f"Ré-initialisation de la base de données — {'SUCCÈS' if succes else 'ÉCHEC'}"
+                return AccueilVue(message)

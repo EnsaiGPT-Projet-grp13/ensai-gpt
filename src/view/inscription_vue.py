@@ -7,7 +7,7 @@ from view.accueil_vue import AccueilVue
 class InscriptionVue(VueAbstraite):
     """Vue d'inscription (DB)"""
 
-    def choisir_menu(self):
+    def afficher(self):
 
         # --- Prénom ---
         while True:

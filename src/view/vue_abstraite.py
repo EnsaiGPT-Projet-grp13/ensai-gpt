@@ -20,7 +20,3 @@ class VueAbstraite(ABC):
         if msg:
             print(msg)
             print()
-
-    @abstractmethod
-    def choisir_menu(self):
-        pass

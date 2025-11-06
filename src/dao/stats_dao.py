@@ -99,11 +99,17 @@ class StatsDao:
         with self.conn.cursor() as cur:
             cur.execute(query, (user.id_utilisateur,))
             rows = cur.fetchall()
+        # print(f"Résultats de la requête: {rows}")
+        # print(type(rows))
+        # results = [PersonnageIA(row) for row in rows]
+        # print(f"row first line: {rows[0]}")
 
         if len(rows) == 0:
             return None
+        
 
-        persona_ids = [row['id_personnageIA'] for row in rows]
+        # persona_ids = [perso.id_personnageIA for perso in results]
+        persona_ids = [row["id_personnageia"] for row in rows]
         persona_counts = Counter(persona_ids)
 
         most_common_persona = persona_counts.most_common(1)
@@ -112,8 +118,10 @@ class StatsDao:
 
         most_used_persona_name = None
         for row in rows:
-            if row['id_personnageIA'] == most_used_persona_id:
+            if row['id_personnageia'] == most_used_persona_id:
                 most_used_persona_name = row['name']
                 break
 
         return most_used_persona_name
+
+    
