@@ -36,7 +36,7 @@ class ConnexionVue(VueAbstraite):
                     }
                     s.session = None
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
-                    return MenuUtilisateurVue(f"Bienvenue {user.prenom} !")
+                    return MenuUtilisateurVue(f"Bienvenue {user.nom}!")
 
                 # mauvais mdp -> si essai restant, on réessaie
                 if i < MAX_TRIES:
@@ -50,3 +50,4 @@ class ConnexionVue(VueAbstraite):
             print("[ConnexionVue] Exception:", repr(e))
             from view.accueil_vue import AccueilVue
             return AccueilVue("Erreur technique pendant la connexion (voir terminal).")
+

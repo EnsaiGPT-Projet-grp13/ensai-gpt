@@ -150,8 +150,31 @@ class UtilisateurService:
 
         nouveau_hash = hash_password(nouveau_mdp)
         self.dao.update_mot_de_passe(id_utilisateur, nouveau_hash)
-        print("update relaisee")
+        print("update réalisé")
         return True
+    @log
+    def changer_nom_utilisateur(self, uid: int, nouveau_nom: str) -> bool:
+        """Permet à l'utilisateur connecté de changer son nom d'utilisateur."""
+        try:
+            # Trouver l'utilisateur existant
+            utilisateur = self.dao.find_by_id(uid)
+            if not utilisateur:
+                raise ValueError("Utilisateur non trouvé.")
+            
+            # Modifier le nom de l'utilisateur
+            utilisateur.nom_utilisateur = nouveau_nom
+
+            # Appeler la méthode update du DAO pour mettre à jour l'utilisateur
+            return self.dao.update_nom_utilisateur(utilisateur)# Appel de la méthode update du DAO
+
+        except Exception as e:
+            print(f"Erreur lors du changement de nom d'utilisateur : {repr(e)}")
+            return False
+
+    @log
+    def changer_email(self, uid, nouvel_email):
+        # Logique pour changer l'e-mail dans la base de données
+        pass
 
     def add_default_persoIA(self, user_id: int):
         """Crée/Met à jour les personas par défaut pour un utilisateur."""
