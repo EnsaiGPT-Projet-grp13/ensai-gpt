@@ -4,7 +4,7 @@ from collections import Counter
 import os
 from objects.session import Session
 
-SCHEMA = os.getenv("POSTGRES_SCHEMA", "public")
+SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
 class StatsDao:
     def __init__(self):

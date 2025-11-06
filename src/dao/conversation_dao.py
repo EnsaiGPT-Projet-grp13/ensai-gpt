@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 from src.dao.db import DBConnection
 from src.objects.conversation import Conversation
 
-SCHEMA = os.getenv("POSTGRES_SCHEMA", "public")
+SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
 class ConversationDao:
     def __init__(self):

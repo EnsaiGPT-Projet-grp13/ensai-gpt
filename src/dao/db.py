@@ -27,7 +27,7 @@ class DBConnection(metaclass=Singleton):
         db   = os.environ.get("POSTGRES_DATABASE", "").strip()
         user = os.environ.get("POSTGRES_USER", "").strip()
         pwd  = os.environ.get("POSTGRES_PASSWORD", "").strip()
-        schema = os.environ.get("POSTGRES_SCHEMA", "public").strip()
+        schema = os.environ.get("POSTGRES_SCHEMA", "projetGPT").strip()
 
         self.__connection = psycopg2.connect(
             host=host,

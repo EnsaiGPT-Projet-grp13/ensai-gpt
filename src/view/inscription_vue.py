@@ -7,7 +7,7 @@ from view.accueil_vue import AccueilVue
 class InscriptionVue(VueAbstraite):
     """Vue d'inscription (DB)"""
 
-    def afficher(self):
+    def choisir_menu(self):
 
         # --- Prénom ---
         while True:
@@ -40,16 +40,22 @@ class InscriptionVue(VueAbstraite):
             except ValueError as e:
                 print(f"{e}\nEssaye à nouveau.\n")
                 continue
-            
+
             MAX_TRIES = 3
+            ok = False
             for i in range(1, MAX_TRIES + 1):
                 mdp2 = inquirer.secret(message="Confirme le mot de passe :").execute() or ""
-                if mdp != mdp2 and i < MAX_TRIES:
-                    print(f"Les mots de passe ne correspondent pas. Réessaie. (essai {i}/{MAX_TRIES}) \n")
-                    continue
+                if mdp2 == mdp:
+                    ok = True
+                    break
                 else:
-                    return AccueilVue("Confirmation de mot de passe incorrecte (3 tentatives).")
+                    if i < MAX_TRIES:
+                        print(f"Les mots de passe ne correspondent pas. Réessaie. (essai {i}/{MAX_TRIES})\n")
+                    else:
+                        return AccueilVue("Confirmation de mot de passe incorrecte (3 tentatives).")
 
+            if ok:
+                break
 
         # --- Date de naissance ---
         while True:

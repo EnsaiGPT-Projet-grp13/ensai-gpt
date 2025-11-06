@@ -2,11 +2,18 @@ from __future__ import annotations
 from typing import Optional, Iterable
 from tabulate import tabulate
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from utils.log_decorator import log
 from utils.securite import hash_password  # compat: voir utils/securite.py plus bas
 
 from objects.utilisateur import Utilisateur
 from dao.utilisateur_dao import UtilisateurDao
+from utils.default_persoIA import DEFAULT_PERSONAS
+from objects.personnage_ia import PersonnageIA
+from dao.personnage_ia_dao import PersonnageIADao
 
 
 class UtilisateurService:
@@ -14,6 +21,7 @@ class UtilisateurService:
 
     def __init__(self) -> None:
         self.dao = UtilisateurDao()
+        self.persona_dao = PersonnageIADao()
 
     # -------------------------
     # Création / Lecture / Maj / Suppression
@@ -145,3 +153,24 @@ class UtilisateurService:
         print("update relaisee")
         return True
 
+    def add_default_persoIA(self, user_id: int):
+        """Crée/Met à jour les personas par défaut pour un utilisateur."""
+        inserted = 0
+        for perso in DEFAULT_PERSONAS:
+            try:
+                p = PersonnageIA(
+                    id_personnageIA=None,
+                    name=perso["name"],
+                    system_prompt=perso["system_prompt"],
+                    created_by=user_id,
+                )
+                self.persona_dao.create(p)   # <-- UPSERT côté DAO
+                inserted += 1
+            except Exception as e:
+                # LOG + rollback pour sortir de l'état 'transaction aborted'
+                print(f"[add_default_persoIA] skip '{perso.get('name')}': {e}")
+                try:
+                    self.persona_dao.conn.rollback()
+                except Exception:
+                    pass
+        return inserted

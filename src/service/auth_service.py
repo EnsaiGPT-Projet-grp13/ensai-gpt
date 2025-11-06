@@ -4,6 +4,7 @@ from datetime import date
 from dao.utilisateur_dao import UtilisateurDao
 from utils.securite import hash_password
 from objects.utilisateur import Utilisateur
+from service.utilisateur_service import UtilisateurService
 
 def is_valid_email(email: str):
     pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
@@ -24,6 +25,7 @@ def is_valid_password(pwd: str) -> None:
 class AuthService:
     def __init__(self):
         self.dao = UtilisateurDao()
+        self.user_service = UtilisateurService()
 
     # --- existant si tu veux le garder ---
     def se_connecter(self, mail: str, mdp: str) -> Optional[Utilisateur]:
@@ -43,13 +45,22 @@ class AuthService:
 
 
     def inscrire(self, prenom: str, nom: str, mail: str, mdp: str, naiss: date) -> Utilisateur:
-        if self.dao.exists_mail(mail):
-            raise ValueError("Un compte existe déjà avec cet email")
         mail_norm = mail.strip().lower()
+        if self.dao.exists_mail(mail_norm):
+            raise ValueError("Un compte existe déjà avec cet email")
+
+        # Création utilisateur
         u = Utilisateur(
             id_utilisateur=None,
-            prenom=prenom, nom=nom, mail=mail,
-            mdp_hash = hash_password(mdp, mail_norm),
+            prenom=prenom,
+            nom=nom,
+            mail=mail_norm,
+            mdp_hash=hash_password(mdp, mail_norm),
             naiss=naiss,
         )
-        return self.dao.create(u)
+        user = self.dao.create(u)
+
+        # Ajout des personas IA par défaut
+        self.user_service.add_default_persoIA(user.id_utilisateur)
+
+        return user

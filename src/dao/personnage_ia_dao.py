@@ -5,66 +5,37 @@ from psycopg2.extras import RealDictCursor
 from dao.db import DBConnection
 from objects.personnage_ia import PersonnageIA
 
-SCHEMA = os.getenv("POSTGRES_SCHEMA", "public")
+SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
 
 class PersonnageIADao:
-    """DAO personnageIA + gestion du lien persoIA_utilisateur."""
+    """DAO pour la table personnageIA (sans table d'association)."""
 
     def __init__(self) -> None:
         self.conn = DBConnection().connection
 
-    # --- Lien user <-> perso ------------------------------------------------
-    def add(self, id_utilisateur: int, id_personnageIA: int) -> None:
-        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"""
-                INSERT INTO {SCHEMA}.persoIA_utilisateur (id_utilisateur, id_personnageIA)
-                VALUES (%s, %s)
-                ON CONFLICT DO NOTHING
-                """,
-                (id_utilisateur, id_personnageIA),
-            )
-        self.conn.commit()
-
-    def remove(self, id_utilisateur: int, id_personnageIA: int) -> None:
-        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"""
-                DELETE FROM {SCHEMA}.persoIA_utilisateur
-                WHERE id_utilisateur = %s AND id_personnageIA = %s
-                """,
-                (id_utilisateur, id_personnageIA),
-            )
-        self.conn.commit()
-
-    def list_personnage_ids_for_user(self, uid: int) -> List[int]:
-        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"""
-                SELECT id_personnageIA
-                FROM {SCHEMA}.persoIA_utilisateur
-                WHERE id_utilisateur = %s
-                """,
-                (uid,),
-            )
-            rows = cur.fetchall() or []
-        return [r["id_personnageIA"] for r in rows]
-
     # --- CRUD personnageIA ---------------------------------------------------
     def create(self, p: PersonnageIA) -> PersonnageIA:
+        """
+        UPSERT sur (name, created_by) :
+        - insert si nouveau
+        - update system_prompt si déjà existant
+        """
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
                 INSERT INTO {SCHEMA}.personnageIA (name, system_prompt, created_by)
                 VALUES (%s, %s, %s)
+                ON CONFLICT (name, created_by) DO UPDATE
+                    SET system_prompt = EXCLUDED.system_prompt,
+                        updated_at = NOW()
                 RETURNING
-                  id_personnageIA AS "id_personnageIA",
-                  name,
-                  system_prompt,
-                  created_by,
-                  created_at,
-                  updated_at
+                    id_personnageIA AS "id_personnageIA",
+                    name,
+                    system_prompt,
+                    created_by,
+                    created_at,
+                    updated_at
                 """,
                 (p.name, p.system_prompt, p.created_by),
             )
@@ -166,49 +137,22 @@ class PersonnageIADao:
         return [PersonnageIA(**r) for r in rows]
 
     def list_for_user(self, uid: int) -> List[PersonnageIA]:
+        """Retourne les personnages standards + ceux créés par l'utilisateur."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
-                SELECT * FROM (
-                    SELECT
-                        p.id_personnageIA AS "id_personnageIA",
-                        p.name,
-                        p.system_prompt,
-                        p.created_by,
-                        p.created_at,
-                        p.updated_at
-                    FROM {SCHEMA}.personnageIA p
-                    WHERE p.created_by IS NULL
-
-                    UNION ALL
-
-                    SELECT
-                        p.id_personnageIA AS "id_personnageIA",
-                        p.name,
-                        p.system_prompt,
-                        p.created_by,
-                        p.created_at,
-                        p.updated_at
-                    FROM {SCHEMA}.personnageIA p
-                    JOIN {SCHEMA}.persoIA_utilisateur pu
-                        ON pu.id_personnageIA = p.id_personnageIA
-                    WHERE pu.id_utilisateur = %s
-
-                    UNION ALL
-
-                    SELECT
-                        p.id_personnageIA AS "id_personnageIA",
-                        p.name,
-                        p.system_prompt,
-                        p.created_by,
-                        p.created_at,
-                        p.updated_at
-                    FROM {SCHEMA}.personnageIA p
-                    WHERE p.created_by = %s
-                ) AS all_persos
-                ORDER BY lower(all_persos.name)
+                SELECT
+                  id_personnageIA AS "id_personnageIA",
+                  name,
+                  system_prompt,
+                  created_by,
+                  created_at,
+                  updated_at
+                FROM {SCHEMA}.personnageIA
+                WHERE created_by IS NULL OR created_by = %s
+                ORDER BY lower(name)
                 """,
-                (uid, uid),
+                (uid,),
             )
             rows = cur.fetchall() or []
         return [PersonnageIA(**r) for r in rows]
