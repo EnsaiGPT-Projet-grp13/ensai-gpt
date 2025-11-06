@@ -62,9 +62,10 @@ class MessageDao:
                   m.created_at
                 FROM {SCHEMA}.message m
                 WHERE m.id_utilisateur = %s
+                    AND lower(m.contenu) LIKE %s
                 ORDER BY created_at DESC
                 LIMIT %s
                 """,
-                (id_utilisateur, limite),
+                (id_utilisateur, f'%{mots}%', limite),
             )
             return cur.fetchall() or []

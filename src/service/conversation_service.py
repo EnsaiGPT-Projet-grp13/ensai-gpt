@@ -85,6 +85,15 @@ class ConversationService:
 
     def get(self, cid: int) -> Optional[Conversation]:
         return self.conv_dao.find_by_id(cid)
+    
+    def modifier(self, c: Conversation, nouveau_titre : str) -> Optional[Conversation]:
+        """Mettre à jour une conversation.""" 
+        id_conversation = c.id_conversation
+        return self.conv_dao.update_titre(id_conversation, nouveau_titre)
+
+    def supprimer(self, c: Conversation) -> bool:
+        """Supprimer une conversation."""
+        return self.conv_dao.delete(c.id_conversation)
 
     def liste_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25):
         """Liste des conversations dont l'utilisateur est propriétaire."""

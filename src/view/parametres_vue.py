@@ -4,8 +4,8 @@ from view.vue_abstraite import VueAbstraite
 from objects.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.utilisateur_service import UtilisateurService
+from view.creer_personnage_vue import CreerPersonnageVue  # Importer la vue pour créer un personnage
 from src.dao.personnage_ia_dao import PersonnageIADao
-
 
 class ParametresVue(VueAbstraite):
     """Vue pour gérer les paramètres utilisateur et personnages IA."""
@@ -17,51 +17,6 @@ class ParametresVue(VueAbstraite):
         if self.message:
             print(self.message)
 
-    # -------------------------------------------------
-    
-    # -------------------------------------------------
-    def choisir_persoIA(self):
-        """Permet à l'utilisateur de choisir un personnage IA."""
-        try:
-            s = Session()
-            uid = s.utilisateur.get("id_utilisateur")
-            dao = PersonnageIADao()
-            persos = dao.list_for_user(uid)
-
-            if not persos:
-                return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
-
-            choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
-            choices.append("Annuler")  # ✅ ajoute une option d’annulation
-
-            label = inquirer.select(
-                message="Choisir un personnage :",
-                choices=choices
-            ).execute()
-
-            # Si l'utilisateur choisit "Annuler", on retourne simplement au menu principal
-            if label == "Annuler":
-                return MenuUtilisateurVue("Retour au menu des paramètres.")
-
-            pid = int(label.split("#")[-1].rstrip(")"))
-            perso = next(p for p in persos if p.id_personnageIA == pid)
-
-            s.personnage = {
-                "id_personnageIA": perso.id_personnageIA,
-                "name": perso.name,
-                "system_prompt": perso.system_prompt,
-            }
-
-            return MenuUtilisateurVue(f"✅ Personnage '{perso.name}' sélectionné.")
-
-        except Exception as e:
-            print("\n[ParametresVue.choisir_persoIA] Exception :", repr(e))
-            print(traceback.format_exc())
-            return ParametresVue("Erreur lors du choix du personnage IA.")
-
-    # -------------------------------------------------
-    
-    # -------------------------------------------------
     def choisir_menu(self):
         """Affiche le menu principal des paramètres."""
         try:
@@ -71,7 +26,8 @@ class ParametresVue(VueAbstraite):
                 message="Faites votre choix : ",
                 choices=[
                     "Paramètres utilisateur",
-                    "Paramètres personnages IA"
+                    "Paramètres personnages IA",  # Nouvelle option ajoutée pour gérer les personnages IA
+                    "Annuler",
                 ],
             ).execute()
 
@@ -92,22 +48,42 @@ class ParametresVue(VueAbstraite):
                     return self.changer_mot_de_passe()
 
                 if sous == "Changer nom utilisateur":
-                    # (Tu pourras l’ajouter plus tard)
                     return ParametresVue("🚧 Fonctionnalité en cours de développement.")
 
             # -----------------------------
             # Paramètres Personnages IA
             # -----------------------------
             if choix == "Paramètres personnages IA":
-                return self.choisir_persoIA()
+                sous = inquirer.select(
+                    message="Choisir une option :",
+                    choices=[
+                        "Créer un nouveau personnage IA",  # Nouvelle option pour créer un personnage
+                        "Voir la liste des personnages IA",  # Option pour afficher la liste des personnages
+                        "Annuler",  # Option pour annuler
+                    ],
+                ).execute()
+
+                if sous == "Créer un nouveau personnage IA":
+                    # Rediriger vers la vue de création d'un personnage IA
+                    return CreerPersonnageVue(
+                        message="Créer un nouveau personnage IA.",
+                        session_svc=None,  # Ajoutez ici les services nécessaires (comme session_svc et perso_svc)
+                        perso_svc=None     # Idem
+                    )
+
+                if sous == "Voir la liste des personnages IA":
+                    # Afficher la liste des personnages IA
+                    return self.afficher_liste_persoIA()
+
+            if choix == "Annuler":
+                return MenuUtilisateurVue()
 
             return MenuUtilisateurVue()
 
         except Exception as e:
-            print("\n[MenuUtilisateurVue] Exception :", repr(e))
+            print("\n[ParametresVue] Exception :", repr(e))
             print(traceback.format_exc())
-            from view.accueil_vue import AccueilVue
-            return AccueilVue("Erreur dans le menu utilisateur (voir terminal).")
+            return MenuUtilisateurVue("Erreur dans le menu des paramètres.")
 
     # -------------------------------------------------
     # 🔐 Changement de mot de passe
@@ -123,15 +99,56 @@ class ParametresVue(VueAbstraite):
             confirmation = inquirer.secret(message="Confirmer le nouveau mot de passe :").execute()
 
             if nouveau != confirmation:
-                return ParametresVue(" Les mots de passe ne correspondent pas.")
+                return ParametresVue("Les mots de passe ne correspondent pas.")
 
             service = UtilisateurService()
             if service.changer_mot_de_passe(uid, ancien, nouveau):
-                return ParametresVue(" Mot de passe modifié avec succès.")
+                return ParametresVue("Mot de passe modifié avec succès.")
             else:
-                return ParametresVue(" Ancien mot de passe incorrect.")
+                return ParametresVue("Ancien mot de passe incorrect.")
 
         except Exception as e:
             print("\n[ParametresVue] Erreur :", repr(e))
             print(traceback.format_exc())
             return ParametresVue("Erreur lors du changement de mot de passe.")
+
+    # -------------------------------------------------
+    # Afficher la liste des personnages IA
+    # -------------------------------------------------
+    def afficher_liste_persoIA(self):
+        """Affiche la liste des personnages IA et permet de consulter leur description (prompt)."""
+        try:
+            s = Session()
+            uid = s.utilisateur.get("id_utilisateur")
+            dao = PersonnageIADao()
+            persos = dao.list_for_user(uid)
+
+            if not persos:
+                return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
+
+            choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
+            choices.append("Retour")  # Option de retour
+
+            label = inquirer.select(
+                message="Choisir un personnage pour voir sa description :",
+                choices=choices
+            ).execute()
+
+            # Si l'utilisateur choisit "Retour", on retourne au menu précédent
+            if label == "Retour":
+                return MenuUtilisateurVue("Retour au menu des paramètres.")
+
+            pid = int(label.split("#")[-1].rstrip(")"))
+            perso = next(p for p in persos if p.id_personnageIA == pid)
+
+            # Afficher la description du personnage avec un simple print
+            print(f"\nDescription du personnage '{perso.name}':\n")
+            print(f"{perso.system_prompt}\n")
+
+            # Retour à la liste des personnages
+            return self.afficher_liste_persoIA()
+
+        except Exception as e:
+            print("\n[ParametresVue.afficher_liste_persoIA] Exception :", repr(e))
+            print(traceback.format_exc())
+            return ParametresVue("Erreur lors de l'affichage des personnages IA.")
