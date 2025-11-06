@@ -38,9 +38,10 @@ class AfficherConversationVue(VueAbstraite):
             raise ValueError("Format de label incorrect, impossible d'extraire l'ID.")
         conversation = next(c for c in conversations if c.get('id_conversation') == pid)
         id_conversation = conversation.get('id_conversation')
+        print(id_conversation)
 
         conversation_choisie = service.get(id_conversation)
-        s.conversation = conversation_choisie
+        s.conversation_id = id_conversation
 
         from view.parametre_conversation_vue import ParametreConversationVue
         return ParametreConversationVue()

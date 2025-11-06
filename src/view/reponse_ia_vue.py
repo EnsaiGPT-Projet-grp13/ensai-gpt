@@ -12,6 +12,7 @@ class ReponseIAVue(VueAbstraite):
         self.service = ConversationService()
 
     def _ensure_conversation(self, s: Session):
+        
         if s.personnage is None or not s.utilisateur:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Sélectionne un personnage et connecte-toi d'abord.")

@@ -101,6 +101,27 @@ class ConversationDao:
             )
         self.conn.commit()
 
+    def update_titre(self, id_conversation: int, nouveau_titre: str) -> None:
+        """Met à jour le titre d'une conversation."""
+        conn = DBConnection().connection
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE conversation
+                SET titre = %s
+                WHERE id_conversation = %s
+            """, (nouveau_titre, id_conversation))
+        conn.commit()
+
+    def delete(self, id_conversation: int) -> None:
+        """Supprime une conversation de la base de données."""
+        conn = DBConnection().connection
+        with conn.cursor() as cur:
+            cur.execute("""
+                DELETE FROM conversation
+                WHERE id_conversation = %s
+            """, (id_conversation,))
+        conn.commit()
+
     def liste_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25) -> List[Conversation]:
         """Renvoie les conversations dont l’utilisateur est propriétaire."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -214,7 +235,7 @@ class ConversationDao:
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
                 WHERE c.id_proprio = %s
-                    AND c.titre LIKE %s
+                    AND lower(c.titre) LIKE %s
                 UNION
                 SELECT
                   c.id_conversation,
@@ -225,7 +246,7 @@ class ConversationDao:
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
                 JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
                 WHERE cu.id_utilisateur = %s
-                    AND c.titre LIKE %s
+                    AND lower(c.titre) LIKE %s
                 ORDER BY updated_at DESC
                 LIMIT %s
                 """,

@@ -22,11 +22,13 @@ class ParametreConversationVue(VueAbstraite):
         print("\n" + "-" * 50 + "\nOptions la conversation\n" + "-" * 50 + "\n")
 
         s = Session()
-        if s.conversation is None:
+        if s.conversation_id is None:
             from view.historique_vue import HistoriqueVue
             return HistoriqueVue("Aucune conversation sélectionnée.")
-        id_conversation = s.conversation.id_conversation
+        id_conversation = s.conversation_id
         conversation = ConversationService().get(id_conversation)
+        print(f"Vous avez sélectionné la conversation : {conversation.titre}" )
+        titre = conversation.titre
 
         choix = inquirer.select(
             message="Que voulez vous faire avec cette conversation ?",
@@ -34,7 +36,7 @@ class ParametreConversationVue(VueAbstraite):
                 "Reprendre la conversation",
                 "Afficher l'entièreté de la conversation",
                 "Télécharger la conversation",
-                "Supperimer la converasation",
+                "Supprimer la conversation",
                 "Changer le titre",
                 "Quitter",
             ],
@@ -44,9 +46,14 @@ class ParametreConversationVue(VueAbstraite):
             case "Reprendre la conversation":
                 # Reprise de la conversation là où elle a été arrêtée
                 id_personnage = conversation.id_personnageIA
-                s.personnage = asdict(PersonnageService().get_by_id(id_personnage))
-                from view.reponse_ia_vue import ReponseIAVue
-                return ReponseIAVue()
+                if personnage is not None:
+                    s.personnage = asdict(personnage)
+                    from view.reponse_ia_vue import ReponseIAVue
+                    return ReponseIAVue()
+                else:
+                    print(f"Erreur : Le personnage avec l'ID {id_personnage} n'existe pas ou plus.")
+                    from view.menu_utilisateur_vue import MenuUtilisateurVue
+                    return MenuUtilisateurVue("Personnage non trouvé")
 
             case "Afficher l'entièreté de la conversation":
                 # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie
@@ -56,9 +63,10 @@ class ParametreConversationVue(VueAbstraite):
 
             case "Changer le titre":
                 # Modification du titre de la conversation sélectionnée
-                pass
-                """from view.parametre_conversation_vue import ParametreConversationVue
-                return ParametreConversationVue"""
+                nouveau_titre = inquirer.text(message="Comment voulez vous renommer votre conversation ? :").execute()
+                ConversationService().modifier(conversation, nouveau_titre)
+                from view.parametre_conversation_vue import ParametreConversationVue
+                return ParametreConversationVue(f"Vous avez modifier {titre} par {nouveau_titre}")
             
             case "Télécharger la conversation":
                 # Télécharge l'entièreté des échanges de la conversation choisie
@@ -66,11 +74,11 @@ class ParametreConversationVue(VueAbstraite):
                 '''from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue()'''
 
-            case "Suprimer la conversation":
+            case "Supprimer la conversation":
                 # Suppression de la conversation sélectionnée
-                pass
-                '''from view.menu_utilisateur_vue import MenuUtilisateurVue
-                return MenuUtilisateurVue()'''
+                ConversationService().supprimer(conversation)
+                from view.menu_utilisateur_vue import MenuUtilisateurVue
+                return MenuUtilisateurVue(f"Vous avez supprimé la conversation {titre}")
 
             case "Quitter":
                 # Retourne vers la vue du menue de l'utilisateur
