@@ -18,7 +18,7 @@ class MenuUtilisateurVue(VueAbstraite):
                 message="Faites votre choix : ",
                 choices=[
                     "Démarrer une conversation",
-                    "Joindre une conversation",
+                    "Rejoindre une conversation",
                     "Historique",
                     "Statistiques",
                     "Paramètres",

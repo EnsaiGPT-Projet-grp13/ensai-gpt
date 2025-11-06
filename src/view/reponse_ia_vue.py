@@ -33,7 +33,7 @@ class ReponseIAVue(VueAbstraite):
             # Assure l'existence de la conversation (met à jour s.* si besoin)
             self.service._ensure_conversation(s)
 
-            # Garde-fous : il faut un user, un personnage et un id de conversation
+            # Garde-fous
             if not isinstance(s.utilisateur, dict) or not s.utilisateur.get("id_utilisateur"):
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue("Connecte-toi d'abord.")
@@ -53,7 +53,7 @@ class ReponseIAVue(VueAbstraite):
                 ia_text, _ = self.service.send_user_and_get_ai(
                     cid=s.conversation_id,
                     id_user=int(s.utilisateur["id_utilisateur"]),
-                    personnage=s.personnage,  # déjà un dict conforme
+                    personnage=s.personnage,
                     user_text=self._first,
                     temperature=temperature,
                     top_p=top_p,
@@ -65,12 +65,13 @@ class ReponseIAVue(VueAbstraite):
                 self._first = ""
                 self._print_banner(s)
 
-            # boucle de chat
+            # boucle de chat (Entrée vide pour quitter)
             while True:
                 pname = s.personnage.get("name", "Assistant")
                 user_msg = inquirer.text(
-                    message=f"[{pname}] Ton message (Entrée vide pour terminer) :"
+                    message=f"[{pname}] Ton message (Entrée vide pour quitter) :"
                 ).execute() or ""
+
                 if not user_msg.strip():
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
                     return MenuUtilisateurVue("Conversation terminée.")

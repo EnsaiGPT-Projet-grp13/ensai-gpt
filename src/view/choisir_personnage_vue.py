@@ -23,7 +23,6 @@ class ChoisirPersonnageVue(VueAbstraite):
         self.conv_svc = conv_svc or ConversationService()
 
     def afficher(self):
-        # CONTRAT DU MAIN : afficher() ne renvoie rien
         if self.message:
             print(self.message)
             print()
@@ -35,9 +34,13 @@ class ChoisirPersonnageVue(VueAbstraite):
             if not persos:
                 return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
 
-            # 1) Sélection du personnage
-            choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
+            # 1) Sélection du personnage (+ option Retour)
+            choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos] + ["Retour"]
             label = inquirer.select(message="Choisir un personnage :", choices=choices).execute()
+
+            if label == "Quitter":
+                return MenuUtilisateurVue("Retour au menu.")
+
             pid = int(label.split("#")[-1].rstrip(")"))
             perso = next(p for p in persos if p.id_personnageIA == pid)
 
@@ -46,19 +49,23 @@ class ChoisirPersonnageVue(VueAbstraite):
 
             # 3) Titre
             default_title = f"Chat avec {perso.name}"
-            titre = inquirer.text(message="Titre de la conversation :", default=default_title).execute().strip() or default_title
+            titre = (inquirer.text(message="Titre de la conversation :", default=default_title).execute() or "").strip() or default_title
 
-            # 4) Mode
+            # 4) Mode (+ option Retour)
             mode = inquirer.select(
                 message="Voulez-vous un chat privé ou collaboratif ?",
-                choices=["Privé", "Collaboratif"],
+                choices=["Privé", "Collaboratif", "Retour"],
             ).execute()
+
+            if mode == "Quitter":
+                return MenuUtilisateurVue("Retour au menu.")
+
             is_collab = (mode == "Collaboratif")
 
             # 5) Création de la conversation via le SERVICE
             conv = self.conv_svc.start(
                 id_user=uid,
-                personnage={"id_personnageIA": pid, "system_prompt": perso.system_prompt},
+                personnage={"id_personnageIA": pid, "system_prompt": perso.system_prompt, "name": perso.name},
                 titre=titre,
                 is_collab=is_collab,
             )
@@ -71,8 +78,13 @@ class ChoisirPersonnageVue(VueAbstraite):
                 token=getattr(conv, "token_collab", None),
             )
 
-            # 7) Première question → on passe à ReponseIAVue
-            texte = inquirer.text(message=f"[{perso.name}] Première question ?").execute()
+            # 7) Première question (Entrée vide pour quitter)
+            texte = inquirer.text(
+                message=f"[{perso.name}] Première question ? (Entrée vide pour quitter) :"
+            ).execute() or ""
+            if not texte.strip():
+                return MenuUtilisateurVue("Conversation annulée.")
+
             return ReponseIAVue(texte)
 
         except Exception as e:
