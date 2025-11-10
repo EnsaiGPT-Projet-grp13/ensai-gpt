@@ -1,4 +1,3 @@
-# conversation_service.py
 from __future__ import annotations
 
 import os
@@ -11,6 +10,8 @@ from objects.conversation import Conversation
 from objects.message import Message
 from dao.conversation_dao import ConversationDao
 from dao.message_dao import MessageDao
+from objects.session import Session
+
 
 
 API_URL = os.getenv("API_URL", "https://ensai-gpt-109912438483.europe-west4.run.app/generate")
@@ -276,3 +277,48 @@ class ConversationService:
         self.conv_dao.touch(cid)
 
         return ia_text, payload
+
+    def _ensure_conversation(self, s: "Session") -> None:
+        """
+        Version alignée à ta logique d’origine, mais adaptée :
+        - 's.utilisateur' est un objet Utilisateur
+        - 's.personnage' est un objet PersonnageIA
+        - crée la conversation si absente et met à jour l’état 's'
+        - ne retourne rien (mutations in-place)
+        """
+
+        # 1) prérequis : utilisateur + personnage doivent exister
+        if s.personnage is None or s.utilisateur is None:
+            return  # la vue décidera du message à afficher
+
+        # 2) si déjà une conversation en cours, on ne fait rien
+        if s.conversation_id:
+            return
+
+        # 3) valeurs par défaut depuis l'objet utilisateur (ou fallback)
+        temperature = float(getattr(s.utilisateur, "temperature", 0.7) or 0.7)
+        top_p = float(getattr(s.utilisateur, "top_p", 1.0) or 1.0)
+        max_tokens = int(getattr(s.utilisateur, "max_tokens", 150) or 150)
+
+        # 4) création de la conversation
+        conv = self.start(
+            id_user=int(s.utilisateur.id_utilisateur),
+            personnage={
+                "id_personnageIA": int(s.personnage.id_personnageIA),
+                "name": s.personnage.name,
+                "system_prompt": s.personnage.system_prompt,
+            },
+            titre=(s.conversation_title or f"Chat avec {s.personnage.name}"),
+            temperature=temperature,
+            top_p=top_p,
+            max_tokens=max_tokens,
+            is_collab=bool(s.conversation_is_collab),
+        )
+
+        # 5) mise à jour de l’état UI
+        s.conversation_id = conv.id_conversation
+        s.conversation_is_collab = bool(conv.is_collab)
+        s.conversation_token = conv.token_collab if conv.is_collab else None
+
+        # reset du titre proposé (temporaire)
+        s.conversation_title = None

@@ -1,4 +1,3 @@
-# src/view/vue_abstraite.py
 import logging
 from abc import ABC, abstractmethod
 

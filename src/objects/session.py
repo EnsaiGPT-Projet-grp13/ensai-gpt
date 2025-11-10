@@ -1,4 +1,3 @@
-# src/view/session.py
 from utils.singleton import Singleton
 from typing import Optional, Dict, Any
 from datetime import datetime

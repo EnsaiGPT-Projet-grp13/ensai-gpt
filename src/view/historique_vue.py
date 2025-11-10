@@ -23,7 +23,7 @@ class HistoriqueVue(VueAbstraite):
                 "Afficher toutes les conversations",
                 "Rechercher une conversation (par titre)",
                 "Rechercher une conversation (par mots clés)",
-                "Quitter",
+                "Retour",
             ],
         ).execute()
 
@@ -45,7 +45,7 @@ class HistoriqueVue(VueAbstraite):
                 from view.recherche_conversation_mots_vue import RechercheConversationMotsVue 
                 return RechercheConversationMotsVue()
 
-            case "Quitter":
+            case "Retour":
                 # Retourne vers la vue du menue de l'utilisateur
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue()

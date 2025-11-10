@@ -45,7 +45,7 @@ class ParametreConversationVue(VueAbstraite):
                 "Télécharger la conversation",
                 "Supprimer la conversation",
                 "Changer le titre",
-                "Quitter",
+                "Retour",
             ],
         ).execute()
 
@@ -111,7 +111,7 @@ class ParametreConversationVue(VueAbstraite):
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue(f"Vous avez supprimé la conversation {titre}")
 
-            case "Quitter":
+            case "Retour":
                 # Retourne vers la vue du menue de l'utilisateur
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue()

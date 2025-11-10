@@ -20,7 +20,6 @@ class CreerPersonnageVue(VueAbstraite):
         self.perso_svc = perso_svc or PersonnageService()
 
     def afficher(self):
-        # CONTRAT DU MAIN : afficher() ne renvoie rien
         if self.message:
             print(self.message)
             print()
@@ -29,21 +28,22 @@ class CreerPersonnageVue(VueAbstraite):
         try:
             uid = self.session_svc.get_user_id()
 
-            name = inquirer.text(message="Nom du personnage :").execute().strip()
+            # --- Nom du personnage ---
+            name = (inquirer.text(message="Nom du personnage (Entrée vide pour quitter) :").execute() or "").strip()
             if not name:
-                return MenuUtilisateurVue("Nom invalide.")
+                return MenuUtilisateurVue("Création annulée.")
 
-            prompt = inquirer.text(
-                message="Prompt système (rôle, style, limites, format de réponse) :"
-            ).execute().strip()
+            # --- Prompt système ---
+            prompt = (inquirer.text(
+                message="Prompt système (rôle, style, limites, format de réponse — Entrée vide pour quitter) :"
+            ).execute() or "").strip()
             if not prompt:
-                return MenuUtilisateurVue("Prompt système vide.")
+                return MenuUtilisateurVue("Création annulée.")
 
-            # Service = crée + lie à l'utilisateur
+            # Création du personnage
             perso = self.perso_svc.create_personnage(uid, name, prompt)
 
-            # On n’écrit pas encore le perso en session ici.
-            # On renvoie vers la sélection (qui gère correctement la session + conv)
+            # Redirection vers la vue de sélection
             return ChoisirPersonnageVue(
                 message=f"Personnage « {perso.name} » créé. Sélectionnez un personnage :",
                 session_svc=self.session_svc,

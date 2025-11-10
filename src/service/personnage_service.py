@@ -1,4 +1,3 @@
-# service/personnage_service.py
 from __future__ import annotations
 from typing import Dict, Any, List, Optional
 
@@ -17,10 +16,9 @@ class PersonnageService:
     # ---------------------------------------------------------
     def list_for_user(self, uid: int) -> List[PersonnageIA]:
         """
-        Retourne tous les personnages visibles par l'utilisateur :
+        Retourne les personnages visibles par l'utilisateur :
         - standards (créés par le système)
-        - liés via persoIA_utilisateur
-        - créés par cet utilisateur.
+        - créés par cet utilisateur (created_by = uid)
         """
         return self.dao.list_for_user(uid)
 
@@ -37,12 +35,11 @@ class PersonnageService:
         return self.dao.find_by_id(pid)
 
     # ---------------------------------------------------------
-    # Création / Lien utilisateur
+    # Création
     # ---------------------------------------------------------
     def create_personnage(self, uid: int, name: str, system_prompt: str) -> PersonnageIA:
         """
-        Crée un personnage IA (created_by = uid),
-        puis ajoute un lien vers l'utilisateur pour qu'il le voie immédiatement.
+        Crée un personnage IA avec created_by = uid.
         """
         perso = PersonnageIA(
             id_personnageIA=None,
@@ -50,21 +47,7 @@ class PersonnageService:
             system_prompt=system_prompt.strip(),
             created_by=uid,
         )
-
-        # Insertion en base
-        perso = self.dao.create(perso)
-
-        # Lier le personnage à l'utilisateur (table persoIA_utilisateur)
-        self.dao.add(uid, perso.id_personnageIA)
-        return perso
-
-    def link_to_user(self, uid: int, pid: int) -> None:
-        """Lie un personnage existant à un utilisateur."""
-        self.dao.add(uid, pid)
-
-    def unlink_from_user(self, uid: int, pid: int) -> None:
-        """Supprime le lien entre un utilisateur et un personnage."""
-        self.dao.remove(uid, pid)
+        return self.dao.create(perso)
 
     # ---------------------------------------------------------
     # Mise à jour / Suppression
@@ -92,7 +75,7 @@ class PersonnageService:
         return self.dao.update(current)
 
     def delete_personnage(self, pid: int) -> bool:
-        """Supprime un personnage de la base (et ses liens si cascade configurée)."""
+        """Supprime un personnage de la base."""
         return self.dao.delete(pid)
 
     # ---------------------------------------------------------

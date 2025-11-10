@@ -1,10 +1,10 @@
 from dao.db import DBConnection
-from src.service.utilisateur_service import UtilisateurService  # Import de la classe UtilisateurService
+from src.service.utilisateur_service import UtilisateurService
 from collections import Counter
 import os
 from objects.session import Session
 
-SCHEMA = os.getenv("POSTGRES_SCHEMA", "public")
+SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
 class StatsDao:
     def __init__(self):
