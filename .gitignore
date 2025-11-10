@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Fichiers de conversations exportées
+exports/
+*.txt
+
 # C extensions
 *.so
 

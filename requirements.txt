@@ -11,3 +11,4 @@ requests
 tabulate
 uvicorn
 psycopg2
+flask

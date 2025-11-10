@@ -1,10 +1,17 @@
 from InquirerPy import inquirer
 from dataclasses import asdict
+import urllib.parse
+from flask import request
+import os
 
 from objects.session import Session
 from objects.personnage_ia import PersonnageIA
+from src.service.message_service import ChatService
 from src.service.personnage_service import PersonnageService
 from src.service.conversation_service import ConversationService
+from src.service.export_service import ExportService
+from src.service.export_service import telecharger
+from src.service.export_service import start_flask_server
 from view.vue_abstraite import VueAbstraite
 
 class ParametreConversationVue(VueAbstraite):
@@ -46,6 +53,7 @@ class ParametreConversationVue(VueAbstraite):
             case "Reprendre la conversation":
                 # Reprise de la conversation là où elle a été arrêtée
                 id_personnage = conversation.id_personnageIA
+                personnage = PersonnageService().get_by_id(id_personnage)
                 if personnage is not None:
                     s.personnage = asdict(personnage)
                     from view.reponse_ia_vue import ReponseIAVue
@@ -57,9 +65,10 @@ class ParametreConversationVue(VueAbstraite):
 
             case "Afficher l'entièreté de la conversation":
                 # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie
-                pass
-                """from view.parametre_conversation_vue import ParametreConversationVue
-                return ParametreConversationVue"""
+                print("\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n")
+                ChatService().affichage_message_conversartion(id_conversation)
+                from view.parametre_conversation_vue import ParametreConversationVue
+                return ParametreConversationVue()
 
             case "Changer le titre":
                 # Modification du titre de la conversation sélectionnée
@@ -69,10 +78,32 @@ class ParametreConversationVue(VueAbstraite):
                 return ParametreConversationVue(f"Vous avez modifier {titre} par {nouveau_titre}")
             
             case "Télécharger la conversation":
-                # Télécharge l'entièreté des échanges de la conversation choisie
-                pass
-                '''from view.menu_utilisateur_vue import MenuUtilisateurVue
-                return MenuUtilisateurVue()'''
+                start_flask_server()
+                nom_fichier = inquirer.text(message="Comment voulez-vous nommer votre fichier ? :").execute()
+                titre_fichier = conversation.titre
+
+                titre_fichier_encoded = urllib.parse.quote(titre_fichier)
+                nom_fichier_encoded = urllib.parse.quote(nom_fichier)
+
+                base_url = "http://127.0.0.1:5000"
+                url_telechargement = f"{base_url}/telecharger/{id_conversation}?titre={titre_fichier_encoded}&fichier={nom_fichier_encoded}"
+
+                import requests
+                r = requests.get(url_telechargement)
+
+                dossier_exports = "exports"
+                os.makedirs(dossier_exports, exist_ok=True)
+                chemin_fichier = os.path.join(dossier_exports, f"{nom_fichier}.txt")
+
+                if r.status_code == 200:
+                    with open(chemin_fichier, "wb") as f:
+                        f.write(r.content)
+                    message = f"Votre fichier a été téléchargé : {chemin_fichier}"
+                else:
+                    message = f"Erreur {r.status_code} : {r.text[:200]}"
+
+                from view.menu_utilisateur_vue import MenuUtilisateurVue
+                return MenuUtilisateurVue(message)
 
             case "Supprimer la conversation":
                 # Suppression de la conversation sélectionnée

@@ -23,4 +23,15 @@ class ChatService:
     def recherche_mots_message(self, id_utilisateur: int, mots: str, limite: int = 5):
         """Renvoie la liste des messages dans lesquels mots est présent"""
         return self.message_dao.recherche_mots_message(id_utilisateur, mots, limite=limite)
+
+    def affichage_message_conversartion(self, id_conversation: int):
+        """Renvoie toutes la suite des messages d'une conversation"""
+        liste_message = MessageDao().list_for_conversation(id_conversation)
+        if not liste_message:
+            print("Aucun message trouvé pour cette conversation.")
+            return
+        for message in liste_message:
+            print("\n" + f"Message de {message.expediteur :}" + "-" *50 + "\n")
+            print(f"{message.contenu}")
+
         
