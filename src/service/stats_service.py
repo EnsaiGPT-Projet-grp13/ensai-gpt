@@ -1,4 +1,4 @@
-from src.dao.stats_dao import StatsDao
+from dao.stats_dao import StatsDao
 
 class StatsService:
     def __init__(self, db):

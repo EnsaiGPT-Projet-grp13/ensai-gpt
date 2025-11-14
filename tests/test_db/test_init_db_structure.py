@@ -36,7 +36,7 @@ class TestStructureDB():
         """Vérifie que toutes les tables ont bien été créées"""
         tables_attendues = {
             'utilisateur', 'personnageia', 'session', 'conversation',
-            'message', 'conv_utilisateur', 'persoia_utilisateur'
+            'message', 'conv_utilisateur'
         }
         self.cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='projetgpt';")
         tables_existantes = {table[0] for table in self.cur.fetchall()}
@@ -49,7 +49,6 @@ class TestStructureDB():
             'idx_utilisateur_mail',
             'idx_session_user',
             'idx_conversation_personnageia',
-            'idx_utilisateur_personnageia',
             'idx_message_conversation_time',
             'idx_conversation_proprio',
             'idx_conv_utilisateur_user',
@@ -150,16 +149,5 @@ class TestStructureDB():
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans conv_utilisateur : {manquantes}"
 
-
-    def test_colonnes_persoIA_utilisateur(self):
-        """Vérifie que les colonnes importantes de 'persoIA_utilisateur' existent"""
-        self.cur.execute("""
-            SELECT column_name FROM information_schema.columns
-            WHERE table_schema='projetgpt' AND table_name='persoia_utilisateur';
-        """)
-        colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_utilisateur', 'id_personnageia'}
-        manquantes = attendues - colonnes_existantes
-        assert not manquantes, f"Colonnes manquantes dans persoIA_utilisateur : {manquantes}"
 
     

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from src.dao.message_dao import MessageDao
+from dao.message_dao import MessageDao
 
 class MessageService:
     """

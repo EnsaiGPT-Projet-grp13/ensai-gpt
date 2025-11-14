@@ -2,7 +2,7 @@ from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite
 from objects.session import Session
-from src.service.conversation_service import ConversationService
+from service.conversation_service import ConversationService
 
 
 

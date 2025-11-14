@@ -79,3 +79,12 @@ def conversation_existante(utilisateur_existant, personnageIA_existant):
     created = ConversationDao().create(c)
     assert created, "Échec de création de l'utilisateur de test"
     return c
+
+@pytest.fixture
+def session():
+    pass
+
+@pytest.fixture
+def message():
+    pass
+

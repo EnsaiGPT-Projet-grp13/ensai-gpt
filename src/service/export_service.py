@@ -2,7 +2,7 @@ from flask import Flask, Response, request
 import threading
 import socket
 import io
-from src.dao.message_dao import MessageDao
+from dao.message_dao import MessageDao
 
 app = Flask(__name__)
 

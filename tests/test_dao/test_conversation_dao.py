@@ -1,23 +1,20 @@
-import os
 import pytest
-from unittest.mock import patch
 
+from dao.conversation_dao import ConversationDao
 
-from src.dao.conversation_dao import ConversationDao
-from src.objects.conversation import Conversation
 
 
 #pytest.setup_test_environment()
 
-def test_recherche_mots_titre_okcomplet(conversation_existante):
+def test_recherche_mots_titre_okcomplet(conversation_existante, setup_test_environment):
     """Recherche par id d'un utilisateur existant"""
     # GIVEN
-    id_utilisateur = conversation_existante.id_proprio.id_utilisateur
+    id_utilisateur = conversation_existante.id_proprio
     mots = "test"  
     limite = 50 
 
     # WHEN
-    conversation = ConversationDao.recherche_mots_titre(id_utilisateur, mots, limite)
+    conversation = ConversationDao().recherche_mots_titre(id_utilisateur, mots, limite)
 
     # THEN
     assert conversation is not None

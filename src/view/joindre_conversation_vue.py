@@ -1,8 +1,8 @@
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from objects.session import Session
-from src.service.conversation_service import ConversationService
-from src.dao.personnage_ia_dao import PersonnageIADao
+from service.conversation_service import ConversationService
+from dao.personnage_ia_dao import PersonnageIADao
 import traceback
 
 class JoindreConversationVue(VueAbstraite):
@@ -37,7 +37,7 @@ class JoindreConversationVue(VueAbstraite):
             s.conversation_token = conv.token_collab
 
             # Charger le personnage de la conversation
-            from src.dao.personnage_ia_dao import PersonnageIADao
+            from dao.personnage_ia_dao import PersonnageIADao
             pdao = PersonnageIADao()
             perso = pdao.find_by_id(conv.id_personnageIA)
             if perso:

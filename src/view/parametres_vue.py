@@ -5,7 +5,7 @@ from objects.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.utilisateur_service import UtilisateurService
 from view.creer_personnage_vue import CreerPersonnageVue  # Importer la vue pour créer un personnage
-from src.dao.personnage_ia_dao import PersonnageIADao
+from dao.personnage_ia_dao import PersonnageIADao
 
 class ParametresVue(VueAbstraite):
     """Vue pour gérer les paramètres utilisateur et personnages IA."""

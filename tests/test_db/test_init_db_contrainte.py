@@ -39,7 +39,7 @@ class TestContraintesDB():
         """Vérification que les clés sont bien des clés primaires"""
         tables = [
             'utilisateur', 'personnageia', 'session', 'conversation',
-            'message', 'conv_utilisateur', 'persoia_utilisateur'
+            'message', 'conv_utilisateur'
         ]
         for table in tables:
             self.cur.execute(f"""

@@ -6,7 +6,7 @@ from typing import Optional
 class Message:
     id_message: Optional[int]
     id_conversation: int
-    expediteur: str                 # 'utilisateur' | 'IA'
+    expediteur: str              
     contenu: str
     id_utilisateur: Optional[int] = None
     created_at: Optional[datetime] = None

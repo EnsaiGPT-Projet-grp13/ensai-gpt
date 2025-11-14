@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from dotenv import load_dotenv, find_dotenv
-from src.utils.singleton import Singleton
+from utils.singleton import Singleton
 
 
 class DBConnection(metaclass=Singleton):

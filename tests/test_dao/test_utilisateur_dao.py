@@ -2,35 +2,11 @@ import os
 import pytest
 from unittest.mock import patch
 
-from src.utils.reset_database import ResetDatabase
-from src.utils.securite import hash_password
+from utils.reset_database import ResetDatabase
+from utils.securite import hash_password
 
-from src.dao.utilisateur_dao import UtilisateurDao
-from src.objects.utilisateur import Utilisateur
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_environment():
-    """Initialisation des données de test (schéma de test + reset BDD)."""
-    with patch.dict(os.environ, {"SCHEMA": "projet_test_dao"}):
-        ResetDatabase().lancer(test_dao=True)
-        yield
-
-
-@pytest.fixture
-def utilisateur_existant():
-    """Crée un utilisateur en BDD et le retourne (utilisé par plusieurs tests)."""
-    u = Utilisateur(
-        prenom="Alice",
-        nom="Test",
-        mdp=hash_password("mdpAlice", "alice@test.io"),
-        naiss="2000-01-01",
-        mail="alice@test.io",
-    )
-    created = UtilisateurDao().creer(u)
-    assert created, "Échec de création de l'utilisateur de test"
-    assert u.id_utilisateur, "id_utilisateur non renseigné après création"
-    return u
+from dao.utilisateur_dao import UtilisateurDao
+from objects.utilisateur import Utilisateur
 
 
 def test_trouver_par_id_existant(utilisateur_existant):

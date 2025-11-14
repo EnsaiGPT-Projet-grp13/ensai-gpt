@@ -6,12 +6,12 @@ import os
 
 from objects.session import Session
 from objects.personnage_ia import PersonnageIA
-from src.service.message_service import MessageService
-from src.service.personnage_service import PersonnageService
-from src.service.conversation_service import ConversationService
-from src.service.export_service import ExportService
-from src.service.export_service import telecharger
-from src.service.export_service import start_flask_server
+from service.message_service import MessageService
+from service.personnage_service import PersonnageService
+from service.conversation_service import ConversationService
+from service.export_service import ExportService
+from service.export_service import telecharger
+from service.export_service import start_flask_server
 from view.vue_abstraite import VueAbstraite
 
 class ParametreConversationVue(VueAbstraite):

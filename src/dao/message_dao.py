@@ -1,8 +1,8 @@
 import os
 from typing import List, Dict, Any
 from psycopg2.extras import RealDictCursor
-from src.dao.db import DBConnection
-from src.objects.message import Message
+from dao.db import DBConnection
+from objects.message import Message
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 

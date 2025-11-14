@@ -39,6 +39,8 @@ class PersonnageIADao:
                 (p.name, p.system_prompt, p.created_by),
             )
             row = cur.fetchone()
+            if row is None:
+                raise Exception("Erreur lors de l'insertion ou mise à jour de l'objet.")
         self.conn.commit()
         return PersonnageIA(**row)
 

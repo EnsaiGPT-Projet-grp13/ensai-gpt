@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS message (
 );
 
 -- ================================
--- Table d’association : utilisateur ↔ conversation
+-- Table d’association : utilisateur - conversation
 -- ================================
 CREATE TABLE IF NOT EXISTS conv_utilisateur (
     id_utilisateur   INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,

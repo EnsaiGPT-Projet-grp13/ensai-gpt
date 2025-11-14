@@ -3,9 +3,9 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.dao.db import DBConnection
-from src.utils.securite import hash_password
-from src.service.utilisateur_service import UtilisateurService
+from dao.db import DBConnection
+from utils.securite import hash_password
+from service.utilisateur_service import UtilisateurService
 
 
 USERS = [

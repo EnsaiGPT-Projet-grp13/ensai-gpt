@@ -1,5 +1,5 @@
 from dao.db import DBConnection
-from src.service.utilisateur_service import UtilisateurService
+from service.utilisateur_service import UtilisateurService
 from collections import Counter
 import os
 from objects.session import Session

@@ -1,8 +1,8 @@
 import os
 from typing import Optional, List, Dict, Any
 from psycopg2.extras import RealDictCursor
-from src.dao.db import DBConnection
-from src.objects.conversation import Conversation
+from dao.db import DBConnection
+from objects.conversation import Conversation
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
@@ -18,7 +18,7 @@ class ConversationDao:
                     (id_proprio, id_personnageIA, titre, temperature, top_p, max_tokens, is_collab, token_collab)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING
-                  id_conversation AS "id_conversation",
+                  id_conversation,
                   id_proprio,
                   id_personnageIA AS "id_personnageIA",
                   titre,
@@ -37,7 +37,6 @@ class ConversationDao:
                 ),
             )
             row = cur.fetchone()
-        self.conn.commit()
         return Conversation(**row)
 
     def find_by_id(self, cid: int) -> Optional[Conversation]:
