@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature      REAL,
     top_p            REAL,
-    max_tokens       INTEGER NOT NULL DEFAULT 300
+    max_tokens       INTEGER NOT NULL DEFAULT 1000
 );
 
 -- ================================
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS conversation (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature     REAL,
     top_p           REAL,
-    max_tokens      INTEGER NOT NULL DEFAULT 300,
+    max_tokens      INTEGER NOT NULL DEFAULT 1000,
     is_collab       BOOLEAN DEFAULT FALSE,
     token_collab    VARCHAR(16)
 );

@@ -6,7 +6,7 @@ import os
 
 from objects.session import Session
 from objects.personnage_ia import PersonnageIA
-from src.service.message_service import ChatService
+from src.service.message_service import MessageService
 from src.service.personnage_service import PersonnageService
 from src.service.conversation_service import ConversationService
 from src.service.export_service import ExportService
@@ -66,7 +66,7 @@ class ParametreConversationVue(VueAbstraite):
             case "Afficher l'entièreté de la conversation":
                 # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie
                 print("\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n")
-                ChatService().affichage_message_conversartion(id_conversation)
+                MessageService().affichage_message_conversartion(id_conversation)
                 from view.parametre_conversation_vue import ParametreConversationVue
                 return ParametreConversationVue()
 
