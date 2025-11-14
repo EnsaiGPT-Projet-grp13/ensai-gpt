@@ -59,7 +59,7 @@ LLM_MAX_TOKENS=300
 
 POSTGRES_HOST=           # ⚠️ à remplacer par votre host
 POSTGRES_PORT=5432
-POSTGRES_DATABASE=       # ⚠️ à remplacer par votre db
+POSTGRES_DATABASE=defaultdb
 POSTGRES_USER=           # ⚠️ à remplacer par votre identifiant
 POSTGRES_PASSWORD=       # ⚠️ à remplacer par votre mot de passe
 POSTGRES_SCHEMA=projetGPT
