@@ -7,6 +7,10 @@ from service.conversation_service import ConversationService
 # === Objets factices communs pour les tests de services ===
 
 class SessionFactice:
+    """
+    Remplace l'objet Session du projet pour les tests de services.
+    On lui donne juste les attributs utilisés par ConversationService._ensure_conversation.
+    """
     def __init__(self):
         self.utilisateur = None
         self.personnage = None
@@ -17,6 +21,9 @@ class SessionFactice:
 
 
 class UtilisateurFactice:
+    """
+    Utilisateur minimal pour les tests (id + préférences IA).
+    """
     def __init__(self, id_utilisateur, temperature=None, top_p=None, max_tokens=None):
         self.id_utilisateur = id_utilisateur
         self.temperature = temperature
@@ -25,6 +32,9 @@ class UtilisateurFactice:
 
 
 class PersonnageFactice:
+    """
+    Personnage IA minimal pour les tests.
+    """
     def __init__(self, id_personnageIA, name, system_prompt):
         self.id_personnageIA = id_personnageIA
         self.name = name

@@ -24,8 +24,8 @@ from objects.utilisateur import Utilisateur
 def environnement_tests():
     """
     - Force l'utilisation d'un schéma de BDD (projetGPT par défaut).
-    - Mock ResetDatabase.lancer pour ne pas tenter de lire data/init_db.sql
-      ou réinitialiser la base pendant les tests.
+    - Mock ResetDatabase.lancer pour ne pas tenter de lire un SQL ou
+      réinitialiser la base pendant les tests.
     """
     schema = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
