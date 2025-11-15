@@ -94,7 +94,6 @@ CREATE TABLE IF NOT EXISTS conv_utilisateur (
     id_conversation  INTEGER NOT NULL REFERENCES conversation(id_conversation) ON DELETE CASCADE,
     PRIMARY KEY (id_utilisateur, id_conversation)
 );
-
 -- ================================
 -- Index
 -- ================================
@@ -118,6 +117,12 @@ CREATE INDEX idx_conv_utilisateur_user ON conv_utilisateur(id_utilisateur);
 
 DROP INDEX IF EXISTS idx_conv_utilisateur_conversation;
 CREATE INDEX idx_conv_utilisateur_conversation ON conv_utilisateur(id_conversation);
+
+DROP INDEX IF EXISTS idx_persoia_utilisateur_user;
+CREATE INDEX idx_persoia_utilisateur_user ON personnageIA(created_by);
+
+DROP INDEX IF EXISTS idx_persoia_utilisateur_perso;
+CREATE INDEX idx_persoia_utilisateur_perso ON personnageIA(id_personnageIA);
 
 -- ================================
 -- Trigger : mise à jour automatique de updated_at
@@ -144,6 +149,7 @@ DROP TRIGGER IF EXISTS personnageIA_set_updated_at ON personnageIA;
 CREATE TRIGGER personnageIA_set_updated_at
 BEFORE UPDATE ON personnageIA
 FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
+
 """
 
 
