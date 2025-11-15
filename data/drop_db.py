@@ -14,17 +14,40 @@ PG_DB   = os.getenv("POSTGRES_DATABASE", "postgres")
 PG_USER = os.getenv("POSTGRES_USER", "postgres")
 PG_PWD  = os.getenv("POSTGRES_PASSWORD", "postgres")
 
+
 def drop_database():
-    # Connexion à la base par défaut "postgres" pour pouvoir supprimer l’autre
+    """
+    Supprime proprement la base PG_DB en :
+    1. Se connectant à la base 'postgres'
+    2. Forçant la fermeture des autres connexions vers PG_DB
+    3. Exécutant DROP DATABASE
+    """
     conn = psycopg2.connect(
         host=PG_HOST, port=PG_PORT, dbname="postgres", user=PG_USER, password=PG_PWD
     )
     conn.autocommit = True
+
     with conn.cursor() as cur:
         print(f"Suppression complète de la base `{PG_DB}`...")
-        cur.execute(sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(PG_DB)))
+
+        cur.execute(
+            """
+            SELECT pg_terminate_backend(pid)
+            FROM pg_stat_activity
+            WHERE datname = %s
+              AND pid <> pg_backend_pid();
+            """,
+            (PG_DB,),
+        )
+        
+        cur.execute(
+            sql.SQL("DROP DATABASE IF EXISTS {}").format(sql.Identifier(PG_DB))
+        )
+
         print(f"Base `{PG_DB}` supprimée avec succès.")
+
     conn.close()
+
 
 if __name__ == "__main__":
     drop_database()
