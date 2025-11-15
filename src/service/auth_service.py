@@ -29,10 +29,17 @@ class AuthService:
 
     # --- existant si tu veux le garder ---
     def se_connecter(self, mail: str, mdp: str) -> Optional[Utilisateur]:
-        u = self.dao.find_by_mail(mail)
+        # normalisation de l'email
+        mail_norm = (mail or "").strip().lower()
+
+        # récupération de l'utilisateur avec l'email normalisé
+        u = self.dao.find_by_mail(mail_norm)
         if not u:
             return None
-        return u if u.mdp_hash == hash_password(mdp) else None
+
+        # comparaison avec le même schéma de hash que lors de l'inscription
+        return u if u.mdp_hash == hash_password(mdp, mail_norm) else None
+        
 
     # --- nouveaux helpers pour distinguer les cas ---
     def find_user(self, mail: str) -> Optional[Utilisateur]:
