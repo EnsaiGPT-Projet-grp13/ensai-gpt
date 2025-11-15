@@ -45,13 +45,76 @@ class ParametresVue(VueAbstraite):
                     ],
                 ).execute()
 
+                # ---- Changer mot de passe ----
                 if sous == "Changer mot de passe":
-                    return self.changer_mot_de_passe()
+                    s = Session()
+                    id_utilisateur = s.utilisateur.get("id_utilisateur")
 
+                    ancien = inquirer.secret(
+                        message="Ancien mot de passe :"
+                    ).execute()
+                    nouveau = inquirer.secret(
+                        message="Nouveau mot de passe :"
+                    ).execute()
+                    confirmation = inquirer.secret(
+                        message="Confirmez le nouveau mot de passe :"
+                    ).execute()
+
+                    if nouveau != confirmation:
+                        return ParametresVue("Les mots de passe ne correspondent pas.")
+
+                    svc = UtilisateurService()
+                    ok = svc.changer_mot_de_passe(id_utilisateur, ancien, nouveau)
+
+                    if ok:
+                        return ParametresVue("Mot de passe modifié avec succès.")
+                    else:
+                        return ParametresVue("Ancien mot de passe incorrect.")
+
+                # ---- Changer nom utilisateur ----
                 if sous == "Changer nom utilisateur":
-                    return self.changer_nom_utilisateur()
+                    s = Session()
+                    id_utilisateur = s.utilisateur.get("id_utilisateur")
+
+                    nouveau_nom = inquirer.text(
+                        message="Nouveau nom d'utilisateur :"
+                    ).execute()
+
+                    svc = UtilisateurService()
+                    ok = svc.changer_nom_utilisateur(id_utilisateur, nouveau_nom)
+
+                    if ok:
+                        return ParametresVue(
+                            f"Nom d'utilisateur modifié avec succès : {nouveau_nom}"
+                        )
+                    else:
+                        return ParametresVue(
+                            "Erreur lors de la modification du nom d'utilisateur."
+                        )
+
+                # ---- Changer e-mail ----
                 if sous == "Changer e-mail":
-                    return self.changer_nom_utilisateur ()
+                    s = Session()
+                    mail = s.utilisateur.get("mail")
+
+                    nouvel_email = inquirer.text(
+                        message="Nouvel e-mail :"
+                    ).execute()
+
+                    svc = UtilisateurService()
+                    ok = svc.changer_email(mail, nouvel_email)
+
+                    if ok:
+                        return ParametresVue(
+                            f"E-mail modifié avec succès : {nouvel_email}"
+                        )
+                    else:
+                        return ParametresVue(
+                            "Erreur lors de la modification de l'e-mail."
+                        )
+
+                if sous == "Annuler":
+                    return MenuUtilisateurVue()
 
             # -----------------------------
             # Paramètres Personnages IA
@@ -75,8 +138,39 @@ class ParametresVue(VueAbstraite):
                     )
 
                 if sous == "Modifier personnages existants":
-                    # Afficher la liste des personnages IA
-                    return self.afficher_liste_persoIA()
+                    # On reste dans choisir_menu, sans def séparée
+                    s = Session()
+                    uid = s.utilisateur.get("id_utilisateur")
+                    dao = PersonnageIADao()
+
+                    while True:
+                        persos = dao.list_for_user(uid)
+
+                        if not persos:
+                            return MenuUtilisateurVue(
+                                "Aucun personnage disponible. Créez-en un d'abord."
+                            )
+
+                        choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
+                        choices.append("Retour")
+
+                        label = inquirer.select(
+                            message="Choisir un personnage pour consulter sa description :",
+                            choices=choices
+                        ).execute()
+
+                        if label == "Retour":
+                            return MenuUtilisateurVue("Retour au menu des paramètres.")
+
+                        pid = int(label.split("#")[-1].rstrip(")"))
+                        perso = next(p for p in persos if p.id_personnageIA == pid)
+
+                        print(f"\nDescription du personnage '{perso.name}':\n")
+                        print(f"{perso.system_prompt}\n")
+                        # La boucle recommence pour permettre d'en consulter un autre
+
+                if sous == "Annuler":
+                    return MenuUtilisateurVue()
 
             if choix == "Annuler":
                 return MenuUtilisateurVue()
@@ -87,116 +181,3 @@ class ParametresVue(VueAbstraite):
             print("\n[ParametresVue] Exception :", repr(e))
             print(traceback.format_exc())
             return MenuUtilisateurVue("Erreur dans le menu des paramètres.")
-
-    # -------------------------------------------------
-    # 🔐 Changement de mot de passe
-    # -------------------------------------------------
-    def changer_mot_de_passe(self):
-        """Permet à l'utilisateur connecté de changer son mot de passe."""
-        try:
-            s = Session()
-            uid = s.utilisateur.get("id_utilisateur")
-
-            ancien = inquirer.secret(message="Ancien mot de passe :").execute()
-            nouveau = inquirer.secret(message="Nouveau mot de passe :").execute()
-            confirmation = inquirer.secret(message="Confirmer le nouveau mot de passe :").execute()
-
-            if nouveau != confirmation:
-                return ParametresVue("Les mots de passe ne correspondent pas.")
-
-            service = UtilisateurService()
-            if service.changer_mot_de_passe(uid, ancien, nouveau):
-                return ParametresVue("Mot de passe modifié avec succès.")
-            else:
-                return ParametresVue("Ancien mot de passe incorrect.")
-
-        except Exception as e:
-            print("\n[ParametresVue] Erreur :", repr(e))
-            print(traceback.format_exc())
-            return ParametresVue("Erreur lors du changement de mot de passe.")
-
-    # -------------------------------------------------
-    # Fonctionnalité pour changer le nom utilisateur
-    # -------------------------------------------------
-    
-    def changer_nom_utilisateur(self):
-        """Permet à l'utilisateur connecté de changer son nom d'utilisateur."""
-        try:
-            s = Session()
-            uid = s.utilisateur.get("id_utilisateur")
-
-            nouveau_nom = inquirer.text(message="Nouveau nom d'utilisateur :").execute()
-
-            service = UtilisateurService()
-            if service.changer_nom_utilisateur(uid, nouveau_nom):
-                return ParametresVue(f"Nom d'utilisateur modifié avec succès : {nouveau_nom}")
-            else:
-                return ParametresVue("Erreur lors de la modification du nom d'utilisateur.")
-
-        except Exception as e:
-            print("\n[ParametresVue] Erreur lors du changement de nom d'utilisateur :", repr(e))
-            print(traceback.format_exc())
-            return ParametresVue("Erreur lors du changement du nom d'utilisateur.")    
-    # -------------------------------------------------
-    # Fonctionnalité pour changer l'e-mail
-    # -------------------------------------------------
-
-    def changer_email(self):
-        """Permet à l'utilisateur connecté de changer son e-mail."""
-        try:
-            s = Session()
-            uid = s.utilisateur.get("id_utilisateur")
-
-            nouvel_email = inquirer.text(message="Nouvel e-mail :").execute()
-
-            service = UtilisateurService()
-            if service.changer_email(uid, nouvel_email):
-                return ParametresVue(f"E-mail modifié avec succès : {nouvel_email}")
-            else:
-                return ParametresVue("Erreur lors de la modification de l'e-mail.")
-
-        except Exception as e:
-            print("\n[ParametresVue] Erreur lors du changement d'e-mail :", repr(e))
-            print(traceback.format_exc())
-            return ParametresVue("Erreur lors du changement de l'e-mail.")            
-
-    # -------------------------------------------------
-    # Afficher la liste des personnages IA
-    # -------------------------------------------------
-    def afficher_liste_persoIA(self):
-        """Affiche la liste des personnages IA et permet de consulter leur description (prompt)."""
-        try:
-            s = Session()
-            uid = s.utilisateur.get("id_utilisateur")
-            dao = PersonnageIADao()
-            persos = dao.list_for_user(uid)
-
-            if not persos:
-                return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
-
-            choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
-            choices.append("Retour")  # Option de retour
-
-            label = inquirer.select(
-                message="Choisir un personnage pour le modifier :",
-                choices=choices
-            ).execute()
-
-            # Si l'utilisateur choisit "Retour", on retourne au menu précédent
-            if label == "Retour":
-                return MenuUtilisateurVue("Retour au menu des paramètres.")
-
-            pid = int(label.split("#")[-1].rstrip(")"))
-            perso = next(p for p in persos if p.id_personnageIA == pid)
-
-            # Afficher la description du personnage avec un simple print
-            print(f"\nDescription du personnage '{perso.name}':\n")
-            print(f"{perso.system_prompt}\n")
-
-            # Retour à la liste des personnages
-            return self.afficher_liste_persoIA()
-
-        except Exception as e:
-            print("\n[ParametresVue.afficher_liste_persoIA] Exception :", repr(e))
-            print(traceback.format_exc())
-            return ParametresVue("Erreur lors de l'affichage des personnages IA.")
