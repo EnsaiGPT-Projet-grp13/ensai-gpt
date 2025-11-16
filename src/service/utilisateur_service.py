@@ -172,9 +172,23 @@ class UtilisateurService:
             return False
 
     @log
-    def changer_email(self, uid, nouvel_email):
-        # Logique pour changer l'e-mail dans la base de données
-        pass
+    def changer_email(self, mail, nouvel_email):
+        """Permet à l'utilisateur connecté de changer son nom d'utilisateur."""
+        try:
+            # Trouver l'utilisateur existant
+            utilisateur = self.dao.find_by_mail(mail)
+            if not utilisateur:
+                raise ValueError("Utilisateur non trouvé.")
+            
+            # Modifier l'e-mail
+            utilisateur.mail = nouvel_email
+
+            # Appeler la méthode update du DAO pour mettre à jour l'utilisateur
+            return self.dao.update_mail_utilisateur(utilisateur)# Appel de la méthode update du DAO
+
+        except Exception as e:
+            print(f"Erreur lors du changement de nom d'utilisateur : {repr(e)}")
+            return False
 
     def add_default_persoIA(self, user_id: int):
         """Crée/Met à jour les personas par défaut pour un utilisateur."""
