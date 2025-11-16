@@ -189,6 +189,7 @@ class ConversationService:
                         content = msg.get("content")
                         if isinstance(content, str) and content.strip():
                             return content.strip()
+                            
                     for key in ("text", "content", "reply"):
                         v = first.get(key)
                         if isinstance(v, str) and v.strip():
