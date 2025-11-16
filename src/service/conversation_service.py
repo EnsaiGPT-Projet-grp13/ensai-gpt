@@ -165,55 +165,96 @@ class ConversationService:
     # Appel API + extraction robuste du texte
     # --------------------------------------------------------------------- #
     @staticmethod
-    def _extract_ai_text(resp: requests.Response) -> str:
+    def _extract_ai_text(resp) -> str:
         """
-        Gestion de formats de réponse variés (string brute ou style OpenAI-like).
-        Retourne toujours une string non vide.
+        Extrait un texte lisible depuis la réponse de l'API (ou depuis un objet déjà décodé).
+        - Si `resp` est un objet type Response : on utilise .json() puis .text en fallback.
+        - Si `resp` est déjà un str/dict/list : on le traite directement.
+        Retourne toujours une chaîne non vide.
         """
-        try:
-            data = resp.json()
-        except Exception:
-            return (resp.text or "").strip() or "[IA] Réponse vide."
 
+        # 1) Récupérer les données "data" à partir de `resp`
+        if hasattr(resp, "json"):
+            # Cas `requests.Response` ou réponse factice de tests
+            try:
+                data = resp.json()
+            except Exception:
+                # JSON invalide → on tente resp.text
+                text = getattr(resp, "text", "") or ""
+                text = text.strip()
+                return text or "[IA] Réponse vide."
+        else:
+            # Cas où on a déjà directement le contenu décodé (str, dict, etc.)
+            data = resp
+
+        # 2) Si la réponse est une simple chaîne JSON (cas ensaiGPT normal)
         if isinstance(data, str):
-            return data.strip() or "[IA] Réponse vide."
+            text = data.strip()
+            return text or "[IA] Réponse vide."
 
+        # 3) Si c'est un dictionnaire
         if isinstance(data, dict):
-            # Format OpenAI-like
+            # 3.a) Erreurs de validation de type {"detail": [...]}
+            detail = data.get("detail")
+            if isinstance(detail, list):
+                msgs = [
+                    d.get("msg")
+                    for d in detail
+                    if isinstance(d, dict) and isinstance(d.get("msg"), str)
+                ]
+                if msgs:
+                    return "[API] " + " | ".join(msgs)
+
+            # 3.b) Format "OpenAI-like" simplifié avec "choices"
             choices = data.get("choices")
             if isinstance(choices, list) and choices:
-                first = choices[0] if isinstance(choices[0], dict) else None
+                first = choices[0]
                 if isinstance(first, dict):
                     msg = first.get("message")
                     if isinstance(msg, dict):
                         content = msg.get("content")
                         if isinstance(content, str) and content.strip():
                             return content.strip()
-                            
+
                     for key in ("text", "content", "reply"):
                         v = first.get(key)
                         if isinstance(v, str) and v.strip():
                             return v.strip()
 
+            # 3.c) Clé "message" au premier niveau
             msg = data.get("message")
+            if isinstance(msg, str) and msg.strip():
+                return msg.strip()
             if isinstance(msg, dict):
                 content = msg.get("content")
                 if isinstance(content, str) and content.strip():
                     return content.strip()
 
-            for key in ("content", "text", "reply"):
+            # 3.d) Clés simples courantes
+            for key in ("content", "text", "reply", "response", "answer", "result"):
                 v = data.get(key)
                 if isinstance(v, str) and v.strip():
                     return v.strip()
 
-            detail = data.get("detail")
-            if isinstance(detail, list) and detail:
-                msgs = [d.get("msg") for d in detail if isinstance(d, dict) and d.get("msg")]
-                if msgs:
-                    return "[API] " + " | ".join(msgs)
-
+            # 3.e) Dernier recours : représentation string du dict
             return (str(data) or "").strip() or "[IA] Réponse vide."
 
+        # 4) Si c'est une liste : on concatène les chaînes lisibles qu'on trouve
+        if isinstance(data, list):
+            parts: list[str] = []
+            for elt in data:
+                if isinstance(elt, str) and elt.strip():
+                    parts.append(elt.strip())
+                elif isinstance(elt, dict):
+                    for key in ("content", "text", "reply"):
+                        v = elt.get(key)
+                        if isinstance(v, str) and v.strip():
+                            parts.append(v.strip())
+                            break
+            if parts:
+                return " ".join(parts)
+
+        # 5) Tout le reste : fallback générique
         return (str(data) or "").strip() or "[IA] Réponse vide."
 
     # --------------------------------------------------------------------- #
