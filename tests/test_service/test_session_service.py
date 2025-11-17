@@ -1,4 +1,3 @@
-# tests/test_service/test_session_service.py
 import pytest
 
 from service.session_service import SessionService
@@ -9,20 +8,11 @@ def service_session():
     return SessionService()
 
 
-# =========================
-# Tests sur get_user_id
-# =========================
-
 def test_get_user_id_retourne_un_entier(service_session):
     service_session._s.utilisateur = {"id_utilisateur": "42"}
     uid = service_session.get_user_id()
     assert isinstance(uid, int)
     assert uid == 42
-
-
-# =========================
-# Tests sur set_personnage / get_personnage
-# =========================
 
 def test_set_personnage_enregistre_un_dict_correct(service_session):
     service_session.set_personnage(
@@ -38,17 +28,12 @@ def test_set_personnage_enregistre_un_dict_correct(service_session):
 
 
 def test_get_personnage_retourne_ce_qui_est_dans_la_session(service_session):
-    """On vérifie que get_personnage retourne ce qui est stocké, même si présent par défaut."""
+    """On vérifie que get_personnage retourne ce qui est stocké"""
     perso = service_session.get_personnage()
-    # On ne peut PAS supposer None -> on teste juste que ça renvoie ce que contient la session
     assert perso == service_session._s.personnage
 
 
-# =========================
-# Tests conversation
-# =========================
-
-def test_set_conversation_info_modifie_les_champs(service_session):
+def test_set_conversation_info_modifie_bien_les_champs(service_session):
     service_session.set_conversation_info(
         cid=10,
         titre="Chat",
@@ -62,7 +47,7 @@ def test_set_conversation_info_modifie_les_champs(service_session):
 
 
 def test_get_conversation_id_retourne_valeur_stockee(service_session):
-    """Même principe : Session possède déjà des valeurs. On vérifie la cohérence."""
+    """Même principe lorsque session possède déjà des valeurs."""
     assert service_session.get_conversation_id() == service_session._s.conversation_id
 
 

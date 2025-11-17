@@ -1,9 +1,8 @@
 from dao.stats_dao import StatsDao
 
 class StatsService:
-    def __init__(self, db):
-        self.db = db
-        self.stats_dao = StatsDao(db)
+    def __init__(self):
+        self.stats_dao = StatsDao()
 
     def get_user_statistics(self, user_id):
         total_messages = self.stats_dao.nbre_msgs_utilisateur(user_id)
