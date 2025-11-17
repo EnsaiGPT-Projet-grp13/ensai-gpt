@@ -3,22 +3,20 @@
 import pytest
 from unittest.mock import Mock
 
-from service.utilisateur_service import UtilisateurService
+from service.utilisateur_service import UtilisateurService, DEFAULT_PERSONAS
+from utils.securite import hash_password
 from objects.utilisateur import Utilisateur
 from objects.personnage_ia import PersonnageIA
 
 
 @pytest.fixture
-def service_utilisateur(monkeypatch):
+def service_utilisateur():
     """
     Fournit un UtilisateurService avec DAO mockés pour tous les tests.
     """
     service = UtilisateurService()
-
-    # Mock des DAO
     service.dao = Mock()
     service.persona_dao = Mock()
-
     return service
 
 
@@ -26,14 +24,7 @@ def service_utilisateur(monkeypatch):
 # Tests de creer()
 # =========================
 
-def test_creer_appelle_dao_create_et_retourne_utilisateur_si_succes(service_utilisateur, monkeypatch):
-    fake_hash = "HASHED_MDP"
-
-    def fake_hash_password(mdp, salt=None):
-        return fake_hash
-
-    monkeypatch.setattr("service.utilisateur_service.hash_password", fake_hash_password)
-
+def test_creer_appelle_dao_create_et_retourne_utilisateur_si_succes(service_utilisateur):
     service_utilisateur.dao.create.return_value = True
 
     u = service_utilisateur.creer(
@@ -44,17 +35,25 @@ def test_creer_appelle_dao_create_et_retourne_utilisateur_si_succes(service_util
         naiss="2000-01-01",
     )
 
+    # On vérifie la forme de l'objet retourné
     assert isinstance(u, Utilisateur)
-    assert u.mdp_hash == fake_hash
+    assert u.prenom == "Alice"
+    assert u.mail == "alice@test.com"
+
+    # Le hash doit correspondre à la vraie fonction hash_password
+    expected_hash = hash_password("secret")
+    assert u.mdp_hash == expected_hash
+
+    # Le DAO doit être appelé une fois avec un Utilisateur
     service_utilisateur.dao.create.assert_called_once()
     args, kwargs = service_utilisateur.dao.create.call_args
     u_passe = args[0]
+    assert isinstance(u_passe, Utilisateur)
     assert u_passe.prenom == "Alice"
     assert u_passe.mail == "alice@test.com"
 
 
-def test_creer_retourne_none_si_create_echoue(service_utilisateur, monkeypatch):
-    monkeypatch.setattr("service.utilisateur_service.hash_password", lambda mdp, salt=None: "HASH")
+def test_creer_retourne_none_si_create_echoue(service_utilisateur):
     service_utilisateur.dao.create.return_value = False
 
     u = service_utilisateur.creer("Bob", "Test", "bob@test.com", "mdp", "1999-01-01")
@@ -70,7 +69,6 @@ def test_creer_retourne_none_si_create_echoue(service_utilisateur, monkeypatch):
 def test_lister_tous_masque_mdp_par_defaut(service_utilisateur):
     user1 = Utilisateur(1, "A", "A", "a@test.com", "HASH1", "2000-01-01")
     user2 = Utilisateur(2, "B", "B", "b@test.com", "HASH2", "2001-01-01")
-
     service_utilisateur.dao.lister_tous.return_value = [user1, user2]
 
     users = service_utilisateur.lister_tous()
@@ -121,6 +119,7 @@ def test_supprimer_delegue_delete(service_utilisateur):
     assert ok is True
     service_utilisateur.dao.delete.assert_called_once_with(1)
 
+
 # =========================
 # Tests de modifier()
 # =========================
@@ -135,19 +134,16 @@ def test_modifier_sans_rehash_appelle_update_et_retourne_utilisateur(service_uti
     service_utilisateur.dao.update.assert_called_once_with(u)
 
 
-def test_modifier_avec_rehash_recalcule_le_hash(service_utilisateur, monkeypatch):
+def test_modifier_avec_rehash_recalcule_le_hash(service_utilisateur):
+    # Ici u.mdp_hash contient le MOT DE PASSE EN CLAIR avant appel
     u = Utilisateur(1, "A", "A", "a@test.com", "mdp_en_clair", "2000-01-01")
-
-    def fake_hash_password(mdp, salt=None):
-        return "NOUVEAU_HASH"
-
-    monkeypatch.setattr("service.utilisateur_service.hash_password", fake_hash_password)
     service_utilisateur.dao.update.return_value = True
 
     res = service_utilisateur.modifier(u, rehash_password=True)
 
     assert res is u
-    assert u.mdp_hash == "NOUVEAU_HASH"
+    expected_hash = hash_password("mdp_en_clair")
+    assert u.mdp_hash == expected_hash
     service_utilisateur.dao.update.assert_called_once_with(u)
 
 
@@ -165,7 +161,7 @@ def test_modifier_retourne_none_si_update_echoue(service_utilisateur):
 # Tests de se_connecter()
 # =========================
 
-def test_se_connecter_retourne_none_si_mail_inconnu(service_utilisateur, monkeypatch):
+def test_se_connecter_retourne_none_si_mail_inconnu(service_utilisateur):
     service_utilisateur.dao.find_by_mail.return_value = None
 
     user = service_utilisateur.se_connecter("unknown@test.com", "mdp")
@@ -174,29 +170,23 @@ def test_se_connecter_retourne_none_si_mail_inconnu(service_utilisateur, monkeyp
     service_utilisateur.dao.find_by_mail.assert_called_once_with("unknown@test.com")
 
 
-def test_se_connecter_retourne_user_si_mdp_valide(service_utilisateur, monkeypatch):
-    u = Utilisateur(1, "A", "A", "a@test.com", "HASH_OK", "2000-01-01")
+def test_se_connecter_retourne_user_si_mdp_valide(service_utilisateur):
+    # On utilise le vrai hash_password pour être cohérent avec l'implémentation
+    mdp_clair = "secret"
+    hashed = hash_password(mdp_clair)
+    u = Utilisateur(1, "A", "A", "a@test.com", hashed, "2000-01-01")
     service_utilisateur.dao.find_by_mail.return_value = u
 
-    def fake_hash_password(mdp, salt=None):
-        return "HASH_OK"
-
-    monkeypatch.setattr("service.utilisateur_service.hash_password", fake_hash_password)
-
-    user = service_utilisateur.se_connecter("a@test.com", "secret")
+    user = service_utilisateur.se_connecter("a@test.com", mdp_clair)
 
     assert user is u
     service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
 
 
-def test_se_connecter_retourne_none_si_mdp_invalide(service_utilisateur, monkeypatch):
-    u = Utilisateur(1, "A", "A", "a@test.com", "HASH_OK", "2000-01-01")
+def test_se_connecter_retourne_none_si_mdp_invalide(service_utilisateur):
+    hashed = hash_password("autre_mdp")
+    u = Utilisateur(1, "A", "A", "a@test.com", hashed, "2000-01-01")
     service_utilisateur.dao.find_by_mail.return_value = u
-
-    def fake_hash_password(mdp, salt=None):
-        return "AUTRE_HASH"
-
-    monkeypatch.setattr("service.utilisateur_service.hash_password", fake_hash_password)
 
     user = service_utilisateur.se_connecter("a@test.com", "secret")
 
@@ -221,7 +211,7 @@ def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
 # Tests changer_mot_de_passe()
 # =========================
 
-def test_changer_mot_de_passe_retourne_false_si_user_introuvable(service_utilisateur, capsys, monkeypatch):
+def test_changer_mot_de_passe_retourne_false_si_user_introuvable(service_utilisateur):
     service_utilisateur.dao.find_by_id.return_value = None
 
     ok = service_utilisateur.changer_mot_de_passe(1, "old", "new")
@@ -231,17 +221,12 @@ def test_changer_mot_de_passe_retourne_false_si_user_introuvable(service_utilisa
     service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
-def test_changer_mot_de_passe_retourne_false_si_ancien_mdp_faux(service_utilisateur, monkeypatch, capsys):
+def test_changer_mot_de_passe_retourne_false_si_ancien_mdp_faux(service_utilisateur):
     u = Utilisateur(1, "A", "A", "a@test.com", "HASH_OLD", "2000-01-01")
     service_utilisateur.dao.find_by_id.return_value = u
 
-    def fake_hash_password(mdp, salt=None):
-        return f"H({mdp}|{salt})"
-
-    monkeypatch.setattr("service.utilisateur_service.hash_password", fake_hash_password)
-
-    # On s'arrange pour que le hash stocké NE corresponde PAS à H(ancien_mdp|mail)
-    u.mdp_hash = "AUTRE_CHOSE"
+    # On met un hash qui ne correspond pas à hash_password("ancien", u.mail)
+    u.mdp_hash = hash_password("autre_mdp", u.mail)
 
     ok = service_utilisateur.changer_mot_de_passe(1, "ancien", "nouveau")
 
@@ -249,22 +234,17 @@ def test_changer_mot_de_passe_retourne_false_si_ancien_mdp_faux(service_utilisat
     service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
-def test_changer_mot_de_passe_succes_update_mot_de_passe(service_utilisateur, monkeypatch):
+def test_changer_mot_de_passe_succes_update_mot_de_passe(service_utilisateur):
     u = Utilisateur(1, "A", "A", "a@test.com", "HASH_OLD", "2000-01-01")
     service_utilisateur.dao.find_by_id.return_value = u
 
-    def fake_hash_password(mdp, salt=None):
-        return f"H({mdp}|{salt})"
-
-    monkeypatch.setattr("service.utilisateur_service.hash_password", fake_hash_password)
-
     # On définit le hash attendu de l'ancien mot de passe
-    u.mdp_hash = fake_hash_password("ancien", u.mail)
+    u.mdp_hash = hash_password("ancien", u.mail)
 
     ok = service_utilisateur.changer_mot_de_passe(1, "ancien", "nouveau")
 
     assert ok is True
-    nouveau_hash_attendu = fake_hash_password("nouveau", u.mail)
+    nouveau_hash_attendu = hash_password("nouveau", u.mail)
     service_utilisateur.dao.update_mot_de_passe.assert_called_once_with(1, nouveau_hash_attendu)
 
 
@@ -288,7 +268,6 @@ def test_changer_nom_utilisateur_met_a_jour_nom_et_appelle_dao(service_utilisate
             self.nom_utilisateur = nom
 
     fake_user = FakeUser(1, "AncienNom")
-
     service_utilisateur.dao.find_by_id.return_value = fake_user
     service_utilisateur.dao.update_nom_utilisateur.return_value = True
 
@@ -304,20 +283,18 @@ def test_changer_nom_utilisateur_met_a_jour_nom_et_appelle_dao(service_utilisate
 # Tests add_default_persoIA()
 # =========================
 
-def test_add_default_persoIA_cree_un_personnage_par_persona(monkeypatch, service_utilisateur):
-    fake_personas = [
-        {"name": "Bot1", "system_prompt": "SP1"},
-        {"name": "Bot2", "system_prompt": "SP2"},
-    ]
-
-    monkeypatch.setattr("service.utilisateur_service.DEFAULT_PERSONAS", fake_personas)
+def test_add_default_persoIA_cree_un_personnage_par_persona(service_utilisateur):
+    # On suppose que DEFAULT_PERSONAS est non vide
+    nb_personas = len(DEFAULT_PERSONAS)
+    assert nb_personas >= 1
 
     service_utilisateur.persona_dao.create.return_value = True
 
     inserted = service_utilisateur.add_default_persoIA(user_id=5)
 
-    assert inserted == 2
-    assert service_utilisateur.persona_dao.create.call_count == 2
+    assert inserted == nb_personas
+    assert service_utilisateur.persona_dao.create.call_count == nb_personas
+
     # On vérifie les types d'objets passés
     for call in service_utilisateur.persona_dao.create.call_args_list:
         perso = call.args[0]
@@ -325,23 +302,23 @@ def test_add_default_persoIA_cree_un_personnage_par_persona(monkeypatch, service
         assert perso.created_by == 5
 
 
-def test_add_default_persoIA_compte_uniquement_les_succes(monkeypatch, service_utilisateur):
-    fake_personas = [
-        {"name": "Bot1", "system_prompt": "SP1"},
-        {"name": "Bot2", "system_prompt": "SP2"},
-    ]
-    monkeypatch.setattr("service.utilisateur_service.DEFAULT_PERSONAS", fake_personas)
+def test_add_default_persoIA_compte_uniquement_les_succes(service_utilisateur):
+    nb_personas = len(DEFAULT_PERSONAS)
+    assert nb_personas >= 2  # on veut simuler au moins un échec
 
-    # On fait échouer la création du deuxième persona
-    def side_effect_create(perso):
-        if perso.name == "Bot2":
+    # On fait échouer la création du DERNIER persona
+    compteur = {"i": 0}
+
+    def fake_create(perso):
+        compteur["i"] += 1
+        if compteur["i"] == nb_personas:
             raise Exception("Erreur d'insertion")
         return True
 
-    service_utilisateur.persona_dao.create.side_effect = side_effect_create
+    service_utilisateur.persona_dao.create.side_effect = fake_create
     service_utilisateur.persona_dao.conn.rollback = Mock()
 
     inserted = service_utilisateur.add_default_persoIA(user_id=5)
 
-    assert inserted == 1  # Seul le premier persona a été inséré
+    assert inserted == nb_personas - 1  # seul le dernier échoue
     service_utilisateur.persona_dao.conn.rollback.assert_called_once()

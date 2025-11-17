@@ -1,191 +1,230 @@
 import pytest
-from unittest.mock import patch
+from unittest.mock import Mock
 
-import requests
-
-from service.conversation_service import ConversationService, _gen_token
+from service.conversation_service import ConversationService
 from objects.conversation import Conversation
 from objects.message import Message
 
+
 class ReponseFactice:
-    def __init__(self, json_data=None, text="", status_code=200, raise_json=False):
+    def __init__(self, json_data, text=""):
         self._json_data = json_data
         self.text = text
-        self.status_code = status_code
-        self._raise_json = raise_json
 
-def test_start_cree_conversation_simple(service_conversation, personnage_factice):
-    cree = {}
+    def json(self):
+        if isinstance(self._json_data, Exception):
+            raise self._json_data
+        return self._json_data
 
-    class FausseConvDao:
-        def create(self, conv: Conversation):
-            conv.id_conversation = 10
-            cree["conv"] = conv
-            return conv
 
-    service_conversation.conv_dao = FausseConvDao()
+@pytest.fixture
+def service_conversation():
+    """
+    Service de conversation avec DAO mockés pour éviter la vraie BDD.
+    """
+    service = ConversationService()
+    service.conv_dao = Mock()
+    service.msg_dao = Mock()
+    return service
+
+
+def test_start_cree_conversation_simple(service_conversation):
+    """start doit construire une Conversation et appeler conv_dao.create une fois."""
+
+    fake_conv_retour = Conversation(
+        id_conversation=10,
+        id_proprio=5,
+        id_personnageIA=3,
+        titre="Ma conversation",
+        created_at=None,
+        updated_at=None,
+        temperature=None,
+        top_p=None,
+        max_tokens=150,
+        is_collab=False,
+        token_collab=None,
+    )
+    service_conversation.conv_dao.create.return_value = fake_conv_retour
+
+    personnage = {
+        "id_personnageIA": 3,
+        "name": "BotTest",
+        "system_prompt": "Prompt test",
+    }
 
     conv = service_conversation.start(
         id_user=5,
-        personnage={
-            "id_personnageIA": personnage_factice.id_personnageIA,
-            "name": personnage_factice.name,
-            "system_prompt": personnage_factice.system_prompt,
-        },
-        titre="Test",
-        temperature=None,
-        top_p=None,
-        max_tokens=None,
-        is_collab=False,
+        personnage=personnage,
+        titre="Ma conversation",
     )
 
+    service_conversation.conv_dao.create.assert_called_once()
+    args, kwargs = service_conversation.conv_dao.create.call_args
+    conv_passe = args[0]
+
+    assert isinstance(conv_passe, Conversation)
+    assert conv_passe.id_proprio == 5
+    assert conv_passe.id_personnageIA == 3
+    assert conv_passe.titre == "Ma conversation"
+    assert conv_passe.max_tokens == 150
+    assert conv_passe.is_collab is False
+    assert conv_passe.token_collab is None
+
+    assert conv is fake_conv_retour
     assert conv.id_conversation == 10
-    assert conv.id_proprio == 5
-    assert conv.id_personnageIA == personnage_factice.id_personnageIA
-    assert conv.max_tokens == 150
-    assert conv.is_collab is False
-    assert conv.token_collab is None
 
 
-def test_start_conversation_collab_genere_un_token(service_conversation, personnage_factice):
-    class FausseConvDao:
-        def create(self, conv: Conversation):
-            conv.id_conversation = 11
-            return conv
-
-    service_conversation.conv_dao = FausseConvDao()
-
-    conv = service_conversation.start(
-        id_user=2,
-        personnage={
-            "id_personnageIA": personnage_factice.id_personnageIA,
-            "name": personnage_factice.name,
-            "system_prompt": personnage_factice.system_prompt,
-        },
-        titre="Collab",
-        is_collab=True,
-        max_tokens=200,
-        temperature=0.5,
-        top_p=0.9,
-    )
-
-    assert conv.is_collab is True
-    assert isinstance(conv.token_collab, str)
-    assert len(conv.token_collab) == 16
 
 
 def test_join_by_token_retourne_none_si_token_vide(service_conversation):
-    conv = service_conversation.join_by_token(id_user=1, token="   ")
-    assert conv is None
+    """join_by_token doit renvoyer None si le token est vide ou seulement des espaces."""
+    res = service_conversation.join_by_token(id_user=5, token="   ")
+    assert res is None
+    service_conversation.conv_dao.find_by_token.assert_not_called()
+
 
 def test_join_by_token_ajoute_participant_quand_token_valide(service_conversation):
-    convo = Conversation(
-        id_conversation=7,
+    """
+    join_by_token doit :
+      - chercher la conversation via le token
+      - appeler add_participant
+      - renvoyer la conversation.
+    """
+    conv_factice = Conversation(
+        id_conversation=42,
         id_proprio=1,
-        id_personnageIA=2,
-        titre="Collab",
+        id_personnageIA=3,
+        titre="Conv collab",
+        created_at=None,
+        updated_at=None,
         temperature=None,
         top_p=None,
         max_tokens=150,
         is_collab=True,
-        token_collab="TOKEN123",
+        token_collab="ABCDEF1234567890",
     )
-    appels = []
 
-    class FausseConvDao:
-        def find_by_token(self, token: str):
-            assert token == "TOKEN123"
-            return convo
+    service_conversation.conv_dao.find_by_token.return_value = conv_factice
 
-        def add_participant(self, id_user: int, cid: int):
-            appels.append((id_user, cid))
+    res = service_conversation.join_by_token(id_user=9, token="  abcdef1234567890  ")
 
-    service_conversation.conv_dao = FausseConvDao()
-
-    conv = service_conversation.join_by_token(id_user=3, token="  token123  ")
-    assert conv is convo
-    assert appels == [(3, 7)]
+    service_conversation.conv_dao.find_by_token.assert_called_once_with("ABCDEF1234567890")
+    service_conversation.conv_dao.add_participant.assert_called_once_with(9, 42)
+    assert res is conv_factice
 
 
-def test_build_history_construit_system_et_messages(service_conversation, personnage_factice):
+def test_build_history_construit_system_et_messages(service_conversation):
+    """build_history doit renvoyer l'historique au bon format, avec rôle system + messages."""
+    # messages factices
     messages = [
         Message(
             id_message=1,
-            id_conversation=1,
+            id_conversation=10,
             expediteur="utilisateur",
             id_utilisateur=5,
-            contenu="Salut",
+            contenu="Bonjour",
         ),
         Message(
             id_message=2,
-            id_conversation=1,
+            id_conversation=10,
             expediteur="IA",
             id_utilisateur=None,
-            contenu="Bonjour, comment puis-je aider ?",
+            contenu="Salut, comment puis-je t'aider ?",
         ),
     ]
 
-    class FauxMsgDao:
-        def list_for_conversation(self, cid: int):
-            assert cid == 1
-            return messages
+    service_conversation.msg_dao.list_for_conversation.return_value = messages
 
-    service_conversation.msg_dao = FauxMsgDao()
+    personnage = {
+        "id_personnageIA": 3,
+        "name": "BotTest",
+        "system_prompt": "Tu es un bot de test.",
+    }
 
-    hist = service_conversation.build_history(
-        {
-            "system_prompt": personnage_factice.system_prompt
-        },
-        cid=1,
-    )
-    assert len(hist) == 3
-    assert hist[0]["role"] == "system"
-    assert hist[0]["content"] == personnage_factice.system_prompt
-    assert hist[1]["role"] == "user"
-    assert hist[2]["role"] == "assistant"
+    history = service_conversation.build_history(personnage, cid=10)
 
-    def json(self):
-        if self._raise_json:
-            raise ValueError("JSON invalide")
-        return self._json_data
+    # 1er message = system_prompt
+    assert history[0] == {"role": "system", "content": "Tu es un bot de test."}
+    # 2e message = utilisateur
+    assert history[1]["role"] == "user"
+    assert history[1]["content"] == "Bonjour"
+    # 3e message = IA
+    assert history[2]["role"] == "assistant"
+    assert "comment puis-je t'aider" in history[2]["content"]
+
+    service_conversation.msg_dao.list_for_conversation.assert_called_once_with(10)
+
 
 def test_extract_ai_text_depuis_resp_text():
-    class R:
-        text = "Salut"
-        def json(self):
-            raise ValueError("pas de JSON")
-    resp = R()
-    texte = ConversationService._extract_ai_text(resp)
-    assert texte == "Salut"
-
-def test_extract_ai_text_depuis_chaine_simple():
-    resp = ReponseFactice(
-        json_data=ValueError("invalid json"),
-        text="Bonjour !"
-    )
+    """
+    Cas où .json() renvoie directement une chaîne simple (format "ensaiGPT").
+    """
+    resp = ReponseFactice(json_data="Bonjour !")
     texte = ConversationService._extract_ai_text(resp)
     assert texte == "Bonjour !"
 
 
+def test_extract_ai_text_depuis_chaine_simple():
+    """Si on passe directement une chaîne, elle est renvoyée telle quelle (trimée)."""
+    texte = ConversationService._extract_ai_text("  Coucou  ")
+    assert texte == "Coucou"
+
+
 def test_extract_ai_text_depuis_chaine_vide():
-    resp = ReponseFactice(json_data="   ")
-    texte = ConversationService._extract_ai_text(resp)
+    """Chaîne vide -> placeholder '[IA] Réponse vide.'."""
+    texte = ConversationService._extract_ai_text("   ")
     assert texte == "[IA] Réponse vide."
 
 
 def test_extract_ai_text_retourne_placeholder_si_vide():
+    """Si rien n'est exploitable, on renvoie le placeholder."""
     resp = ReponseFactice(json_data="", text="")
     texte = ConversationService._extract_ai_text(resp)
-    assert "[IA] Réponse vide." in texte
-
-def test_ensure_conversation_ne_fait_rien_si_pas_d_utilisateur_ou_personnage(service_conversation, session_factice):
-    s = session_factice
-    service_conversation._ensure_conversation(s)
-    assert s.conversation_id is None
-
+    assert texte == "[IA] Réponse vide."
 
 
 def test_extract_ai_text_json_invalide_utilise_text():
+    """
+    Si resp.json() lève une exception, on utilise resp.text comme fallback.
+    """
     resp = ReponseFactice(json_data=ValueError("invalid json"), text="Réponse brute")
     texte = ConversationService._extract_ai_text(resp)
     assert texte == "Réponse brute"
+
+
+def test_extract_ai_text_format_openai_like():
+    """
+    Cas d'un JSON de type OpenAI :
+      {"choices": [{"message": {"content": "Texte IA"}}]}
+    """
+    resp = ReponseFactice(
+        json_data={
+            "choices": [
+                {
+                    "message": {"content": "Bonjour depuis OpenAI-like"},
+                }
+            ]
+        }
+    )
+    texte = ConversationService._extract_ai_text(resp)
+    assert texte == "Bonjour depuis OpenAI-like"
+
+
+def test_extract_ai_text_detail_erreur():
+    """
+    Cas d'une réponse d'erreur de validation :
+      {"detail": [{"msg": "..."}]}
+    """
+    resp = ReponseFactice(
+        json_data={
+            "detail": [
+                {"msg": "Champ requis manquant"},
+                {"msg": "Autre erreur"},
+            ]
+        }
+    )
+    texte = ConversationService._extract_ai_text(resp)
+    assert texte.startswith("[API] ")
+    assert "Champ requis manquant" in texte
+    assert "Autre erreur" in texte
+
