@@ -36,9 +36,6 @@ class TestContraintesDB:
         """Retour à l'état précédent le test"""
         self.cur.execute("ROLLBACK TO SAVEPOINT test_savepoint;")
 
-    # ================================
-    # Tests des clés primaires
-    # ================================
     def test_cles_primaires(self):
         """Vérification que les clés sont bien des clés primaires"""
         tables = [
@@ -63,9 +60,6 @@ class TestContraintesDB:
             nb_pk = self.cur.fetchone()[0]
             assert nb_pk == 1, f"Attention : la table {table} ne possède pas de clé primaire."
 
-    # ================================
-    # Test des contraintes d'unicité
-    # ================================
     def test_mail_utilisateur_unique(self):
         """Test si une erreur est bien signalée si on met deux fois le même mail"""
         self.cur.execute(
@@ -82,9 +76,6 @@ class TestContraintesDB:
                 """
             )
 
-    # ================================
-    # Tests des ON DELETE CASCADE
-    # ================================
     def test_fk_on_delete_cascade(self):
         """Vérifie que si l'on supprime un utilisateur, ses conversations et sessions sont aussi supprimées"""
         # Création d'un utilisateur
@@ -270,9 +261,6 @@ class TestContraintesDB:
             deuxieme_temps > premier_temps
         ), "Le trigger 'set_updated_at' n'a pas été exécuté sur personnageIA."
 
-    # ================================
-    # Tests des valeurs par défaut de timestamps
-    # ================================
     def test_default_timestamps(self):
         """
         Vérifie que created_at et updated_at de la table utilisateur

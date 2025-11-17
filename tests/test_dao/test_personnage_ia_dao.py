@@ -1,37 +1,12 @@
-# tests/test_dao/test_personnage_ia_dao.py
-
-import uuid
-from datetime import date
-
 from dao.utilisateur_dao import UtilisateurDao
 from dao.personnage_ia_dao import PersonnageIADao
-from objects.utilisateur import Utilisateur
 from objects.personnage_ia import PersonnageIA
 
-
-def _make_fake_user() -> Utilisateur:
-    """
-    Crée un utilisateur factice avec un email unique, sans id.
-    Utilisé pour les tests de PersonnageIADao.
-    """
-    unique_part = uuid.uuid4().hex[:8]
-    mail = f"perso_user_{unique_part}@example.com"
-    return Utilisateur(
-        id_utilisateur=None,
-        prenom="Perso",
-        nom="Owner",
-        mail=mail,
-        mdp_hash="HASH_TEST",
-        naiss=date(2000, 1, 1),
-    )
-
-
-def _create_user_in_db() -> Utilisateur:
-    """Insère un utilisateur en base et le retourne avec son id_utilisateur renseigné."""
-    udao = UtilisateurDao()
-    u = _make_fake_user()
-    created = udao.create(u)
-    return created
+from tests.test_dao.helpers_dao import (
+    create_test_user,
+    create_test_personnage,
+    create_standard_personnage,
+)
 
 
 def test_create_and_find_by_id_personnage():
@@ -40,21 +15,10 @@ def test_create_and_find_by_id_personnage():
     """
     udao = UtilisateurDao()
     pdao = PersonnageIADao()
-
-    # 1) créer un utilisateur propriétaire
-    user = _create_user_in_db()
-
-    # 2) créer un personnage IA
-    p = PersonnageIA(
-        id_personnageIA=None,
-        name="BotTest_" + uuid.uuid4().hex[:6],
-        system_prompt="Je suis un bot de test.",
-        created_by=user.id_utilisateur,
-    )
-    created = pdao.create(p)
+    user = create_test_user(email_prefix="perso_user")
+    created = create_test_personnage(user.id_utilisateur, prefix="BotTest")
 
     assert created.id_personnageIA is not None
-    assert created.name == p.name
     assert created.created_by == user.id_utilisateur
 
     # 3) vérifier via find_by_id
@@ -64,7 +28,6 @@ def test_create_and_find_by_id_personnage():
     assert relu.name == created.name
     assert relu.system_prompt == created.system_prompt
 
-    # Nettoyage
     pdao.delete(created.id_personnageIA)
     udao.delete(user.id_utilisateur)
 
@@ -78,8 +41,8 @@ def test_create_fait_un_upsert_sur_name_et_created_by():
     udao = UtilisateurDao()
     pdao = PersonnageIADao()
 
-    user = _create_user_in_db()
-    name = "BotUpsert_" + uuid.uuid4().hex[:6]
+    user = create_test_user(email_prefix="perso_upsert")
+    name = "BotUpsertTest"
 
     p1 = PersonnageIA(
         id_personnageIA=None,
@@ -101,7 +64,6 @@ def test_create_fait_un_upsert_sur_name_et_created_by():
     assert created2.id_personnageIA == created1.id_personnageIA
     assert created2.system_prompt == "Prompt v2"
 
-    # Nettoyage
     pdao.delete(created1.id_personnageIA)
     udao.delete(user.id_utilisateur)
 
@@ -114,15 +76,8 @@ def test_delete_retourne_true_quand_un_personnage_est_supprime():
     udao = UtilisateurDao()
     pdao = PersonnageIADao()
 
-    user = _create_user_in_db()
-
-    p = PersonnageIA(
-        id_personnageIA=None,
-        name="BotDelete_" + uuid.uuid4().hex[:6],
-        system_prompt="À supprimer.",
-        created_by=user.id_utilisateur,
-    )
-    created = pdao.create(p)
+    user = create_test_user(email_prefix="perso_delete")
+    created = create_test_personnage(user.id_utilisateur, prefix="BotDelete")
 
     # 1er delete -> True
     ok = pdao.delete(created.id_personnageIA)
@@ -132,7 +87,6 @@ def test_delete_retourne_true_quand_un_personnage_est_supprime():
     ok2 = pdao.delete(created.id_personnageIA)
     assert ok2 is False
 
-    # Nettoyage
     udao.delete(user.id_utilisateur)
 
 
@@ -143,25 +97,11 @@ def test_list_by_creator_ne_retourne_que_les_personnages_de_ce_user():
     udao = UtilisateurDao()
     pdao = PersonnageIADao()
 
-    user1 = _create_user_in_db()
-    user2 = _create_user_in_db()
+    user1 = create_test_user(email_prefix="perso_user1")
+    user2 = create_test_user(email_prefix="perso_user2")
 
-    p1 = pdao.create(
-        PersonnageIA(
-            id_personnageIA=None,
-            name="BotUser1_" + uuid.uuid4().hex[:4],
-            system_prompt="Pour user1",
-            created_by=user1.id_utilisateur,
-        )
-    )
-    p2 = pdao.create(
-        PersonnageIA(
-            id_personnageIA=None,
-            name="BotUser2_" + uuid.uuid4().hex[:4],
-            system_prompt="Pour user2",
-            created_by=user2.id_utilisateur,
-        )
-    )
+    p1 = create_test_personnage(user1.id_utilisateur, prefix="BotUser1")
+    p2 = create_test_personnage(user2.id_utilisateur, prefix="BotUser2")
 
     liste1 = pdao.list_by_creator(user1.id_utilisateur)
     noms1 = {p.name for p in liste1}
@@ -186,13 +126,10 @@ def test_list_standards_inclut_les_personnages_sans_created_by():
     pdao = PersonnageIADao()
 
     # Création d'un personnage standard (created_by = None)
-    p_std = PersonnageIA(
-        id_personnageIA=None,
-        name="StandardTest_" + uuid.uuid4().hex[:4],
+    created_std = create_standard_personnage(
+        name_prefix="StandardTest",
         system_prompt="Standard de test.",
-        created_by=None,
     )
-    created_std = pdao.create(p_std)
 
     standards = pdao.list_standards()
     ids = {p.id_personnageIA for p in standards}
@@ -212,41 +149,27 @@ def test_list_for_user_retourne_standards_et_personnages_de_l_utilisateur():
     udao = UtilisateurDao()
     pdao = PersonnageIADao()
 
-    user = _create_user_in_db()
+    user = create_test_user(email_prefix="perso_list")
 
-    # 1) standard
-    p_std = pdao.create(
-        PersonnageIA(
-            id_personnageIA=None,
-            name="StdListForUser_" + uuid.uuid4().hex[:4],
-            system_prompt="Standard pour list_for_user.",
-            created_by=None,
-        )
+    p_std = create_standard_personnage(
+        name_prefix="StdListForUser",
+        system_prompt="Standard pour list_for_user.",
     )
 
-    # 2) perso du user
-    p_user = pdao.create(
-        PersonnageIA(
-            id_personnageIA=None,
-            name="UserListForUser_" + uuid.uuid4().hex[:4],
-            system_prompt="Perso user.",
-            created_by=user.id_utilisateur,
-        )
+    p_user = create_test_personnage(
+        user.id_utilisateur,
+        prefix="UserListForUser",
     )
 
     liste = pdao.list_for_user(user.id_utilisateur)
     ids = {p.id_personnageIA for p in liste}
     creators = {p.created_by for p in liste}
 
-    # On s'assure que nos deux persos sont dedans
     assert p_std.id_personnageIA in ids
     assert p_user.id_personnageIA in ids
-
-    # created_by contient au moins {None, user.id}
     assert None in creators
     assert user.id_utilisateur in creators
 
-    # Nettoyage
     pdao.delete(p_std.id_personnageIA)
     pdao.delete(p_user.id_personnageIA)
     udao.delete(user.id_utilisateur)
