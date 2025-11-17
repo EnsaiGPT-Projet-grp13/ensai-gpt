@@ -35,21 +35,38 @@ class ChoisirPersonnageVue(VueAbstraite):
                 return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
 
             # 1) Sélection du personnage (+ option Retour)
-            choices = [f"{p.name}" for p in persos] + ["Retour"]
-            label = inquirer.select(message="Choisir un personnage :", choices=choices).execute()
+            choices = [p.name for p in persos] + ["Retour"]
+            label = inquirer.select(
+                message="Choisir un personnage :",
+                choices=choices
+            ).execute()
 
-            if label == "Quitter":
+            if label == "Retour":
                 return MenuUtilisateurVue("Retour au menu.")
 
-            pid = int(label.split("#")[-1].rstrip(")"))
-            perso = next(p for p in persos if p.id_personnageIA == pid)
+            # On retrouve le personnage par son nom
+            perso = next((p for p in persos if p.name == label), None)
+            if perso is None:
+                return MenuUtilisateurVue("Personnage introuvable, veuillez réessayer.")
+
+            pid = perso.id_personnageIA
 
             # 2) Mémoriser le personnage en session
-            self.session_svc.set_personnage(pid=pid, name=perso.name, system_prompt=perso.system_prompt)
+            self.session_svc.set_personnage(
+                pid=pid,
+                name=perso.name,
+                system_prompt=perso.system_prompt,
+            )
 
             # 3) Titre
             default_title = f"Chat avec {perso.name}"
-            titre = (inquirer.text(message="Titre de la conversation :", default=default_title).execute() or "").strip() or default_title
+            titre = (
+                inquirer.text(
+                    message="Titre de la conversation :",
+                    default=default_title
+                ).execute()
+                or ""
+            ).strip() or default_title
 
             # 4) Mode (+ option Retour)
             mode = inquirer.select(
@@ -57,7 +74,7 @@ class ChoisirPersonnageVue(VueAbstraite):
                 choices=["Privé", "Collaboratif", "Retour"],
             ).execute()
 
-            if mode == "Quitter":
+            if mode == "Retour":
                 return MenuUtilisateurVue("Retour au menu.")
 
             is_collab = (mode == "Collaboratif")
@@ -65,7 +82,11 @@ class ChoisirPersonnageVue(VueAbstraite):
             # 5) Création de la conversation via le SERVICE
             conv = self.conv_svc.start(
                 id_user=uid,
-                personnage={"id_personnageIA": pid, "system_prompt": perso.system_prompt, "name": perso.name},
+                personnage={
+                    "id_personnageIA": pid,
+                    "system_prompt": perso.system_prompt,
+                    "name": perso.name,
+                },
                 titre=titre,
                 is_collab=is_collab,
             )

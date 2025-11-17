@@ -63,7 +63,7 @@ class MenuUtilisateurVue(VueAbstraite):
 
                 return MenuUtilisateurVue("Opération annulée.")
 
-            if choix == "Joindre une conversation":
+            if choix == "Rejoindre une conversation":
                 from view.joindre_conversation_vue import JoindreConversationVue
                 return JoindreConversationVue()
 
