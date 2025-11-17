@@ -149,9 +149,6 @@ def test_build_history_construit_system_et_messages(service_conversation, person
             raise ValueError("JSON invalide")
         return self._json_data
 
-
-
-
 def test_extract_ai_text_depuis_resp_text():
     class R:
         text = "Salut"

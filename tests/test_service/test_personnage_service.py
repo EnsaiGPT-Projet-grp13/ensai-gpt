@@ -1,4 +1,3 @@
-# tests/test_service/test_personnage_service.py
 import pytest
 from unittest.mock import Mock
 
@@ -6,18 +5,10 @@ from service.personnage_service import PersonnageService
 from objects.personnage_ia import PersonnageIA
 
 
-# =========================
-# Fixture de service
-# =========================
-
 @pytest.fixture
 def service_personnage():
     return PersonnageService()
 
-
-# =========================
-# Tests de lecture (list / get)
-# =========================
 
 def test_list_for_user_appelle_dao_avec_bon_id(service_personnage):
     dao_mock = Mock()
@@ -109,13 +100,7 @@ def test_create_personnage_construit_objet_et_appelle_create(service_personnage)
     assert perso_cree.name == "Mon Bot"
     assert perso_cree.system_prompt == "Je suis un bot."
     assert perso_cree.created_by == 5
-    # l'id_personnageIA est None au moment de la création (avant retour DAO)
     assert perso_cree.id_personnageIA is None
-
-
-# =========================
-# Tests de update_personnage
-# =========================
 
 def test_update_personnage_retourne_none_si_id_inexistant(service_personnage):
     dao_mock = Mock()
@@ -203,7 +188,7 @@ def test_update_personnage_ignore_nom_vide(service_personnage):
 
     res = service_personnage.update_personnage(
         pid=12,
-        name="   ",  # nom vide -> ignoré
+        name="   ",  # nom vide
         system_prompt="Nouveau prompt",
     )
 
@@ -228,17 +213,13 @@ def test_update_personnage_ignore_prompt_vide(service_personnage):
     res = service_personnage.update_personnage(
         pid=13,
         name="Nouveau nom",
-        system_prompt="   ",  # prompt vide -> ignoré
+        system_prompt="   ",  # prompt vide
     )
 
     assert res.name == "Nouveau nom"
     assert res.system_prompt == "Prompt de base"
     dao_mock.update.assert_called_once_with(perso_initial)
 
-
-# =========================
-# Tests de delete_personnage
-# =========================
 
 def test_delete_personnage_appelle_dao_delete(service_personnage):
     dao_mock = Mock()
@@ -249,11 +230,6 @@ def test_delete_personnage_appelle_dao_delete(service_personnage):
 
     assert res is True
     dao_mock.delete.assert_called_once_with(50)
-
-
-# =========================
-# Tests de build_payload (statique)
-# =========================
 
 def test_build_payload_avec_personnage_objet():
     perso = PersonnageIA(
