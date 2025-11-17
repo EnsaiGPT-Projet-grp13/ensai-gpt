@@ -35,7 +35,7 @@ class ChoisirPersonnageVue(VueAbstraite):
                 return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
 
             # 1) Sélection du personnage (+ option Retour)
-            choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos] + ["Retour"]
+            choices = [f"{p.name}" for p in persos] + ["Retour"]
             label = inquirer.select(message="Choisir un personnage :", choices=choices).execute()
 
             if label == "Quitter":
