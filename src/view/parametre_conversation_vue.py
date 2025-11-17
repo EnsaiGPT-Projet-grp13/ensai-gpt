@@ -66,7 +66,7 @@ class ParametreConversationVue(VueAbstraite):
             case "Afficher l'entièreté de la conversation":
                 # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie
                 print("\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n")
-                MessageService().affichage_message_conversartion(id_conversation)
+                MessageService().affichage_message_conversation(id_conversation)
                 from view.parametre_conversation_vue import ParametreConversationVue
                 return ParametreConversationVue()
 

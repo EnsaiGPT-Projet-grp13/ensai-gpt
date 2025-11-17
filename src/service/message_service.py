@@ -17,14 +17,18 @@ class MessageService:
         """Renvoie la liste des messages dans lesquels mots est présent"""
         return self.message_dao.recherche_mots_message(id_utilisateur, mots, limite=limite)
 
-    def affichage_message_conversartion(self, id_conversation: int):
-        """Renvoie toutes la suite des messages d'une conversation"""
-        liste_message = MessageDao().list_for_conversation(id_conversation)
-        if not liste_message:
-            print("Aucun message trouvé pour cette conversation.")
-            return
-        for message in liste_message:
-            print("\n" + f"Message de {message.expediteur :}" + "-" *50 + "\n")
-            print(f"{message.contenu}")
+    def affichage_message_conversation(self, id_conversation: int):
+        dao = MessageDao()
+        messages = dao.list_for_conversation(id_conversation)
+
+        if not messages:
+            return "Aucun message trouvé pour cette conversation."
+
+        lignes = []
+        for msg in messages:
+            lignes.append(f"Message de {msg.expediteur} : {msg.contenu}")
+
+        return "\n".join(lignes)
+
 
         
