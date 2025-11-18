@@ -4,8 +4,9 @@ from view.vue_abstraite import VueAbstraite
 from objects.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.utilisateur_service import UtilisateurService
+from service.personnage_service import PersonnageService
 from view.creer_personnage_vue import CreerPersonnageVue  # Importer la vue pour créer un personnage
-from dao.personnage_ia_dao import PersonnageIADao
+
 
 class ParametresVue(VueAbstraite):
     """Vue pour gérer les paramètres utilisateur et personnages IA."""
@@ -63,13 +64,14 @@ class ParametresVue(VueAbstraite):
                     if nouveau != confirmation:
                         return ParametresVue("Les mots de passe ne correspondent pas.")
 
-                    svc = UtilisateurService()
-                    ok = svc.changer_mot_de_passe(id_utilisateur, ancien, nouveau)
 
-                    if ok:
-                        return ParametresVue("Mot de passe modifié avec succès.")
-                    else:
-                        return ParametresVue("Ancien mot de passe incorrect.")
+                    if ancien == nouveau:
+                        return ParametresVue("Le nouveau mot de passe doit être différent de l'ancien.")
+                    svc = UtilisateurService()
+                    ok, msg = svc.changer_mot_de_passe(id_utilisateur, ancien, nouveau)
+
+                    
+                    return ParametresVue(msg)
 
                 # ---- Changer nom utilisateur ----
                 if sous == "Changer nom utilisateur":
@@ -79,6 +81,11 @@ class ParametresVue(VueAbstraite):
                     nouveau_nom = inquirer.text(
                         message="Nouveau nom d'utilisateur :"
                     ).execute()
+
+                    if not nouveau_nom or not nouveau_nom.strip():
+                        return ParametresVue(
+                        "Le nouveau nom d'utilisateur ne peut pas être vide ou composé uniquement d'espaces."
+                        )
 
                     svc = UtilisateurService()
                     ok = svc.changer_nom_utilisateur(id_utilisateur, nouveau_nom)
@@ -132,11 +139,12 @@ class ParametresVue(VueAbstraite):
                 if sous == "Supprimer un personnage IA existant":
                     s = Session()
                     uid = s.utilisateur.get("id_utilisateur")
-                    dao = PersonnageIADao()
+
+                    svc = PersonnageService()
 
                     while True:
                         # On ne propose à la suppression que les personnages créés par l'utilisateur
-                        persos = dao.list_by_creator(uid)
+                        persos = svc.lister_personnages_ia_crees_par(uid)
 
                         if not persos:
                             return MenuUtilisateurVue(
@@ -175,16 +183,18 @@ class ParametresVue(VueAbstraite):
                                 # On reboucle pour choisir à nouveau un personnage
                                 continue
 
-                        ok = dao.delete(pid)
+                        # 👉 ICI on appelle le service, plus le DAO
+                        ok = svc.supprimer_personnage_ia(uid, pid)
+
                         if ok:
                             return MenuUtilisateurVue(
                                 f"Personnage « {perso.name} » supprimé avec succès."
                             )
                         else:
                             return MenuUtilisateurVue(
-                                "Impossible de supprimer ce personnage IA car des conversations y sont encore associées.\n"
-                                "Supprimez d'abord les conversations correspondantes dans l'historique, puis réessayez."
+                                "Impossible de supprimer ce personnage IA (il n'appartient pas à cet utilisateur ou une erreur est survenue)."
                             )
+    
                 if sous == "Créer un nouveau personnage IA":
                     # Rediriger vers la vue de création d'un personnage IA
                     return CreerPersonnageVue(
@@ -197,10 +207,11 @@ class ParametresVue(VueAbstraite):
                     # On reste dans choisir_menu, sans def séparée
                     s = Session()
                     uid = s.utilisateur.get("id_utilisateur")
-                    dao = PersonnageIADao()
+                    svc = PersonnageService()
 
                     while True:
-                        persos = dao.list_for_user(uid)
+                        # Personnages disponibles pour cet utilisateur (standards + perso créés)
+                        persos = svc.lister_personnages_ia_pour_utilisateur(uid)
 
                         if not persos:
                             return MenuUtilisateurVue(
@@ -224,6 +235,7 @@ class ParametresVue(VueAbstraite):
                         print(f"\nDescription du personnage '{perso.name}':\n")
                         print(f"{perso.system_prompt}\n")
                         # La boucle recommence pour permettre d'en consulter un autre
+
 
                 if sous == "Annuler":
                     return MenuUtilisateurVue()

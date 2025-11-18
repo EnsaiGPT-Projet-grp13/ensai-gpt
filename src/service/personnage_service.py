@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Optional
 
 from objects.personnage_ia import PersonnageIA
 from dao.personnage_ia_dao import PersonnageIADao
+from utils.log_decorator import log
 
 
 class PersonnageService:
@@ -108,3 +109,39 @@ class PersonnageService:
             "top_p": float(top_p),
             "max_tokens": int(max_tokens),
         }
+
+    @log
+    def lister_personnages_ia_crees_par(self, user_id: int) -> list[PersonnageIA]:
+        """
+        Retourne la liste des personnages IA créés par un utilisateur.
+        (wrapping de PersonnageIADao.list_by_creator)
+        """
+        return self.dao.list_by_creator(user_id)
+
+    @log
+    def supprimer_personnage_ia(self, user_id: int, personnage_id: int) -> bool:
+        """
+        Supprime un personnage IA appartenant à l'utilisateur, ainsi que
+        ses conversations et messages (via PersonnageIADao.delete).
+        Retourne True si la suppression a réussi, False sinon.
+        """
+        # Vérifier que ce personnage appartient bien à cet utilisateur
+        persos = self.dao.list_by_creator(user_id)
+        if not any(p.id_personnageIA == personnage_id for p in persos):
+            # Le personnage n'est pas à lui → on ne supprime pas
+            return False
+
+        # Appel à la méthode delete du DAO qui supprime aussi les conversations/messages
+        return self.dao.delete(personnage_id)
+
+    @log
+    def lister_personnages_ia_pour_utilisateur(self, user_id: int) -> list[PersonnageIA]:
+        """
+        Retourne les personnages IA disponibles pour un utilisateur :
+        - personnages standards
+        - + personnages créés par l'utilisateur
+        (wrapping de PersonnageIADao.list_for_user)
+        """
+        return self.dao.list_for_user(user_id)
+   
+    

@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional, Iterable
 from tabulate import tabulate
 
+import re
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -15,6 +16,16 @@ from utils.default_persoIA import DEFAULT_PERSONAS
 from objects.personnage_ia import PersonnageIA
 from dao.personnage_ia_dao import PersonnageIADao
 
+
+def is_valid_password(pwd: str) -> None:
+    if len(pwd) < 8:
+        raise ValueError("Au moins 8 caractères requis.")
+    if not re.search(r"[A-Z]", pwd):
+        raise ValueError("Doit contenir une majuscule.")
+    if not re.search(r"[a-z]", pwd):
+        raise ValueError("Doit contenir une minuscule.")
+    if not re.search(r"\d", pwd):
+        raise ValueError("Doit contenir un chiffre.")
 
 class UtilisateurService:
     """Classe contenant les méthodes de service des Utilisateurs"""
@@ -133,25 +144,23 @@ class UtilisateurService:
         """
         u = self.dao.find_by_id(id_utilisateur)
         if not u:
-            print("utilisateur introuvable")
-            return False
+            return False, "Utilisateur introuvable."
 
         ancien_mdp_hash = hash_password(ancien_mdp, u.mail)
-
         if u.mdp_hash != ancien_mdp_hash:
-            print("mdp differents")
-            return False
+            return False, "Ancien mot de passe incorrect."
+
+        try:
+            is_valid_password(nouveau_mdp)
+        except ValueError as e:
+            return False, f"Mot de passe invalide : {e}"
 
         nouveau_hash = hash_password(nouveau_mdp, u.mail)
-
         self.dao.update_mot_de_passe(id_utilisateur, nouveau_hash)
-        print("update réalisée")
-        return True
+        return True, "Mot de passe modifié avec succès."
 
-        nouveau_hash = hash_password(nouveau_mdp)
-        self.dao.update_mot_de_passe(id_utilisateur, nouveau_hash)
-        print("update réalisé")
-        return True
+
+
     @log
     def changer_nom_utilisateur(self, uid: int, nouveau_nom: str) -> bool:
         """Permet à l'utilisateur connecté de changer son nom d'utilisateur."""
