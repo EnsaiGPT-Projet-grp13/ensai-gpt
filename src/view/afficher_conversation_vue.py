@@ -26,7 +26,7 @@ class AfficherConversationVue(VueAbstraite):
         if not conversations:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
-        choix = [f"{c.get('titre')} avec {c.get('personnage_name')} (id_conversation#{c.get('id_conversation')})" for c in conversations] + ["Retour"]
+        choix = [f"{c.get('titre')} ({str(c.get('created_at')).split(' ')[0]})" for c in conversations] + ["Retour"]
         label = inquirer.select(message="Quelle conversation voulez-vous ?", choices=choix).execute()
         if label == "Retour":
             # Retourne vers la vue du menue de l'utilisateur

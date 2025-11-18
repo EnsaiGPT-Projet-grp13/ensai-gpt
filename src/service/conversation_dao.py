@@ -191,7 +191,7 @@ class ConversationDao:
             )
             return cur.fetchall() or []
 
-    def liste_resumee_accessible_pour_utilisateur(
+    def affichage_message_conversation(
         self, id_utilisateur: int, limite: int = 50
     ) -> List[Dict[str, Any]]:
         """Renvoie un résumé des conversations (id + titre + nom personnageIA) dont l’utilisateur a l'accès."""
