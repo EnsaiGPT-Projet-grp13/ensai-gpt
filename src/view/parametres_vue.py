@@ -123,12 +123,68 @@ class ParametresVue(VueAbstraite):
                 sous = inquirer.select(
                     message="Choisir une option :",
                     choices=[
+                        "Supprimer un personnage IA existant",
                         "Créer un nouveau personnage IA",  # Nouvelle option pour créer un personnage
-                        "Modifier personnages existants",  # Option pour afficher la liste des personnages
+                        "description des personnages existants",  # Option pour afficher la liste des personnages
                         "Annuler",  # Option pour annuler
                     ],
                 ).execute()
+                if sous == "Supprimer un personnage IA existant":
+                    s = Session()
+                    uid = s.utilisateur.get("id_utilisateur")
+                    dao = PersonnageIADao()
 
+                    while True:
+                        # On ne propose à la suppression que les personnages créés par l'utilisateur
+                        persos = dao.list_by_creator(uid)
+
+                        if not persos:
+                            return MenuUtilisateurVue(
+                                "Vous n'avez aucun personnage IA à supprimer."
+                            )
+
+                        choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
+                        choices.append("Annuler")
+
+                        label = inquirer.select(
+                            message="Choisir le personnage IA à supprimer :",
+                            choices=choices,
+                        ).execute()
+
+                        if label == "Annuler":
+                            return MenuUtilisateurVue("Suppression annulée.")
+
+                        # Récupérer l'id à partir du label "Nom (#id)"
+                        pid = int(label.split("#")[-1].rstrip(")"))
+                        perso = next(p for p in persos if p.id_personnageIA == pid)
+
+                        confirm = inquirer.confirm(
+                            message=f"Confirmer la suppression du personnage « {perso.name} » ?",
+                            default=False,
+                        ).execute()
+
+                        if not confirm:
+                            # On redemande si on veut revenir au menu
+                            retour = inquirer.confirm(
+                                message="Annuler la suppression et revenir au menu ?",
+                                default=True,
+                            ).execute()
+                            if retour:
+                                return MenuUtilisateurVue("Suppression annulée.")
+                            else:
+                                # On reboucle pour choisir à nouveau un personnage
+                                continue
+
+                        ok = dao.delete(pid)
+                        if ok:
+                            return MenuUtilisateurVue(
+                                f"Personnage « {perso.name} » supprimé avec succès."
+                            )
+                        else:
+                            return MenuUtilisateurVue(
+                                "Impossible de supprimer ce personnage IA car des conversations y sont encore associées.\n"
+                                "Supprimez d'abord les conversations correspondantes dans l'historique, puis réessayez."
+                            )
                 if sous == "Créer un nouveau personnage IA":
                     # Rediriger vers la vue de création d'un personnage IA
                     return CreerPersonnageVue(
@@ -137,7 +193,7 @@ class ParametresVue(VueAbstraite):
                         perso_svc=None     # Idem
                     )
 
-                if sous == "Modifier personnages existants":
+                if sous == "description des personnages existants":
                     # On reste dans choisir_menu, sans def séparée
                     s = Session()
                     uid = s.utilisateur.get("id_utilisateur")

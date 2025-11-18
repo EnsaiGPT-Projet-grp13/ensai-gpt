@@ -25,34 +25,34 @@ class CreerPersonnageVue(VueAbstraite):
             print()
 
     def choisir_menu(self):
-    try:
-        uid = self.session_svc.get_user_id()
+        try:
+            uid = self.session_svc.get_user_id()
 
-        # --- Nom du personnage ---
-        name = (inquirer.text(message="Nom du personnage (Entrée vide pour quitter) :").execute() or "").strip()
-        if not name:
-            return MenuUtilisateurVue("Création annulée.")
+            # --- Nom du personnage ---
+            name = (inquirer.text(message="Nom du personnage (Entrée vide pour quitter) :").execute() or "").strip()
+            if not name:
+                return MenuUtilisateurVue("Création annulée.")
 
-        # --- Prompt système ---
-        prompt = (inquirer.text(
-            message="Prompt système (rôle, style, limites, format de réponse — Entrée vide pour quitter) :"
-        ).execute() or "").strip()
-        if not prompt:
-            return MenuUtilisateurVue("Création annulée.")
+            # --- Prompt système ---
+            prompt = (inquirer.text(
+                message="Prompt système (rôle, style, limites, format de réponse — Entrée vide pour quitter) :"
+            ).execute() or "").strip()
+            if not prompt:
+                return MenuUtilisateurVue("Création annulée.")
 
-        prompt = "Tu es le personnage suivant : " + prompt
+            prompt = "Tu es le personnage suivant : " + prompt
 
-        # Création du personnage
-        perso = self.perso_svc.create_personnage(uid, name, prompt)
+            # Création du personnage
+            perso = self.perso_svc.create_personnage(uid, name, prompt)
 
-        # Redirection vers la vue de sélection
-        return ChoisirPersonnageVue(
-            message=f"Personnage « {perso.name} » créé. Sélectionnez un personnage :",
-            session_svc=self.session_svc,
-            perso_svc=self.perso_svc,
-        )
+            # Redirection vers la vue de sélection
+            return ChoisirPersonnageVue(
+                message=f"Personnage « {perso.name} » créé. Sélectionnez un personnage :",
+                session_svc=self.session_svc,
+                perso_svc=self.perso_svc,
+            )
 
-    except Exception as e:
-        print("\n[CreerPersonnageVue] Exception :", repr(e))
-        print(traceback.format_exc())
-        return MenuUtilisateurVue("Erreur lors de la création du personnage (voir logs).")
+        except Exception as e:
+            print("\n[CreerPersonnageVue] Exception :", repr(e))
+            print(traceback.format_exc())
+            return MenuUtilisateurVue("Erreur lors de la création du personnage (voir logs).")

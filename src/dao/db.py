@@ -38,6 +38,7 @@ class DBConnection(metaclass=Singleton):
             options=f"-c search_path={schema}",
             cursor_factory=RealDictCursor,
         )
+        self.__connection.autocommit = True
 
     @property
     def connection(self):

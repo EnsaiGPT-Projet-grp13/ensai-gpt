@@ -86,16 +86,70 @@ class PersonnageIADao:
             row = cur.fetchone()
         self.conn.commit()
         return PersonnageIA(**row) if row else None
-
     def delete(self, pid: int) -> bool:
-        with self.conn.cursor() as cur:
-            cur.execute(
-                f"DELETE FROM {SCHEMA}.personnageIA WHERE id_personnageIA = %s",
-                (pid,),
-            )
-            affected = cur.rowcount
-        self.conn.commit()
-        return affected > 0
+        """
+        Supprime un personnage IA et tout ce qui est lié :
+          - messages des conversations du personnage
+          - liens conv_utilisateur
+          - conversations du personnage
+          - le personnage lui-même
+        """
+        try:
+            with self.conn.cursor() as cur:
+                # 1) Supprimer les messages des conversations liées à ce personnage
+                cur.execute(
+                    f"""
+                    DELETE FROM {SCHEMA}.message
+                    WHERE id_conversation IN (
+                        SELECT id_conversation
+                        FROM {SCHEMA}.conversation
+                        WHERE id_personnageIA = %s
+                    )
+                    """,
+                    (pid,),
+                )
+
+                # 2) Supprimer les liens conv_utilisateur pour ces conversations
+                cur.execute(
+                    f"""
+                    DELETE FROM {SCHEMA}.conv_utilisateur
+                    WHERE id_conversation IN (
+                        SELECT id_conversation
+                        FROM {SCHEMA}.conversation
+                        WHERE id_personnageIA = %s
+                    )
+                    """,
+                    (pid,),
+                )
+
+                # 3) Supprimer les conversations de ce personnage
+                cur.execute(
+                    f"""
+                    DELETE FROM {SCHEMA}.conversation
+                    WHERE id_personnageIA = %s
+                    """,
+                    (pid,),
+                )
+
+                # 4) Supprimer le personnage lui-même
+                cur.execute(
+                    f"""
+                    DELETE FROM {SCHEMA}.personnageIA
+                    WHERE id_personnageIA = %s
+                    """,
+                    (pid,),
+                )
+                affected = cur.rowcount
+
+            self.conn.commit()
+            return affected > 0
+
+        except Exception:
+            self.conn.rollback()
+            raise
+
+
+        
 
     # --- Listes --------------------------------------------------------------
     def list_standards(self) -> List[PersonnageIA]:
