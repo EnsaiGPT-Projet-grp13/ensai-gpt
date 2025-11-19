@@ -101,13 +101,13 @@ class UtilisateurDao:
             # Préparer la requête SQL pour mettre à jour les informations de l'utilisateur
             cur.execute("""
                 UPDATE utilisateur
-                SET prenom = %s, nom = %s, mail = %s, mdp = %s, naiss = %s
-                WHERE mail= %s
-            """, (utilisateur.prenom, utilisateur.nom_utilisateur, utilisateur.mail, utilisateur.mdp_hash, utilisateur.naiss, utilisateur.id_utilisateur))
-
+                SET mail= %s
+                WHERE id_utilisateur= %s
+            """, (utilisateur.mail,utilisateur.id_utilisateur))
+            affected = cur.rowcount
             # Commit des changements sans vérifier si des lignes ont été affectées
             conn.commit()
-            return True  # Retourne toujours True, peu importe si la mise à jour a eu lieu ou non
+            return affected==1  # Retourne toujours True, peu importe si la mise à jour a eu lieu ou non
 
     def delete(self, id_utilisateur: int) -> None:
         """Supprime un utilisateur de la base de données."""

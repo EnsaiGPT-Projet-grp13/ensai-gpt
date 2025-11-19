@@ -103,7 +103,7 @@ class ParametresVue(VueAbstraite):
                 if sous == "Changer e-mail":
                     s = Session()
                     mail = s.utilisateur.get("mail")
-
+                    
                     nouvel_email = inquirer.text(
                         message="Nouvel e-mail :"
                     ).execute()
