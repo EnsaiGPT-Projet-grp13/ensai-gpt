@@ -136,6 +136,28 @@ class UtilisateurService:
 
         return None
 
+    def add_default_persoIA(self, user_id: int):
+        """Crée/Met à jour les personas par défaut pour un utilisateur."""
+        inserted = 0
+        for perso in DEFAULT_PERSONAS:
+            try:
+                p = PersonnageIA(
+                    id_personnageIA=None,
+                    name=perso["name"],
+                    system_prompt=perso["system_prompt"],
+                    created_by=user_id,
+                )
+                self.persona_dao.create(p)   # <-- UPSERT côté DAO
+                inserted += 1
+            except Exception as e:
+                # LOG + rollback pour sortir de l'état 'transaction aborted'
+                print(f"[add_default_persoIA] skip '{perso.get('name')}': {e}")
+                try:
+                    self.persona_dao.conn.rollback()
+                except Exception:
+                    pass
+        return inserted
+
 
     @log
     def mail_deja_utilise(self, mail: str) -> bool:

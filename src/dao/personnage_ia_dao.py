@@ -203,7 +203,7 @@ class PersonnageIADao:
                   created_at,
                   updated_at
                 FROM {SCHEMA}.personnageIA
-                WHERE created_by IS NULL OR created_by = %s
+                WHERE created_by = %s
                 ORDER BY lower(name)
                 """,
                 (uid,),

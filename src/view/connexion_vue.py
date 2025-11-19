@@ -17,13 +17,17 @@ class ConnexionVue(VueAbstraite):
                 raise KeyboardInterrupt
 
         try:
+            user_svc = UtilisateurService()
+
             # --- Email ---
             mail = (inquirer.text(
                 message="Email (Entrée vide pour quitter) :"
             ).execute() or "").strip().lower()
             quitter_si_vide(mail)
 
-            user_svc = UtilisateurService()
+            # Vérifier si un compte existe avec cet email
+            if not user_svc.mail_deja_utilise(mail):
+                return AccueilVue("Aucun compte ne correspond à cet email. Créez un compte.")
 
             # --- Mot de passe (3 essais) ---
             MAX_TRIES = 3
