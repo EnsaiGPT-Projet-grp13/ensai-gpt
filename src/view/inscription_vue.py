@@ -31,14 +31,25 @@ class InscriptionVue(VueAbstraite):
                 print("Le nom ne peut pas être vide.\n")
 
             # --- Email ---
+            from service.utilisateur_service import UtilisateurService
+            service = UtilisateurService()
+
             while True:
                 mail = (inquirer.text(message="Email (Entrée vide pour quitter) :").execute() or "").strip().lower()
                 quitter_si_vide(mail)
+
                 try:
                     is_valid_email(mail)
-                    break
                 except ValueError as e:
                     print(f"{e}\nRéessaie.\n")
+                    continue
+
+                # Vérifier si l’email est déjà utilisé
+                if service.mail_deja_utilise(mail):
+                    print("Cet email est déjà utilisé.\n")
+                    continue
+
+                break
 
             # --- Mot de passe ---
             while True:
@@ -79,9 +90,7 @@ class InscriptionVue(VueAbstraite):
 
             # --- Inscription ---
             try:
-                from service.utilisateur_service import UtilisateurService
-                user = UtilisateurService().creer(prenom, nom, mail, mdp, naiss)
-
+                user = service.creer(prenom, nom, mail, mdp, naiss)
             except ValueError as e:
                 return AccueilVue(f"Inscription impossible : {e}")
 

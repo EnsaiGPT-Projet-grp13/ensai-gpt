@@ -6,7 +6,6 @@ from objects.personnage_ia import PersonnageIA
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
-
 class PersonnageIADao:
     """DAO pour la table personnageIA (sans table d'association)."""
 

@@ -188,24 +188,57 @@ class UtilisateurService:
             print(f"Erreur lors du changement de nom d'utilisateur : {repr(e)}")
             return False
 
+    from service.auth_service import is_valid_email, is_valid_password  # tu l'as déjà
+
     @log
-    def changer_email(self, mail, nouvel_email):
-        """Permet à l'utilisateur connecté de changer son nom d'utilisateur."""
+    def changer_email(self, mail: str, nouvel_email: str, mdp: str):
+        """
+        Change l'email d'un utilisateur en gardant le sel = email.
+        Étapes :
+        1) On retrouve l'utilisateur par l'email actuel.
+        2) On vérifie que le mot de passe est correct avec l'ancien mail.
+        3) On vérifie la validité et la disponibilité du nouvel email.
+        4) On met à jour mail + mdp_hash (re-hash avec le NOUVEL email).
+        Retourne (bool, message).
+        """
+        mail_norm = mail.strip().lower()
+        nouvel_email_norm = nouvel_email.strip().lower()
+
+        # 1) utilisateur existant
+        u = self.dao.find_by_mail(mail_norm)
+        if not u:
+            return False, "Utilisateur non trouvé."
+
+        # 2) vérifier mot de passe avec l'ANCIEN email (et compat éventuelle)
+        hash_salt_old = hash_password(mdp, mail_norm)
+        hash_nosalt = hash_password(mdp)
+
+        if u.mdp_hash not in (hash_salt_old, hash_nosalt):
+            return False, "Mot de passe incorrect."
+
+        # 3) valider le nouvel email + vérifier qu'il n'est pas déjà pris
         try:
-            # Trouver l'utilisateur existant
-            utilisateur = self.dao.find_by_mail(mail)
-            if not utilisateur:
-                raise ValueError("Utilisateur non trouvé.")
-            
-            # Modifier l'e-mail
-            utilisateur.mail = nouvel_email
+            is_valid_email(nouvel_email_norm)
+        except ValueError as e:
+            return False, f"Email invalide : {e}"
 
-            # Appeler la méthode update du DAO pour mettre à jour l'utilisateur
-            return self.dao.update_mail_utilisateur(utilisateur)# Appel de la méthode update du DAO
+        if self.dao.exists_mail(nouvel_email_norm):
+            return False, "Un compte existe déjà avec ce nouvel email."
 
-        except Exception as e:
-            print(f"Erreur lors du changement de nom d'utilisateur : {repr(e)}")
-            return False
+        # 4) recalculer le hash avec le NOUVEL email comme sel
+        new_hash = hash_password(mdp, nouvel_email_norm)
+
+        # 5) mettre à jour l'objet + persister
+        u.mail = nouvel_email_norm
+        u.mdp_hash = new_hash
+
+        # IMPORTANT : il faut que ton DAO mette à jour mail + mdp_hash
+        ok = self.dao.update(u)
+        if not ok:
+            return False, "Échec de la mise à jour en base."
+
+        return True, "Email modifié avec succès."
+
 
     def add_default_persoIA(self, user_id: int):
         """Crée/Met à jour les personas par défaut pour un utilisateur."""
