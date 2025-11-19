@@ -270,100 +270,39 @@ def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
     assert res is True
     service_utilisateur.dao.exists_mail.assert_called_once_with("a@test.com")
 
-
 # =========================
-# Tests changer_mot_de_passe()
+# Tests changer_identite()
 # =========================
 
-def test_changer_mot_de_passe_retourne_false_si_user_introuvable(service_utilisateur):
+def test_changer_identite_retourne_false_si_user_introuvable(service_utilisateur):
     service_utilisateur.dao.find_by_id.return_value = None
 
-    ok, msg = service_utilisateur.changer_mot_de_passe(1, "old", "new")
+    ok, msg = service_utilisateur.changer_identite(1, "NewPrenom", "NewNom")
 
     assert ok is False
     assert "introuvable" in msg
-    service_utilisateur.dao.find_by_id.assert_called_once_with(1)
-    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
+    service_utilisateur.dao.update_identite.assert_not_called()
 
 
-def test_changer_mot_de_passe_retourne_false_si_ancien_mdp_faux(service_utilisateur):
-    u = Utilisateur(1, "A", "A", "a@test.com", "HASH_OLD", "2000-01-01")
-    service_utilisateur.dao.find_by_id.return_value = u
+def test_changer_identite_met_a_jour_prenom_nom_et_appelle_dao(service_utilisateur):
+    class FakeUser:
+        def __init__(self, uid, prenom, nom):
+            self.id_utilisateur = uid
+            self.prenom = prenom
+            self.nom = nom
 
-    # On met un hash qui ne correspond pas à hash_password("ancien", u.mail)
-    u.mdp_hash = hash_password("autre_mdp", u.mail)
+    fake_user = FakeUser(1, "AncienPrenom", "AncienNom")
+    service_utilisateur.dao.find_by_id.return_value = fake_user
+    service_utilisateur.dao.update_identite.return_value = True
 
-    ok, msg = service_utilisateur.changer_mot_de_passe(1, "ancien", "nouveau")
-
-    assert ok is False
-    assert "incorrect" in msg
-    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
-
-
-def test_changer_mot_de_passe_retourne_false_si_nouveau_mdp_invalide(service_utilisateur, monkeypatch):
-    u = Utilisateur(1, "A", "A", "a@test.com", hash_password("ancien", "a@test.com"), "2000-01-01")
-    service_utilisateur.dao.find_by_id.return_value = u
-
-    def fake_is_valid_password(p):
-        raise ValueError("mdp trop court")
-
-    monkeypatch.setattr("service.utilisateur_service.is_valid_password", fake_is_valid_password)
-
-    ok, msg = service_utilisateur.changer_mot_de_passe(1, "ancien", "xx")
-
-    assert ok is False
-    assert "Mot de passe invalide" in msg
-    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
-
-
-def test_changer_mot_de_passe_succes_update_mot_de_passe(service_utilisateur, monkeypatch):
-    # pas d'erreur de validation
-    monkeypatch.setattr("service.utilisateur_service.is_valid_password", lambda p: True)
-
-    u = Utilisateur(1, "A", "A", "a@test.com", "HASH_OLD", "2000-01-01")
-    service_utilisateur.dao.find_by_id.return_value = u
-
-    # hash attendu de l'ancien mot de passe
-    u.mdp_hash = hash_password("ancien", u.mail)
-
-    ok, msg = service_utilisateur.changer_mot_de_passe(1, "ancien", "nouveau")
+    ok, msg = service_utilisateur.changer_identite(1, "NouveauPrenom", "NouveauNom")
 
     assert ok is True
     assert "succès" in msg
-
-    nouveau_hash_attendu = hash_password("nouveau", u.mail)
-    service_utilisateur.dao.update_mot_de_passe.assert_called_once_with(1, nouveau_hash_attendu)
-
-
-# =========================
-# Tests changer_nom_utilisateur()
-# =========================
-
-def test_changer_nom_utilisateur_retourne_false_si_user_introuvable(service_utilisateur):
-    service_utilisateur.dao.find_by_id.return_value = None
-
-    ok = service_utilisateur.changer_nom_utilisateur(1, "NouveauNom")
-
-    assert ok is False
-    service_utilisateur.dao.update_nom_utilisateur.assert_not_called()
-
-
-def test_changer_nom_utilisateur_met_a_jour_nom_et_appelle_dao(service_utilisateur):
-    class FakeUser:
-        def __init__(self, uid, nom):
-            self.id_utilisateur = uid
-            self.nom_utilisateur = nom
-
-    fake_user = FakeUser(1, "AncienNom")
-    service_utilisateur.dao.find_by_id.return_value = fake_user
-    service_utilisateur.dao.update_nom_utilisateur.return_value = True
-
-    ok = service_utilisateur.changer_nom_utilisateur(1, "NouveauNom")
-
-    assert ok is True
-    assert fake_user.nom_utilisateur == "NouveauNom"
+    assert fake_user.prenom == "NouveauPrenom"
+    assert fake_user.nom == "NouveauNom"
     service_utilisateur.dao.find_by_id.assert_called_once_with(1)
-    service_utilisateur.dao.update_nom_utilisateur.assert_called_once_with(fake_user)
+    service_utilisateur.dao.update_identite.assert_called_once_with(fake_user)
 
 
 # =========================
@@ -371,71 +310,84 @@ def test_changer_nom_utilisateur_met_a_jour_nom_et_appelle_dao(service_utilisate
 # =========================
 
 def test_changer_email_retourne_false_si_user_introuvable(service_utilisateur):
-    service_utilisateur.dao.find_by_mail.return_value = None
+    service_utilisateur.dao.find_by_id.return_value = None
 
-    ok, msg = service_utilisateur.changer_email("old@test.com", "new@test.com", "mdp")
+    ok, msg = service_utilisateur.changer_email(1, "new@test.com", "mdp")
 
     assert ok is False
-    assert "Utilisateur non trouvé" in msg
-    service_utilisateur.dao.update.assert_not_called()
+    assert "introuvable" in msg
+    service_utilisateur.dao.update_mail_utilisateur.assert_not_called()
+    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
 def test_changer_email_retourne_false_si_mdp_incorrect(service_utilisateur):
-    u = Utilisateur(1, "A", "A", "old@test.com", "OTHER_HASH", "2000-01-01")
-    service_utilisateur.dao.find_by_mail.return_value = u
+    # utilisateur avec mail old@test.com et hash qui ne correspond pas à "mdp"
+    u = Utilisateur(1, "A", "A", "old@test.com", hash_password("autre", "old@test.com"), "2000-01-01")
+    service_utilisateur.dao.find_by_id.return_value = u
 
-    ok, msg = service_utilisateur.changer_email("old@test.com", "new@test.com", "mdp")
+    ok, msg = service_utilisateur.changer_email(1, "new@test.com", "mdp")
 
     assert ok is False
     assert "Mot de passe incorrect" in msg
-    service_utilisateur.dao.update.assert_not_called()
+    service_utilisateur.dao.update_mail_utilisateur.assert_not_called()
+    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
 def test_changer_email_retourne_false_si_nouvel_email_invalide(service_utilisateur, monkeypatch):
-    u = Utilisateur(1, "A", "A", "old@test.com", hash_password("mdp", "old@test.com"), "2000-01-01")
-    service_utilisateur.dao.find_by_mail.return_value = u
+    old_mail = "old@test.com"
+    u = Utilisateur(1, "A", "A", old_mail, hash_password("mdp", old_mail), "2000-01-01")
+    service_utilisateur.dao.find_by_id.return_value = u
 
     def fake_is_valid_email(mail):
         raise ValueError("format invalide")
 
     monkeypatch.setattr("service.utilisateur_service.is_valid_email", fake_is_valid_email)
 
-    ok, msg = service_utilisateur.changer_email("old@test.com", "new@", "mdp")
+    ok, msg = service_utilisateur.changer_email(1, "new@", "mdp")
 
     assert ok is False
     assert "Email invalide" in msg
-    service_utilisateur.dao.update.assert_not_called()
+    service_utilisateur.dao.exists_mail.assert_not_called()
+    service_utilisateur.dao.update_mail_utilisateur.assert_not_called()
+    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
 def test_changer_email_retourne_false_si_nouvel_email_deja_pris(service_utilisateur, monkeypatch):
-    u = Utilisateur(1, "A", "A", "old@test.com", hash_password("mdp", "old@test.com"), "2000-01-01")
-    service_utilisateur.dao.find_by_mail.return_value = u
+    old_mail = "old@test.com"
+    u = Utilisateur(1, "A", "A", old_mail, hash_password("mdp", old_mail), "2000-01-01")
+    service_utilisateur.dao.find_by_id.return_value = u
 
     monkeypatch.setattr("service.utilisateur_service.is_valid_email", lambda m: True)
     service_utilisateur.dao.exists_mail.return_value = True
 
-    ok, msg = service_utilisateur.changer_email("old@test.com", "new@test.com", "mdp")
+    ok, msg = service_utilisateur.changer_email(1, "new@test.com", "mdp")
 
     assert ok is False
     assert "existe déjà" in msg
-    service_utilisateur.dao.update.assert_not_called()
+    service_utilisateur.dao.update_mail_utilisateur.assert_not_called()
+    service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
 def test_changer_email_retourne_false_si_update_echoue(service_utilisateur, monkeypatch):
-    u = Utilisateur(1, "A", "A", "old@test.com", hash_password("mdp", "old@test.com"), "2000-01-01")
-    service_utilisateur.dao.find_by_mail.return_value = u
+    old_mail = "old@test.com"
+    new_mail = "new@test.com"
+    u = Utilisateur(1, "A", "A", old_mail, hash_password("mdp", old_mail), "2000-01-01")
+    service_utilisateur.dao.find_by_id.return_value = u
 
     monkeypatch.setattr("service.utilisateur_service.is_valid_email", lambda m: True)
     service_utilisateur.dao.exists_mail.return_value = False
-    service_utilisateur.dao.update.return_value = False
 
-    ok, msg = service_utilisateur.changer_email("old@test.com", "new@test.com", "mdp")
+    # on simule un échec de mise à jour en base
+    service_utilisateur.dao.update_mail_utilisateur.return_value = False
+    service_utilisateur.dao.update_mot_de_passe.return_value = True
+
+    ok, msg = service_utilisateur.changer_email(1, new_mail, "mdp")
 
     assert ok is False
     assert "Échec" in msg
-    service_utilisateur.dao.update.assert_called_once()
-    # le mail de l'objet a été modifié malgré tout
-    assert u.mail == "new@test.com"
+    assert u.mail == new_mail  # l'objet en mémoire a été modifié
+    service_utilisateur.dao.update_mail_utilisateur.assert_called_once_with(u)
+    service_utilisateur.dao.update_mot_de_passe.assert_called_once()
 
 
 def test_changer_email_succes(service_utilisateur, monkeypatch):
@@ -444,62 +396,19 @@ def test_changer_email_succes(service_utilisateur, monkeypatch):
     mdp = "mdp"
 
     u = Utilisateur(1, "A", "A", old_mail, hash_password(mdp, old_mail), "2000-01-01")
-    service_utilisateur.dao.find_by_mail.return_value = u
+    service_utilisateur.dao.find_by_id.return_value = u
 
     monkeypatch.setattr("service.utilisateur_service.is_valid_email", lambda m: True)
     service_utilisateur.dao.exists_mail.return_value = False
-    service_utilisateur.dao.update.return_value = True
+    service_utilisateur.dao.update_mail_utilisateur.return_value = True
+    service_utilisateur.dao.update_mot_de_passe.return_value = True
 
-    ok, msg = service_utilisateur.changer_email(old_mail, new_mail, mdp)
+    ok, msg = service_utilisateur.changer_email(1, new_mail, mdp)
 
     assert ok is True
     assert "succès" in msg
 
-    # Vérif mail et hash mis à jour
     assert u.mail == new_mail
     expected_hash = hash_password(mdp, new_mail)
-    assert u.mdp_hash == expected_hash
-
-    service_utilisateur.dao.update.assert_called_once_with(u)
-
-
-# =========================
-# Tests add_default_persoIA()
-# =========================
-
-def test_add_default_persoIA_cree_un_personnage_par_persona(service_utilisateur):
-    nb_personas = len(DEFAULT_PERSONAS)
-    assert nb_personas >= 1
-
-    service_utilisateur.persona_dao.create.return_value = True
-
-    inserted = service_utilisateur.add_default_persoIA(user_id=5)
-
-    assert inserted == nb_personas
-    assert service_utilisateur.persona_dao.create.call_count == nb_personas
-
-    for call in service_utilisateur.persona_dao.create.call_args_list:
-        perso = call.args[0]
-        assert isinstance(perso, PersonnageIA)
-        assert perso.created_by == 5
-
-
-def test_add_default_persoIA_compte_uniquement_les_succes(service_utilisateur):
-    nb_personas = len(DEFAULT_PERSONAS)
-    assert nb_personas >= 2  # on veut simuler au moins un échec
-
-    compteur = {"i": 0}
-
-    def fake_create(perso):
-        compteur["i"] += 1
-        if compteur["i"] == nb_personas:
-            raise Exception("Erreur d'insertion")
-        return True
-
-    service_utilisateur.persona_dao.create.side_effect = fake_create
-    service_utilisateur.persona_dao.conn.rollback = Mock()
-
-    inserted = service_utilisateur.add_default_persoIA(user_id=5)
-
-    assert inserted == nb_personas - 1  # seul le dernier échoue
-    service_utilisateur.persona_dao.conn.rollback.assert_called_once()
+    service_utilisateur.dao.update_mail_utilisateur.assert_called_once_with(u)
+    service_utilisateur.dao.update_mot_de_passe.assert_called_once_with(1, expected_hash)

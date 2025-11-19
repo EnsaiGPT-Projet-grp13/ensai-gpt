@@ -3,6 +3,24 @@ from objects.utilisateur import Utilisateur
 from dao.db import DBConnection
 
 class UtilisateurDao:
+
+    def update(self, u: Utilisateur) -> bool:
+        """Met à jour mail et mdp_hash (et éventuellement prénom/nom)."""
+        cur = self.conn.cursor()
+        cur.execute(
+            """
+            UPDATE utilisateur
+            SET prenom = %s,
+                nom = %s,
+                mail = %s,
+                mdp_hash = %s,
+                naiss = %s
+            WHERE id_utilisateur = %s
+            """,
+            (u.prenom, u.nom, u.mail, u.mdp_hash, u.naiss, u.id_utilisateur),
+        )
+        self.conn.commit()
+        return cur.rowcount == 1
     
     def find_by_mail(self, mail: str) -> Optional[Utilisateur]:
         conn = DBConnection().connection
@@ -67,34 +85,44 @@ class UtilisateurDao:
             """, (nouveau_hash, id_utilisateur))
         conn.commit()
         
-    def update_nom_utilisateur(self, utilisateur: Utilisateur) -> bool:
-        """Met à jour un utilisateur dans la base de données."""
+    def update_identite(self, utilisateur: Utilisateur) -> bool:
+        """
+        Met à jour le prénom et le nom d'un utilisateur.
+        Retourne True si exactement une ligne a été modifiée.
+        """
         conn = DBConnection().connection
         with conn.cursor() as cur:
-            # Préparer la requête SQL pour mettre à jour les informations de l'utilisateur
-            cur.execute("""
+            cur.execute(
+                """
                 UPDATE utilisateur
-                SET prenom = %s, nom = %s, mail = %s, mdp = %s, naiss = %s
+                SET prenom = %s,
+                    nom    = %s
                 WHERE id_utilisateur = %s
-            """, (utilisateur.prenom, utilisateur.nom_utilisateur, utilisateur.mail, utilisateur.mdp_hash, utilisateur.naiss, utilisateur.id_utilisateur))
-
-            # Commit des changements sans vérifier si des lignes ont été affectées
+                """,
+                (utilisateur.prenom, utilisateur.nom, utilisateur.id_utilisateur),
+            )
+            affected = cur.rowcount
             conn.commit()
-            return True  # Retourne toujours True, peu importe si la mise à jour a eu lieu ou non
+            return affected == 1
+
     def update_mail_utilisateur(self, utilisateur: Utilisateur) -> bool:
-        """Met à jour un utilisateur dans la base de données."""
+        """
+        Met à jour l'adresse mail d'un utilisateur.
+        Retourne True si exactement une ligne a été modifiée.
+        """
         conn = DBConnection().connection
         with conn.cursor() as cur:
-            # Préparer la requête SQL pour mettre à jour les informations de l'utilisateur
-            cur.execute("""
+            cur.execute(
+                """
                 UPDATE utilisateur
-                SET mail= %s
-                WHERE id_utilisateur= %s
-            """, (utilisateur.mail,utilisateur.id_utilisateur))
+                SET mail = %s
+                WHERE id_utilisateur = %s
+                """,
+                (utilisateur.mail, utilisateur.id_utilisateur),
+            )
             affected = cur.rowcount
-            # Commit des changements sans vérifier si des lignes ont été affectées
             conn.commit()
-            return affected==1  # Retourne toujours True, peu importe si la mise à jour a eu lieu ou non
+            return affected == 1
 
     def delete(self, id_utilisateur: int) -> None:
         """Supprime un utilisateur de la base de données."""

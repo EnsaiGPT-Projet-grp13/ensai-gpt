@@ -50,5 +50,5 @@ class RechercheConversationMotsVue(VueAbstraite):
         conversation_choisie = service.get(id_conversation)
         s.conversation_id = id_conversation
 
-        from view.parametre_conversation_vue import ParametreConversationVue
-        return ParametreConversationVue()
+        from view.parametre_conversation_vue import ParametresConversationVue
+        return ParametresConversationVue()

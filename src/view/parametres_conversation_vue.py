@@ -14,7 +14,7 @@ from service.export_service import telecharger
 from service.export_service import start_flask_server
 from view.vue_abstraite import VueAbstraite
 
-class ParametreConversationVue(VueAbstraite):
+class ParametresConversationVue(VueAbstraite):
     """Vue des options la conversation choisie"""
 
     def __init__(self, message: str = "") -> None:
@@ -67,15 +67,15 @@ class ParametreConversationVue(VueAbstraite):
                 # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie
                 print("\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n")
                 MessageService().affichage_message_conversation(id_conversation)
-                from view.parametre_conversation_vue import ParametreConversationVue
-                return ParametreConversationVue()
+                from view.parametre_conversation_vue import ParametresConversationVue
+                return ParametresConversationVue()
 
             case "Changer le titre":
                 # Modification du titre de la conversation sélectionnée
                 nouveau_titre = inquirer.text(message="Comment voulez vous renommer votre conversation ? :").execute()
                 ConversationService().modifier(conversation, nouveau_titre)
-                from view.parametre_conversation_vue import ParametreConversationVue
-                return ParametreConversationVue(f"Vous avez modifier {titre} par {nouveau_titre}")
+                from view.parametre_conversation_vue import ParametresConversationVue
+                return ParametresConversationVue(f"Vous avez modifier {titre} par {nouveau_titre}")
             
             case "Télécharger la conversation":
                 start_flask_server()
