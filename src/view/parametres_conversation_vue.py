@@ -10,8 +10,9 @@ from service.conversation_service import ConversationService
 from service.export_service import start_flask_server
 from view.vue_abstraite import VueAbstraite
 
+
 class ParametresConversationVue(VueAbstraite):
-    """Vue des options la conversation choisie"""
+    """Vue des options pour la conversation choisie"""
 
     def __init__(self, message: str = "") -> None:
         self.message = message
@@ -22,32 +23,35 @@ class ParametresConversationVue(VueAbstraite):
 
     def choisir_menu(self):
         """Choix du menu suivant"""
-        print("\n" + "-" * 50 + "\nOptions la conversation\n" + "-" * 50 + "\n")
+        try:
+            print("\n" + "-" * 50 + "\nOptions de la conversation\n" + "-" * 50 + "\n")
 
-        s = Session()
-        if s.conversation_id is None:
-            from view.historique_vue import HistoriqueVue
-            return HistoriqueVue("Aucune conversation sélectionnée.")
-        id_conversation = s.conversation_id
-        conversation = ConversationService().get(id_conversation)
-        print(f"Vous avez sélectionné la conversation : {conversation.titre}" )
-        titre = conversation.titre
+            s = Session()
+            if s.conversation_id is None:
+                from view.historique_vue import HistoriqueVue
+                return HistoriqueVue("Aucune conversation sélectionnée.")
+            id_conversation = s.conversation_id
 
-        choix = inquirer.select(
-            message="Que voulez vous faire avec cette conversation ?",
-            choices=[
-                "Reprendre la conversation",
-                "Afficher l'entièreté de la conversation",
-                "Télécharger la conversation",
-                "Supprimer la conversation",
-                "Changer le titre",
-                "Retour",
-            ],
-        ).execute()
+            conversation = ConversationService().get(id_conversation)
+            print(f"Vous avez sélectionné la conversation : {conversation.titre}")
+            titre = conversation.titre
 
-        match choix:
-            case "Reprendre la conversation":
-                # Reprise de la conversation là où elle a été arrêtée
+            choix = inquirer.select(
+                message="Que voulez-vous faire avec cette conversation ?",
+                choices=[
+                    "Reprendre la conversation",
+                    "Afficher l'entièreté de la conversation",
+                    "Télécharger la conversation",
+                    "Supprimer la conversation",
+                    "Changer le titre",
+                    "Retour",
+                ],
+            ).execute()
+
+            # -------------------------------------------------
+            # Reprendre la conversation
+            # -------------------------------------------------
+            if choix == "Reprendre la conversation":
                 id_personnage = conversation.id_personnageIA
                 personnage = PersonnageService().get_by_id(id_personnage)
                 if personnage is not None:
@@ -59,30 +63,46 @@ class ParametresConversationVue(VueAbstraite):
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
                     return MenuUtilisateurVue("Personnage non trouvé")
 
-            case "Afficher l'entièreté de la conversation":
-                # Retroune l'entièreté des échanges entre l'utilisateur et le LLM dans le cadre de la conversation choisie
-                print("\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n")
+            # -------------------------------------------------
+            # Afficher la conversation entière
+            # -------------------------------------------------
+            if choix == "Afficher l'entièreté de la conversation":
+                print(
+                    "\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n"
+                )
                 MessageService().affichage_message_conversation(id_conversation)
-                from view.parametre_conversation_vue import ParametresConversationVue
                 return ParametresConversationVue()
 
-            case "Changer le titre":
-                # Modification du titre de la conversation sélectionnée
-                nouveau_titre = inquirer.text(message="Comment voulez vous renommer votre conversation ? :").execute()
+            # -------------------------------------------------
+            # Changer le titre
+            # -------------------------------------------------
+            if choix == "Changer le titre":
+                nouveau_titre = inquirer.text(
+                    message="Comment voulez-vous renommer votre conversation ? :"
+                ).execute()
                 ConversationService().modifier(conversation, nouveau_titre)
-                from view.parametre_conversation_vue import ParametresConversationVue
-                return ParametresConversationVue(f"Vous avez modifier {titre} par {nouveau_titre}")
-            
-            case "Télécharger la conversation":
+                return ParametresConversationVue(
+                    f"Vous avez modifié « {titre} » en « {nouveau_titre} »."
+                )
+
+            # -------------------------------------------------
+            # Télécharger la conversation
+            # -------------------------------------------------
+            if choix == "Télécharger la conversation":
                 start_flask_server()
-                nom_fichier = inquirer.text(message="Comment voulez-vous nommer votre fichier ? :").execute()
+                nom_fichier = inquirer.text(
+                    message="Comment voulez-vous nommer votre fichier ? :"
+                ).execute()
                 titre_fichier = conversation.titre
 
                 titre_fichier_encoded = urllib.parse.quote(titre_fichier)
                 nom_fichier_encoded = urllib.parse.quote(nom_fichier)
 
                 base_url = "http://127.0.0.1:5000"
-                url_telechargement = f"{base_url}/telecharger/{id_conversation}?titre={titre_fichier_encoded}&fichier={nom_fichier_encoded}"
+                url_telechargement = (
+                    f"{base_url}/telecharger/{id_conversation}"
+                    f"?titre={titre_fichier_encoded}&fichier={nom_fichier_encoded}"
+                )
 
                 import requests
                 r = requests.get(url_telechargement)
@@ -101,13 +121,25 @@ class ParametresConversationVue(VueAbstraite):
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue(message)
 
-            case "Supprimer la conversation":
-                # Suppression de la conversation sélectionnée
+            # -------------------------------------------------
+            # Supprimer la conversation
+            # -------------------------------------------------
+            if choix == "Supprimer la conversation":
                 ConversationService().supprimer(conversation)
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
-                return MenuUtilisateurVue(f"Vous avez supprimé la conversation {titre}")
+                return MenuUtilisateurVue(f"Vous avez supprimé la conversation « {titre} ».")
 
-            case "Retour":
-                # Retourne vers la vue du menue de l'utilisateur
+            # -------------------------------------------------
+            # Retour
+            # -------------------------------------------------
+            if choix == "Retour":
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue()
+
+            from view.menu_utilisateur_vue import MenuUtilisateurVue
+            return MenuUtilisateurVue()
+
+        except Exception as e:
+            print("[ParametresConversationVue] Exception :", repr(e))
+            from view.menu_utilisateur_vue import MenuUtilisateurVue
+            return MenuUtilisateurVue("Erreur dans les options de conversation.")

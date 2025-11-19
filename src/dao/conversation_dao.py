@@ -177,10 +177,10 @@ class ConversationDao:
             cur.execute(
                 f"""
                 SELECT
-                  c.id_conversation
-                  c.titre,
-                  c.updated_at,
-                  p.name AS "personnageIA_name"
+                c.id_conversation,
+                c.titre,
+                c.updated_at,
+                p.name AS "personnageIA_name"
                 FROM {SCHEMA}.conversation c
                 JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
                 WHERE c.id_proprio = %s
@@ -190,6 +190,7 @@ class ConversationDao:
                 (id_utilisateur, limite),
             )
             return cur.fetchall() or []
+
 
     def liste_resumee_accessible_pour_utilisateur(
         self, id_utilisateur: int, limite: int = 50

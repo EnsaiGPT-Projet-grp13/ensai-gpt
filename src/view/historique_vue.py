@@ -30,7 +30,6 @@ class HistoriqueVue(VueAbstraite):
         match choix:
             case "Afficher toutes les conversations":
                 # Retroune vers la vue de recherche d'une conversation par son titre
-                pass
                 from view.afficher_conversation_vue import AfficherConversationVue
                 return AfficherConversationVue()
 
