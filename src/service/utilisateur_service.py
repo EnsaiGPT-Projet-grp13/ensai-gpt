@@ -15,17 +15,8 @@ from dao.utilisateur_dao import UtilisateurDao
 from utils.default_persoIA import DEFAULT_PERSONAS
 from objects.personnage_ia import PersonnageIA
 from dao.personnage_ia_dao import PersonnageIADao
+from service.auth_service import is_valid_email, is_valid_password
 
-
-def is_valid_password(pwd: str) -> None:
-    if len(pwd) < 8:
-        raise ValueError("Au moins 8 caractères requis.")
-    if not re.search(r"[A-Z]", pwd):
-        raise ValueError("Doit contenir une majuscule.")
-    if not re.search(r"[a-z]", pwd):
-        raise ValueError("Doit contenir une minuscule.")
-    if not re.search(r"\d", pwd):
-        raise ValueError("Doit contenir un chiffre.")
 
 class UtilisateurService:
     """Classe contenant les méthodes de service des Utilisateurs"""
@@ -38,23 +29,35 @@ class UtilisateurService:
     # Création / Lecture / Maj / Suppression
     # -------------------------
     @log
-    def creer(self, prenom: str, nom: str, mail: str, mdp: str, naiss) -> Optional[Utilisateur]:
-        """
-        Création d'un utilisateur à partir de ses attributs.
-        NOTE: on hash le mdp via hash_password(). Par défaut, SANS sel pour rester
-        rétro-compatible avec les inserts existants (pop_db.py). Tu peux activer un sel (email)
-        quand toute la base aura été migrée.
-        """
+    def creer(self, prenom: str, nom: str, mail: str, mdp: str, naiss) -> Utilisateur:
+        mail_norm = mail.strip().lower()
+
+        # Vérif email
+        is_valid_email(mail_norm)
+
+        # Vérif doublon
+        if self.dao.exists_mail(mail_norm):
+            raise ValueError("Un compte existe déjà avec cet email")
+
+        # Vérif mdp
+        is_valid_password(mdp)
+
+        # Création utilisateur
         u = Utilisateur(
             id_utilisateur=None,
             prenom=prenom,
             nom=nom,
-            mail=mail,
-            mdp_hash=hash_password(mdp),  # <— pas de sel par défaut (compat)
+            mail=mail_norm,
+            mdp_hash=hash_password(mdp, mail_norm),
             naiss=naiss,
         )
-        ok = self.dao.create(u)
-        return u if ok else None
+        user = self.dao.create(u)
+
+        # Ajout personas IA par défaut
+        self.add_default_persoIA(user.id_utilisateur)
+
+        return user
+
 
     @log
     def lister_tous(self, inclure_mdp=False) -> list[Utilisateur]:
@@ -118,16 +121,21 @@ class UtilisateurService:
     # -------------------------
     @log
     def se_connecter(self, mail: str, mdp: str) -> Optional[Utilisateur]:
-        """
-        Se connecter à partir d'un mail et d'un mot de passe (en clair).
-        Compare au hash stocké en BDD.
-        NOTE: par défaut, hash sans sel pour rester compatible avec les données déjà insérées.
-        Si tu souhaites durcir, passe à hash_password(mdp, salt=mail) ET réinsère/réhash toutes les données.
-        """
-        u = self.dao.find_by_mail(mail)
+        mail_norm = mail.strip().lower()
+        u = self.dao.find_by_mail(mail_norm)
         if not u:
             return None
-        return u if u.mdp_hash == hash_password(mdp) else None
+
+        # 1) Cas normal : hash salé avec l'email
+        if u.mdp_hash == hash_password(mdp, mail_norm):
+            return u
+
+        # 2) Compatibilité ancienne version : hash sans sel
+        if u.mdp_hash == hash_password(mdp):
+            return u
+
+        return None
+
 
     @log
     def mail_deja_utilise(self, mail: str) -> bool:

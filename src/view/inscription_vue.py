@@ -1,7 +1,7 @@
 from datetime import date
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
-from service.auth_service import is_valid_email, is_valid_password, AuthService
+from service.auth_service import is_valid_email, is_valid_password
 from view.accueil_vue import AccueilVue
 
 class InscriptionVue(VueAbstraite):
@@ -79,12 +79,13 @@ class InscriptionVue(VueAbstraite):
 
             # --- Inscription ---
             try:
-                user = AuthService().inscrire(prenom, nom, mail, mdp, naiss)
+                from service.utilisateur_service import UtilisateurService
+                user = UtilisateurService().creer(prenom, nom, mail, mdp, naiss)
+
             except ValueError as e:
                 return AccueilVue(f"Inscription impossible : {e}")
 
             return AccueilVue(f"Compte créé pour {user.prenom} {user.nom}. Vous pouvez vous connecter.")
 
         except KeyboardInterrupt:
-            # ✅ bloc except bien aligné maintenant
             return AccueilVue("Inscription annulée. Retour à l'accueil.")

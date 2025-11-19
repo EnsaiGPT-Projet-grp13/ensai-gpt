@@ -38,20 +38,6 @@ class UtilisateurDao:
             row = cur.fetchone()
         return Utilisateur(**row) if row else None
 
-        """Trouver un utilisateur par son ID."""
-        with DBConnection().connection as conn:  # Connexion à la base de données
-            with conn.cursor() as cur:  # Curseur pour exécuter la requête
-                cur.execute("""
-                    SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
-                    FROM utilisateur
-                    WHERE id_utilisateur = %s
-                """, (id_utilisateur,))
-                row = cur.fetchone()
-                
-        # Si un utilisateur est trouvé, on retourne un objet Utilisateur
-        return Utilisateur(**row) if row else None   
-
-
     def exists_mail(self, mail: str) -> bool:
         conn = DBConnection().connection
         with conn.cursor() as cur:
@@ -80,7 +66,7 @@ class UtilisateurDao:
                 WHERE id_utilisateur = %s
             """, (nouveau_hash, id_utilisateur))
         conn.commit()
-
+        
     def update_nom_utilisateur(self, utilisateur: Utilisateur) -> bool:
         """Met à jour un utilisateur dans la base de données."""
         conn = DBConnection().connection
@@ -95,7 +81,6 @@ class UtilisateurDao:
             # Commit des changements sans vérifier si des lignes ont été affectées
             conn.commit()
             return True  # Retourne toujours True, peu importe si la mise à jour a eu lieu ou non
-            
     def update_mail_utilisateur(self, utilisateur: Utilisateur) -> bool:
         """Met à jour un utilisateur dans la base de données."""
         conn = DBConnection().connection

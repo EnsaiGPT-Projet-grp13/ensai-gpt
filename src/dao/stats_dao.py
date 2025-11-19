@@ -1,6 +1,6 @@
 from dao.db import DBConnection
 from service.utilisateur_service import UtilisateurService
-from collections import Counter
+
 import os
 from objects.session import Session
 
