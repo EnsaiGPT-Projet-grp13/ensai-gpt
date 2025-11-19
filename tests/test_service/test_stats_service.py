@@ -1,5 +1,3 @@
-# tests/test_service/test_stats_service.py
-
 from unittest.mock import Mock
 from service.stats_service import StatsService
 

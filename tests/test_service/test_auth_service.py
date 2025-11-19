@@ -1,5 +1,3 @@
-# tests/test_service/test_auth_service.py
-
 import pytest
 
 from service.auth_service import AuthService, is_valid_email, is_valid_password
@@ -10,10 +8,6 @@ def service_auth():
     """Instance d'AuthService pour les tests."""
     return AuthService()
 
-
-# =========================
-# Tests de validation email
-# =========================
 
 def test_email_valide_est_accepte():
     """is_valid_email ne doit pas lever d'erreur pour un email valide simple."""
@@ -47,10 +41,6 @@ def test_methode_static_is_valid_email_fonctionne_via_instance(service_auth):
     """La méthode appelée sur l'instance doit se comporter comme la version statique."""
     service_auth.is_valid_email("test.instance@example.com")
 
-
-# =========================
-# Tests de validation mot de passe
-# =========================
 
 def test_mot_de_passe_solide_est_accepte():
     """is_valid_password ne doit pas lever d'erreur pour un mot de passe solide."""

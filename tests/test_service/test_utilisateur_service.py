@@ -1,13 +1,9 @@
-# tests/test_service/test_utilisateur_service.py
-
 import pytest
 from unittest.mock import Mock
 
 from service.utilisateur_service import UtilisateurService, DEFAULT_PERSONAS
 from utils.securite import hash_password
 from objects.utilisateur import Utilisateur
-from objects.personnage_ia import PersonnageIA
-
 
 @pytest.fixture
 def service_utilisateur():
@@ -19,10 +15,6 @@ def service_utilisateur():
     service.persona_dao = Mock()
     return service
 
-
-# =========================
-# Tests de creer()
-# =========================
 
 def test_creer_valide_appelle_validations_et_dao(service_utilisateur, monkeypatch):
     # On neutralise les validations pour ce test
@@ -114,10 +106,6 @@ def test_creer_echoue_si_mdp_invalide(service_utilisateur, monkeypatch):
     service_utilisateur.dao.create.assert_not_called()
 
 
-# =========================
-# Tests de lister_tous()
-# =========================
-
 def test_lister_tous_masque_mdp_par_defaut(service_utilisateur):
     user1 = Utilisateur(1, "A", "A", "a@test.com", "HASH1", "2000-01-01")
     user2 = Utilisateur(2, "B", "B", "b@test.com", "HASH2", "2001-01-01")
@@ -140,10 +128,6 @@ def test_lister_tous_conserve_mdp_si_inclure_mdp_true(service_utilisateur):
     assert users[0].mdp_hash == "HASH1"
     service_utilisateur.dao.lister_tous.assert_called_once()
 
-
-# =========================
-# Tests de trouver_par_id() / supprimer()
-# =========================
 
 def test_trouver_par_id_delegue_au_dao(service_utilisateur):
     u = Utilisateur(1, "A", "A", "a@test.com", "HASH", "2000-01-01")
@@ -171,10 +155,6 @@ def test_supprimer_delegue_delete(service_utilisateur):
     assert ok is True
     service_utilisateur.dao.delete.assert_called_once_with(1)
 
-
-# =========================
-# Tests de modifier()
-# =========================
 
 def test_modifier_sans_rehash_appelle_update_et_retourne_utilisateur(service_utilisateur):
     u = Utilisateur(1, "A", "A", "a@test.com", "HASH", "2000-01-01")
@@ -208,10 +188,6 @@ def test_modifier_retourne_none_si_update_echoue(service_utilisateur):
     assert res is None
     service_utilisateur.dao.update.assert_called_once_with(u)
 
-
-# =========================
-# Tests de se_connecter()
-# =========================
 
 def test_se_connecter_retourne_none_si_mail_inconnu(service_utilisateur):
     service_utilisateur.dao.find_by_mail.return_value = None
@@ -258,9 +234,6 @@ def test_se_connecter_retourne_none_si_mdp_invalide(service_utilisateur):
     service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
 
 
-# =========================
-# Tests mail_deja_utilise()
-# =========================
 
 def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
     service_utilisateur.dao.exists_mail.return_value = True
@@ -270,9 +243,6 @@ def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
     assert res is True
     service_utilisateur.dao.exists_mail.assert_called_once_with("a@test.com")
 
-# =========================
-# Tests changer_identite()
-# =========================
 
 def test_changer_identite_retourne_false_si_user_introuvable(service_utilisateur):
     service_utilisateur.dao.find_by_id.return_value = None
@@ -304,10 +274,6 @@ def test_changer_identite_met_a_jour_prenom_nom_et_appelle_dao(service_utilisate
     service_utilisateur.dao.find_by_id.assert_called_once_with(1)
     service_utilisateur.dao.update_identite.assert_called_once_with(fake_user)
 
-
-# =========================
-# Tests changer_email()
-# =========================
 
 def test_changer_email_retourne_false_si_user_introuvable(service_utilisateur):
     service_utilisateur.dao.find_by_id.return_value = None

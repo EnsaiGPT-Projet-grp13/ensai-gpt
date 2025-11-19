@@ -4,8 +4,6 @@ from view.vue_abstraite import VueAbstraite
 from objects.session import Session
 from service.conversation_service import ConversationService
 
-
-
 class RechercheConversationTitreVue(VueAbstraite):
     """Vue des options au sujet de l'historique de l'application"""
 

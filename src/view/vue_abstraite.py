@@ -1,5 +1,5 @@
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class VueAbstraite(ABC):
     """Modèle de Vue"""
