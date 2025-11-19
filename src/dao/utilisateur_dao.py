@@ -80,6 +80,7 @@ class UtilisateurDao:
                 WHERE id_utilisateur = %s
             """, (nouveau_hash, id_utilisateur))
         conn.commit()
+
     def update_nom_utilisateur(self, utilisateur: Utilisateur) -> bool:
         """Met à jour un utilisateur dans la base de données."""
         conn = DBConnection().connection
@@ -94,6 +95,7 @@ class UtilisateurDao:
             # Commit des changements sans vérifier si des lignes ont été affectées
             conn.commit()
             return True  # Retourne toujours True, peu importe si la mise à jour a eu lieu ou non
+            
     def update_mail_utilisateur(self, utilisateur: Utilisateur) -> bool:
         """Met à jour un utilisateur dans la base de données."""
         conn = DBConnection().connection

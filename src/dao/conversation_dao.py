@@ -261,6 +261,76 @@ class ConversationDao:
             )
             return cur.fetchall() or []
 
+        def affichage_message_conversation(
+        self, id_utilisateur: int, limite: int = 50
+    ) -> List[Dict[str, Any]]:
+            """Renvoie un résumé des conversations (id + titre + nom personnageIA) dont l’utilisateur a l'accès."""
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    f"""
+                    SELECT
+                    c.id_conversation,
+                    c.titre,
+                    c.updated_at,
+                    c.created_at,
+                    p.name AS "personnage_name"
+                    FROM {SCHEMA}.conversation c
+                    JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
+                    WHERE c.id_proprio = %s
+
+                    UNION
+
+                    SELECT
+                    c.id_conversation,
+                    c.titre,
+                    c.updated_at,
+                    c.created_at,
+                    p.name AS "personnage_name"
+                    FROM {SCHEMA}.conversation c
+                    JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
+                    JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
+                    WHERE cu.id_utilisateur = %s
+
+                    ORDER BY updated_at DESC
+                    LIMIT %s
+                    """,
+                    (id_utilisateur, id_utilisateur, limite),
+                )
+                return cur.fetchall() or []
+
+    
+    def recherche_mots_titre(self, id_utilisateur: int, mots: str, limite: int = 50) -> List[Dict[str, Any]]:
+        """Recherche une suite de caractères dans le titre des conversations d'un utilisateur et renvoie les conversations associées"""
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                f"""
+                SELECT
+                  c.id_conversation,
+                  c.titre,
+                  c.updated_at,
+                  p.name AS "personnage_name"
+                FROM {SCHEMA}.conversation c
+                JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
+                WHERE c.id_proprio = %s
+                    AND lower(c.titre) LIKE %s
+                UNION
+                SELECT
+                  c.id_conversation,
+                  c.titre,
+                  c.updated_at,
+                  p.name AS "personnage_name"
+                FROM {SCHEMA}.conversation c
+                JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
+                JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
+                WHERE cu.id_utilisateur = %s
+                    AND lower(c.titre) LIKE %s
+                ORDER BY updated_at DESC
+                LIMIT %s
+                """,
+                (id_utilisateur, f'%{mots}%', id_utilisateur, f'%{mots}%', limite),
+            )
+            return cur.fetchall() or []
+
 
     def touch(self, cid: int) -> None:
         with self.conn.cursor() as cur:
