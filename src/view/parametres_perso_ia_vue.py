@@ -1,5 +1,3 @@
-# view/parametres_persoIA_vue.py
-
 import traceback
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
@@ -38,9 +36,7 @@ class ParametresPersoIAVue(VueAbstraite):
             uid = s.utilisateur.get("id_utilisateur")
             svc = PersonnageService()
 
-            # -----------------------------
-            # Supprimer un personnage IA
-            # -----------------------------
+
             if sous == "Supprimer un personnage IA existant":
                 while True:
                     persos = svc.lister_personnages_ia_crees_par(uid)
@@ -91,9 +87,7 @@ class ParametresPersoIAVue(VueAbstraite):
                             "Impossible de supprimer ce personnage IA (il n'appartient pas à cet utilisateur ou une erreur est survenue)."
                         )
 
-            # -----------------------------
-            # Créer un nouveau personnage IA
-            # -----------------------------
+
             if sous == "Créer un nouveau personnage IA":
                 # À adapter si tu veux vraiment injecter des services
                 return CreerPersonnageVue(
@@ -102,9 +96,6 @@ class ParametresPersoIAVue(VueAbstraite):
                     perso_svc=None,
                 )
 
-            # -----------------------------
-            # Description des personnages existants
-            # -----------------------------
             if sous == "Description des personnages existants":
                 while True:
                     persos = svc.lister_personnages_ia_pour_utilisateur(uid)
@@ -132,9 +123,7 @@ class ParametresPersoIAVue(VueAbstraite):
                     print(f"{perso.system_prompt}\n")
                     # reboucle pour en consulter un autre
 
-            # -----------------------------
-            # Annuler
-            # -----------------------------
+
             if sous == "Annuler":
                 return MenuUtilisateurVue()
 

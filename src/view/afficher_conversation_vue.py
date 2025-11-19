@@ -1,5 +1,3 @@
-# view/afficher_conversation_vue.py
-
 from InquirerPy import inquirer
 
 from view.vue_abstraite import VueAbstraite

@@ -1,5 +1,3 @@
-# view/parametres_vue.py
-
 import traceback
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
@@ -35,7 +33,7 @@ class ParametresVue(VueAbstraite):
                 return ParametresUtilisateurVue()
 
             if choix == "Paramètres personnages IA":
-                from view.parametres_persoIA_vue import ParametresPersoIAVue
+                from view.parametres_perso_ia_vue import ParametresPersoIAVue
                 return ParametresPersoIAVue()
 
             # Annuler
