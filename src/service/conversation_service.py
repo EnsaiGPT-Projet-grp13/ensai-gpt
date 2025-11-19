@@ -10,6 +10,7 @@ from objects.conversation import Conversation
 from objects.message import Message
 from dao.conversation_dao import ConversationDao
 from dao.message_dao import MessageDao
+from dao.personnage_ia_dao import PersonnageIADao
 from objects.session import Session
 
 
@@ -33,6 +34,7 @@ class ConversationService:
     def __init__(self) -> None:
         self.conv_dao = ConversationDao()
         self.msg_dao = MessageDao()
+        self.perso_dao = PersonnageIADao()
 
     # --------------------------------------------------------------------- #
     # CRUD / accès conversations
@@ -364,3 +366,21 @@ class ConversationService:
 
         # reset du titre proposé (temporaire)
         s.conversation_title = None
+
+    def get_personnage_for_conversation(self, conv: Conversation) -> Optional[dict]:
+        """
+        Retourne le personnage associé à une conversation
+        sous forme de dict prêt à mettre en session, ou None si introuvable.
+        """
+        if not conv or not getattr(conv, "id_personnageIA", None):
+            return None
+
+        perso = self.perso_dao.find_by_id(conv.id_personnageIA)
+        if not perso:
+            return None
+
+        return {
+            "id_personnageIA": perso.id_personnageIA,
+            "name": perso.name,
+            "system_prompt": perso.system_prompt,
+        }
