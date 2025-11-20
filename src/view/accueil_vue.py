@@ -1,6 +1,6 @@
 from InquirerPy import inquirer
+
 from view.vue_abstraite import VueAbstraite
-from objects.session import Session
 
 
 class AccueilVue(VueAbstraite):
@@ -12,7 +12,6 @@ class AccueilVue(VueAbstraite):
     def afficher(self):
         if self.message:
             print(self.message)
-            
 
     def choisir_menu(self):
         """Choix du menu suivant"""
@@ -33,13 +32,17 @@ class AccueilVue(VueAbstraite):
 
             case "Se connecter":
                 from view.connexion_vue import ConnexionVue  # import local
+
                 return ConnexionVue()
 
             case "Créer un compte":
                 from view.inscription_vue import InscriptionVue  # import local
+
                 return InscriptionVue()
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()
-                message = f"Ré-initialisation de la base de données — {'SUCCÈS' if succes else 'ÉCHEC'}"
+                message = (
+                    f"Ré-initialisation de la base de données — {'SUCCÈS' if succes else 'ÉCHEC'}"
+                )
                 return AccueilVue(message)

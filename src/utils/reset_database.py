@@ -1,16 +1,13 @@
-import os
 import logging
-import dotenv
-import data.init_db
-
+import os
 from unittest import mock
 
+import dotenv
+
+from dao.db import DBConnection
+from service.utilisateur_service import UtilisateurService
 from utils.log_decorator import log
 from utils.singleton import Singleton
-from dao.db import DBConnection
-
-
-from service.utilisateur_service import UtilisateurService
 
 
 class ResetDatabase(metaclass=Singleton):

@@ -1,9 +1,11 @@
-import pytest
 from unittest.mock import Mock
 
-from service.utilisateur_service import UtilisateurService, DEFAULT_PERSONAS
-from utils.securite import hash_password
+import pytest
+
 from objects.utilisateur import Utilisateur
+from service.utilisateur_service import DEFAULT_PERSONAS, UtilisateurService
+from utils.securite import hash_password
+
 
 @pytest.fixture
 def service_utilisateur():
@@ -234,7 +236,6 @@ def test_se_connecter_retourne_none_si_mdp_invalide(service_utilisateur):
     service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
 
 
-
 def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
     service_utilisateur.dao.exists_mail.return_value = True
 
@@ -257,7 +258,9 @@ def test_changer_email_retourne_false_si_user_introuvable(service_utilisateur):
 
 def test_changer_email_retourne_false_si_mdp_incorrect(service_utilisateur):
     # utilisateur avec mail old@test.com et hash qui ne correspond pas à "mdp"
-    u = Utilisateur(1, "A", "A", "old@test.com", hash_password("autre", "old@test.com"), "2000-01-01")
+    u = Utilisateur(
+        1, "A", "A", "old@test.com", hash_password("autre", "old@test.com"), "2000-01-01"
+    )
     service_utilisateur.dao.find_by_id.return_value = u
 
     ok, msg = service_utilisateur.changer_email(1, "new@test.com", "mdp")

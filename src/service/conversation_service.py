@@ -1,24 +1,22 @@
 from __future__ import annotations
 
 import os
-import requests
 import secrets
 import string
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from objects.conversation import Conversation
-from objects.message import Message
+import requests
+
 from dao.conversation_dao import ConversationDao
 from dao.message_dao import MessageDao
 from dao.personnage_ia_dao import PersonnageIADao
+from objects.conversation import Conversation
+from objects.message import Message
 from objects.session import Session
-import os, psycopg2
 
 LLM_MAX_TOKENS = os.getenv("LLM_MAX_TOKENS", 300)
-LLM_TOP_P= os.getenv("LLM_TOP_P", 1.0)
-LLM_TEMPERATURE= os.getenv("LLM_TEMPERATURE", 0.7)
-
-
+LLM_TOP_P = os.getenv("LLM_TOP_P", 1.0)
+LLM_TEMPERATURE = os.getenv("LLM_TEMPERATURE", 0.7)
 
 
 API_URL = os.getenv("API_URL", "https://ensai-gpt-109912438483.europe-west4.run.app/generate")
@@ -56,7 +54,6 @@ class ConversationService:
         is_collab: bool = False,
         token_override: Optional[str] = None,
     ) -> Conversation:
-
         token = token_override or (_gen_token(16) if is_collab else None)
 
         conv = Conversation(
@@ -72,7 +69,6 @@ class ConversationService:
         )
         return self.conv_dao.create(conv)
 
-
     def join_by_token(self, id_user: int, token: str) -> Optional[Conversation]:
         """Rejoint une conversation collaborative via token (et ajoute l'utilisateur aux participants)."""
         token = (token or "").strip().upper()
@@ -86,9 +82,9 @@ class ConversationService:
 
     def get(self, cid: int) -> Optional[Conversation]:
         return self.conv_dao.find_by_id(cid)
-    
-    def modifier(self, c: Conversation, nouveau_titre : str) -> Optional[Conversation]:
-        """Mettre à jour une conversation.""" 
+
+    def modifier(self, c: Conversation, nouveau_titre: str) -> Optional[Conversation]:
+        """Mettre à jour une conversation."""
         id_conversation = c.id_conversation
         return self.conv_dao.update_titre(id_conversation, nouveau_titre)
 
@@ -106,11 +102,15 @@ class ConversationService:
 
     def liste_resumee_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25):
         """Liste résumée (titre + nom personnage) des conversations dont l'utilisateur est propriétaire."""
-        return self.conv_dao.liste_resumee_proprietaire_pour_utilisateur(id_utilisateur, limite=limite)
+        return self.conv_dao.liste_resumee_proprietaire_pour_utilisateur(
+            id_utilisateur, limite=limite
+        )
 
     def liste_resumee_accessible_pour_utilisateur(self, id_utilisateur: int, limite: int = 50):
         """Liste résumée (titre + nom personnage) des conversations auxquelles l'utilisateur a accès."""
-        return self.conv_dao.liste_resumee_accessible_pour_utilisateur(id_utilisateur, limite=limite)
+        return self.conv_dao.liste_resumee_accessible_pour_utilisateur(
+            id_utilisateur, limite=limite
+        )
 
     def recherche_mots_titre(self, id_utilisateur: int, mots: str, limite: int = 50):
         """Renvoie la liste des conversations dans lesquelles mots est présent dans le titre"""
@@ -124,9 +124,7 @@ class ConversationService:
         Construit l'historique complet au format attendu par l'API :
         [{role:'system'|'user'|'assistant', content:'...'}, ...]
         """
-        history: List[Dict[str, str]] = [
-            {"role": "system", "content": personnage["system_prompt"]}
-        ]
+        history: List[Dict[str, str]] = [{"role": "system", "content": personnage["system_prompt"]}]
         for m in self.msg_dao.list_for_conversation(cid):
             role = "assistant" if m.expediteur == "IA" else "user"
             history.append({"role": role, "content": m.contenu})
@@ -280,18 +278,18 @@ class ConversationService:
         5) Retourne (texte_IA, payload_envoyé)
         """
         # 1) message utilisateur
-        self.msg_dao.add(Message(
-            id_message=None,
-            id_conversation=cid,
-            expediteur="utilisateur",
-            id_utilisateur=id_user,
-            contenu=user_text,
-        ))
+        self.msg_dao.add(
+            Message(
+                id_message=None,
+                id_conversation=cid,
+                expediteur="utilisateur",
+                id_utilisateur=id_user,
+                contenu=user_text,
+            )
+        )
 
         # 2) payload
-        payload = self._make_payload(
-            personnage, cid, temperature, top_p, max_tokens, stop=stop
-        )
+        payload = self._make_payload(personnage, cid, temperature, top_p, max_tokens, stop=stop)
 
         # 3) appel API
         try:
@@ -307,13 +305,15 @@ class ConversationService:
             ia_text = "[IA] Réponse vide."
 
         # 4) message IA
-        self.msg_dao.add(Message(
-            id_message=None,
-            id_conversation=cid,
-            expediteur="IA",
-            id_utilisateur=None,
-            contenu=ia_text,
-        ))
+        self.msg_dao.add(
+            Message(
+                id_message=None,
+                id_conversation=cid,
+                expediteur="IA",
+                id_utilisateur=None,
+                contenu=ia_text,
+            )
+        )
 
         # 5) MAJ updated_at
         self.conv_dao.touch(cid)

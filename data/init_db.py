@@ -1,16 +1,20 @@
-import os, psycopg2
+import os
+
+import psycopg2
 
 try:
-    import dotenv; dotenv.load_dotenv(override=True)
+    import dotenv
+
+    dotenv.load_dotenv(override=True)
 except Exception:
     pass
 
 PG_HOST = os.getenv("POSTGRES_HOST", "localhost")
 PG_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
-PG_DB   = os.getenv("POSTGRES_DATABASE", "postgres")
+PG_DB = os.getenv("POSTGRES_DATABASE", "postgres")
 PG_USER = os.getenv("POSTGRES_USER", "postgres")
-PG_PWD  = os.getenv("POSTGRES_PASSWORD", "postgres")
-SCHEMA  = os.getenv("POSTGRES_SCHEMA", "projetGPT")
+PG_PWD = os.getenv("POSTGRES_PASSWORD", "postgres")
+SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
 
 DDL = f"""
@@ -152,7 +156,9 @@ FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
 
 def ensure_database_exists():
     # Se connecte à "postgres" pour gérer l'existence de PG_DB
-    admin_conn = psycopg2.connect(host=PG_HOST, port=PG_PORT, dbname="postgres", user=PG_USER, password=PG_PWD)
+    admin_conn = psycopg2.connect(
+        host=PG_HOST, port=PG_PORT, dbname="postgres", user=PG_USER, password=PG_PWD
+    )
     admin_conn.autocommit = True
     with admin_conn.cursor() as cur:
         cur.execute("SELECT 1 FROM pg_database WHERE datname = %s;", (PG_DB,))
@@ -162,6 +168,7 @@ def ensure_database_exists():
             print(f"Base `{PG_DB}` créée.")
     admin_conn.close()
 
+
 def main():
     ensure_database_exists()  # <-- clé
     conn = psycopg2.connect(host=PG_HOST, port=PG_PORT, dbname=PG_DB, user=PG_USER, password=PG_PWD)
@@ -170,6 +177,7 @@ def main():
         cur.execute(DDL)
         print(f"Base/Schéma initialisés dans `{SCHEMA}` (DB `{PG_DB}`).")
     conn.close()
+
 
 if __name__ == "__main__":
     main()
