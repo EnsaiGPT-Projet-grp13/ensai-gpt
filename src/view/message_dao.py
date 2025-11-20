@@ -48,24 +48,21 @@ class MessageDao:
             rows = cur.fetchall() or []
         return [Message(**r) for r in rows]
 
-    def recherche_mots_message(self, id_utilisateur: int, mots: str, limite: int = 5) -> List[Dict[str, Any]]:
-        """Recherche une suite de caractères dans les messages d'un utilisateur et renvoie les messages associés"""
+    def get_title(self, cid: int) -> str:
+        """Retourne le titre d'une conversation, ou '(sans titre)' si introuvable."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
-                SELECT
-                  m.id_message,
-                  m.id_conversation,
-                  m.expediteur,
-                  m.contenu,
-                  m.id_utilisateur,
-                  m.created_at
-                FROM {SCHEMA}.message m
-                WHERE m.id_utilisateur = %s OR m.id_utilisateur = NULL
-                    AND lower(m.contenu) LIKE %s
-                ORDER BY created_at DESC
-                LIMIT %s
+                SELECT titre
+                FROM {SCHEMA}.conversation
+                WHERE id_conversation = %s
                 """,
-                (id_utilisateur, f'%{mots}%', limite),
+                (cid,),
             )
-            return cur.fetchall() or []
+            row = cur.fetchone()
+
+        if not row:
+            return "(sans titre)"
+
+        titre = (row["titre"] or "").strip()
+        return titre if titre else "(sans titre)"

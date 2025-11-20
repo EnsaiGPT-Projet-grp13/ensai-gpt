@@ -18,37 +18,73 @@ class RechercheConversationMotsVue(VueAbstraite):
             print(self.message)
 
     def choisir_menu(self):
-        """Insertion des mots recherchés"""
+        """Recherche de conversations par mots-clés dans les messages."""
         print("\n" + "-" * 50 + "\nHistorique\n" + "-" * 50 + "\n")
         s = Session()
         id_utilisateur = s.utilisateur.get("id_utilisateur")
-        service = ConversationService()
-        conversations = service.liste_resumee_accessible_pour_utilisateur(id_utilisateur)
+
+        conv_svc = ConversationService()
+        msg_svc = MessageService()
+
+        # On récupère les conversations accessibles (résumées)
+        conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(id_utilisateur)
         if not conversations:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
 
-        mots = inquirer.text(message="Quel mots clés recherchez vous dans vos anciennes conversations ? :").execute().strip().lower()
-        listes_message = MessageService().recherche_mots_message(id_utilisateur, mots)
+        # Saisie des mots-clés
+        mots = (inquirer.text(
+            message="Quels mots-clés recherchez-vous dans vos anciennes conversations ? :"
+        ).execute() or "").strip().lower()
+
+        if not mots:
+            from view.historique_vue import HistoriqueVue
+            return HistoriqueVue("Recherche annulée (mots-clés vides).")
+
+        # Recherche des messages contenant ces mots
+        listes_message = msg_svc.recherche_mots_message(id_utilisateur, mots)
+
         if not listes_message:
             from view.historique_vue import HistoriqueVue
-            return HistoriqueVue("Aucune conversation ne contient ces mots")
+            return HistoriqueVue("Aucune conversation ne contient ces mots.")
 
-        choix = [f"{m.get('contenu')} par {m.get('expediteur')} (id_conversation#{m.get('id_conversation')})" for m in listes_message] + ["Retour"]
-        label = inquirer.select(message="Quelle conversation voulez-vous ?", choices=choix).execute()
-        if label == "Retour":
-            # Retourne vers la vue du menue de l'utilisateur
+        # Comptage du nombre de messages correspondants par conversation
+        # conv_counts: { id_conversation -> nb_messages_trouvés }
+        conv_counts: dict[int, int] = {}
+        for m in listes_message:
+            cid = m.get("id_conversation")
+            conv_counts[cid] = conv_counts.get(cid, 0) + 1
+
+        # Index des conversations résumées par id_conversation
+        conv_index = {c.get("id_conversation"): c for c in conversations}
+
+        # Construction des choix pour Inquirer
+        choices = []
+        for cid, count in conv_counts.items():
+            c = conv_index.get(cid)
+
+            titre = c.get("titre") or "(sans titre)"
+            perso = c.get("personnageIA_name") or c.get("personnage_name") or "Personnage inconnu"
+
+            label = f"{titre} avec {perso} ({count} occurrence(s))"
+            choices.append({"name": label, "value": cid})
+
+        if not choices:
+            from view.historique_vue import HistoriqueVue
+            return HistoriqueVue("Aucune conversation ne contient ces mots (après filtrage).")
+
+        choices.append({"name": "Retour", "value": None})
+
+        cid_choisi = inquirer.select(
+            message="Quelle conversation voulez-vous ?",
+            choices=choices,
+        ).execute()
+
+        if cid_choisi is None:
             from view.historique_vue import HistoriqueVue
             return HistoriqueVue()
-        if "#" in label and ")" in label:
-            pid = int(label.split("#")[-1].rstrip(")"))
-        else:
-            raise ValueError("Format de label incorrect, impossible d'extraire l'ID.")
-        conversation = next(c for c in conversations if c.get('id_conversation') == pid)
-        id_conversation = conversation.get('id_conversation')
+            
+        s.conversation_id = cid_choisi
 
-        conversation_choisie = service.get(id_conversation)
-        s.conversation_id = id_conversation
-
-        from view.parametre_conversation_vue import ParametresConversationVue
+        from view.parametres_conversation_vue import ParametresConversationVue
         return ParametresConversationVue()
