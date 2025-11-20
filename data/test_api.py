@@ -1,3 +1,4 @@
+import os
 import requests
 
 API_URL = "https://ensai-gpt-109912438483.europe-west4.run.app/generate"
@@ -5,11 +6,11 @@ API_URL = "https://ensai-gpt-109912438483.europe-west4.run.app/generate"
 payload = {
     "history": [
         {"role": "system", "content": "Tu es un assistant utile."},
-        {"role": "user", "content": "Bonjour, peux-tu me donner une citation inspirante ?"},
+        {"role": "user", "content": "Bonjour, peux-tu me donner une citation inspirante ?"}
     ],
     "temperature": 0.7,
     "top_p": 1.0,
-    "max_tokens": 150,  # tester dautres valeurs
+    "max_tokens": 150 #tester dautres valeurs
 }
 
 response = requests.post(API_URL, json=payload)
