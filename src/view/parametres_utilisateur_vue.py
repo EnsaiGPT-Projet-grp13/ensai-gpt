@@ -20,7 +20,6 @@ class ParametresUtilisateurVue(VueAbstraite):
 
     def choisir_menu(self):
         try:
-            self.afficher()
             print("\n" + "-" * 50 + "\nParamètres utilisateur\n" + "-" * 50 + "\n")
 
             choix = inquirer.select(
@@ -42,10 +41,25 @@ class ParametresUtilisateurVue(VueAbstraite):
             # Changer mot de passe
             # -----------------------------
             if choix == "Changer mot de passe":
+                # Récupération de l'email courant pour la vérif
+                mail = s.utilisateur.get("mail")
+
+                # 1) Ancien mot de passe
                 ancien = inquirer.secret(
                     message="Ancien mot de passe :"
                 ).execute() or ""
 
+                # Si vide -> on annule proprement
+                if not ancien:
+                    return ParametresUtilisateurVue("Changement de mot de passe annulé.")
+
+                # Vérifier immédiatement l’ancien mot de passe
+                user_ok = UtilisateurService().se_connecter(mail, ancien)
+                if user_ok is None:
+                    # ⬅️ ICI on s'arrête DIRECT si ancien mdp faux
+                    return ParametresUtilisateurVue("Ancien mot de passe incorrect.")
+
+                # 2) Nouveau mot de passe
                 nouveau = inquirer.secret(
                     message="Nouveau mot de passe :"
                 ).execute() or ""
@@ -57,23 +71,10 @@ class ParametresUtilisateurVue(VueAbstraite):
                 if nouveau != confirmation:
                     return ParametresUtilisateurVue("Les mots de passe ne correspondent pas.")
 
+                # 3) Appel du service (validation + hash + update)
                 ok, msg = svc.changer_mot_de_passe(uid, ancien, nouveau)
                 return ParametresUtilisateurVue(msg)
 
-            # -----------------------------
-            # Changer identité (prénom + nom)
-            # -----------------------------
-            if choix == "Changer identité (prénom + nom)":
-                nouveau_prenom = inquirer.text(
-                    message="Nouveau prénom :"
-                ).execute() or ""
-
-                nouveau_nom = inquirer.text(
-                    message="Nouveau nom :"
-                ).execute() or ""
-
-                ok, msg = svc.changer_identite(uid, nouveau_prenom, nouveau_nom)
-                return ParametresUtilisateurVue(msg)
 
             # -----------------------------
             # Changer e-mail

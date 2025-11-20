@@ -69,3 +69,22 @@ class MessageDao:
                 (id_utilisateur, f'%{mots}%', limite),
             )
             return cur.fetchall() or []
+
+    def get_title(self, cid: int) -> str:
+        """Retourne le titre d'une conversation, ou '(sans titre)' si introuvable."""
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                f"""
+                SELECT titre
+                FROM {SCHEMA}.conversation
+                WHERE id_conversation = %s
+                """,
+                (cid,),
+            )
+            row = cur.fetchone()
+
+        if not row:
+            return "(sans titre)"
+
+        titre = (row["titre"] or "").strip()
+        return titre if titre else "(sans titre)"
