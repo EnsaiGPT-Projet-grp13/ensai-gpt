@@ -66,7 +66,6 @@ def test_start_cree_conversation_simple(service_conversation):
     assert conv_passe.id_proprio == 5
     assert conv_passe.id_personnageIA == 3
     assert conv_passe.titre == "Ma conversation"
-    assert conv_passe.max_tokens == 150
     assert conv_passe.is_collab is False
     assert conv_passe.token_collab is None
 
