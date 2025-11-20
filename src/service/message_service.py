@@ -30,5 +30,3 @@ class MessageService:
 
         return "\n".join(lignes)
 
-
-        

@@ -4,7 +4,6 @@ from view.vue_abstraite import VueAbstraite
 from objects.session import Session
 from view.menu_utilisateur_vue import MenuUtilisateurVue
 from service.personnage_service import PersonnageService
-from view.creer_personnage_vue import CreerPersonnageVue
 
 
 class ParametresPersoIAVue(VueAbstraite):
@@ -36,7 +35,6 @@ class ParametresPersoIAVue(VueAbstraite):
             uid = s.utilisateur.get("id_utilisateur")
             svc = PersonnageService()
 
-
             if sous == "Supprimer un personnage IA existant":
                 while True:
                     persos = svc.lister_personnages_ia_crees_par(uid)
@@ -46,18 +44,20 @@ class ParametresPersoIAVue(VueAbstraite):
                             "Vous n'avez aucun personnage IA à supprimer."
                         )
 
-                    choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
-                    choices.append("Annuler")
+                    choices = [
+                        {"name": p.name, "value": p.id_personnageIA}
+                        for p in persos
+                    ]
+                    choices.append({"name": "Annuler", "value": None})
 
-                    label = inquirer.select(
+                    pid = inquirer.select(
                         message="Choisir le personnage IA à supprimer :",
                         choices=choices,
                     ).execute()
 
-                    if label == "Annuler":
+                    if pid is None:
                         return MenuUtilisateurVue("Suppression annulée.")
 
-                    pid = int(label.split("#")[-1].rstrip(")"))
                     perso = next(p for p in persos if p.id_personnageIA == pid)
 
                     confirm = inquirer.confirm(
@@ -73,7 +73,6 @@ class ParametresPersoIAVue(VueAbstraite):
                         if retour:
                             return MenuUtilisateurVue("Suppression annulée.")
                         else:
-                            # on reboucle
                             continue
 
                     ok = svc.supprimer_personnage_ia(uid, pid)
@@ -87,14 +86,25 @@ class ParametresPersoIAVue(VueAbstraite):
                             "Impossible de supprimer ce personnage IA (il n'appartient pas à cet utilisateur ou une erreur est survenue)."
                         )
 
-
             if sous == "Créer un nouveau personnage IA":
-                # À adapter si tu veux vraiment injecter des services
-                return CreerPersonnageVue(
-                    message="Créer un nouveau personnage IA.",
-                    session_svc=None,
-                    perso_svc=None,
-                )
+                name = (inquirer.text(
+                    message="Nom du personnage (Entrée vide pour annuler) :"
+                ).execute() or "").strip()
+                if not name:
+                    return MenuUtilisateurVue("Création annulée.")
+
+                prompt = (inquirer.text(
+                    message=(
+                        "Prompt système (rôle, style, limites, format de réponse — "
+                        "Entrée vide pour annuler) :"
+                    )
+                ).execute() or "").strip()
+                if not prompt:
+                    return MenuUtilisateurVue("Création annulée.")
+
+                prompt_full = "Tu es le personnage suivant : " + prompt
+                perso = svc.create_personnage(uid, name, prompt_full)
+                return MenuUtilisateurVue(f"Personnage « {perso.name} » créé.")
 
             if sous == "Description des personnages existants":
                 while True:
@@ -105,24 +115,24 @@ class ParametresPersoIAVue(VueAbstraite):
                             "Aucun personnage disponible. Créez-en un d'abord."
                         )
 
-                    choices = [f"{p.name} (#{p.id_personnageIA})" for p in persos]
-                    choices.append("Retour")
+                    choices = [
+                        {"name": p.name, "value": p.id_personnageIA}
+                        for p in persos
+                    ]
+                    choices.append({"name": "Retour", "value": None})
 
-                    label = inquirer.select(
+                    pid = inquirer.select(
                         message="Choisir un personnage pour consulter sa description :",
                         choices=choices,
                     ).execute()
 
-                    if label == "Retour":
+                    if pid is None:
                         return MenuUtilisateurVue("Retour au menu des paramètres.")
 
-                    pid = int(label.split("#")[-1].rstrip(")"))
                     perso = next(p for p in persos if p.id_personnageIA == pid)
 
                     print(f"\nDescription du personnage '{perso.name}':\n")
                     print(f"{perso.system_prompt}\n")
-                    # reboucle pour en consulter un autre
-
 
             if sous == "Annuler":
                 return MenuUtilisateurVue()
