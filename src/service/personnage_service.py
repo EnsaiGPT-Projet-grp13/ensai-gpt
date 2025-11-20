@@ -1,13 +1,16 @@
 from __future__ import annotations
-from typing import Dict, Any, List, Optional
 
-from objects.personnage_ia import PersonnageIA
+import os
+from typing import Any, Dict, List, Optional
+
 from dao.personnage_ia_dao import PersonnageIADao
+from objects.personnage_ia import PersonnageIA
 from utils.log_decorator import log
-import os, psycopg2
 
 try:
-    import dotenv; dotenv.load_dotenv(override=True)
+    import dotenv
+
+    dotenv.load_dotenv(override=True)
 except Exception:
     pass
 
@@ -151,4 +154,3 @@ class PersonnageService:
         (wrapping de PersonnageIADao.list_for_user)
         """
         return self.dao.list_for_user(user_id)
-
