@@ -14,12 +14,10 @@ from dao.personnage_ia_dao import PersonnageIADao
 from objects.session import Session
 import os, psycopg2
 
-try:
-    import dotenv; dotenv.load_dotenv(override=True)
-except Exception:
-    pass
-
 LLM_MAX_TOKENS = os.getenv("LLM_MAX_TOKENS", 300)
+LLM_TOP_P= os.getenv("LLM_TOP_P", 1.0)
+LLM_TEMPERATURE= os.getenv("LLM_TEMPERATURE", 0.7)
+
 
 
 
@@ -52,16 +50,12 @@ class ConversationService:
         id_user: int,
         personnage: Dict[str, Any],
         titre: Optional[str] = None,
-        temperature: Optional[float] = None,
-        top_p: Optional[float] = None,
+        temperature: Optional[float] = LLM_TEMPERATURE,
+        top_p: Optional[float] = LLM_TOP_P,
         max_tokens: Optional[int] = LLM_MAX_TOKENS,
         is_collab: bool = False,
         token_override: Optional[str] = None,
     ) -> Conversation:
-        if temperature is not None:#supp
-            temperature = float(temperature)
-        if top_p is not None:
-            top_p = float(top_p)
 
         token = token_override or (_gen_token(16) if is_collab else None)
 
@@ -142,8 +136,8 @@ class ConversationService:
         self,
         personnage: Dict[str, Any],
         cid: int,
-        temperature: float,
-        top_p: float,
+        temperature: LLM_TEMPERATURE,
+        top_p: LLM_TOP_P,
         max_tokens: LLM_MAX_TOKENS,
         stop: Optional[List[str]] = None,
     ) -> Dict[str, Any]:

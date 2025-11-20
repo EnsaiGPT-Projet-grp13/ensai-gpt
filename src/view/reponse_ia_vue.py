@@ -18,12 +18,6 @@ class ReponseIAVue(VueAbstraite):
             print("  Partagez ce token pour inviter d'autres utilisateurs à rejoindre cette conversation collaborative.")
             print("====================================\n")
 
-    def _defaults_from_user(self, s: Session):
-        u = s.utilisateur if isinstance(s.utilisateur, dict) else {}
-        temperature = float(u.get("temperature", 0.7) or 0.7)
-        top_p = float(u.get("top_p", 1.0) or 1.0)
-        max_tokens = int(u.get("max_tokens", 150) or 150)
-        return temperature, top_p, max_tokens
 
     def choisir_menu(self):
         try:
@@ -48,15 +42,11 @@ class ReponseIAVue(VueAbstraite):
 
             # premier tour automatique
             if self._first:
-                temperature, top_p, max_tokens = self._defaults_from_user(s)
                 ia_text, _ = self.service.send_user_and_get_ai(
                     cid=s.conversation_id,
                     id_user=int(s.utilisateur["id_utilisateur"]),
                     personnage=s.personnage,
                     user_text=self._first,
-                    temperature=temperature,
-                    top_p=top_p,
-                    max_tokens=max_tokens,
                 )
                 print("\n--- Réponse de l'IA ---\n")
                 print(ia_text)
@@ -75,15 +65,11 @@ class ReponseIAVue(VueAbstraite):
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
                     return MenuUtilisateurVue("Conversation terminée.")
 
-                temperature, top_p, max_tokens = self._defaults_from_user(s)
                 ia_text, _ = self.service.send_user_and_get_ai(
                     cid=s.conversation_id,
                     id_user=int(s.utilisateur["id_utilisateur"]),
                     personnage=s.personnage,
                     user_text=user_msg.strip(),
-                    temperature=temperature,
-                    top_p=top_p,
-                    max_tokens=max_tokens,
                 )
                 print("\n--- Réponse de l'IA ---\n")
                 print(ia_text)

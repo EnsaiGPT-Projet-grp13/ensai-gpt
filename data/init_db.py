@@ -28,10 +28,7 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     mdp              TEXT NOT NULL,
     naiss            DATE,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    temperature      REAL,
-    top_p            REAL,
-    max_tokens       INTEGER NOT NULL DEFAULT 300
+    updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- ================================

@@ -162,6 +162,28 @@ class UtilisateurService:
         """Retourne True si un utilisateur existe déjà avec ce mail."""
         return self.dao.exists_mail(mail)
 
+    def changer_identite(self, id_utilisateur: int, nouveau_prenom: str, nouveau_nom: str):
+        """Change prénom + nom d'un utilisateur."""
+        u = self.dao.find_by_id(id_utilisateur)
+        if not u:
+            return False, "Utilisateur introuvable."
+
+        if not nouveau_prenom.strip():
+            return False, "Le prénom ne peut pas être vide."
+
+        if not nouveau_nom.strip():
+            return False, "Le nom ne peut pas être vide."
+
+        u.prenom = nouveau_prenom.strip()
+        u.nom = nouveau_nom.strip()
+
+        ok = self.dao.update_identite(u)
+        if not ok:
+            return False, "Erreur en base de données."
+
+        return True, "Identité modifiée avec succès."
+
+
     def changer_mot_de_passe(self, id_utilisateur: int, ancien_mdp: str, nouveau_mdp: str):
         """
         Change le mot de passe d'un utilisateur.

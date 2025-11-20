@@ -97,6 +97,17 @@ class ParametresUtilisateurVue(VueAbstraite):
                 ok, msg = svc.changer_email(uid, nouvel_email, mdp)
                 return ParametresUtilisateurVue(msg)
 
+            # ----------------------------- #
+            # Changer identité (prénom + nom) 
+            # -----------------------------
+            if choix == "Changer identité (prénom + nom)":
+                nouveau_prenom = inquirer.text(message="Nouveau prénom :").execute() or ""
+                nouveau_nom = inquirer.text(message="Nouveau nom :").execute() or ""
+                ok, msg = svc.changer_identite(uid, nouveau_prenom, nouveau_nom)
+                
+                return ParametresUtilisateurVue(msg)
+
+
             # -----------------------------
             # Retour
             # -----------------------------

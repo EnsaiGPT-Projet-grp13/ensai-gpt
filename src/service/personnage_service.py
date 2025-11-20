@@ -151,5 +151,4 @@ class PersonnageService:
         (wrapping de PersonnageIADao.list_for_user)
         """
         return self.dao.list_for_user(user_id)
-   
-    
+

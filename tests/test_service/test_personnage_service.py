@@ -247,17 +247,11 @@ def test_build_payload_avec_personnage_objet():
     payload = PersonnageService.build_payload(
         personnage=perso,
         user_messages=user_messages,
-        temperature=0.9,
-        top_p=0.8,
-        max_tokens=200,
     )
 
     assert "history" in payload
     assert payload["history"][0] == {"role": "system", "content": "Tu es un bot."}
     assert payload["history"][1:] == user_messages
-    assert payload["temperature"] == pytest.approx(0.9)
-    assert payload["top_p"] == pytest.approx(0.8)
-    assert payload["max_tokens"] == 200
 
 
 def test_build_payload_avec_personnage_dict():
@@ -274,11 +268,7 @@ def test_build_payload_avec_personnage_dict():
     payload = PersonnageService.build_payload(
         personnage=perso_dict,
         user_messages=user_messages,
-        temperature=0.5,
-        top_p=1.0,
-        max_tokens=50,
     )
 
     assert payload["history"][0] == {"role": "system", "content": "Je viens d'un dict."}
     assert payload["history"][1:] == user_messages
-    assert payload["max_tokens"] == 50

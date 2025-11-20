@@ -46,10 +46,7 @@ class ConnexionVue(VueAbstraite):
                         "id_utilisateur": user.id_utilisateur,
                         "prenom": user.prenom,
                         "nom": user.nom,
-                        "mail": user.mail,
-                        "temperature": getattr(user, "temperature", 0.7),
-                        "top_p": getattr(user, "top_p", 1.0),
-                        "max_tokens": getattr(user, "max_tokens", 150),
+                        "mail": user.mail
                     }
                     s.session = None
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
