@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS session (
     id_session     SERIAL PRIMARY KEY,
     id_utilisateur INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
     started_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    ended_at       TIMESTAMPTZ NULL
+    ended_at       TIMESTAMPTZ DEFAULT NULL
 );
 
 -- ================================
