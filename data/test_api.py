@@ -10,7 +10,7 @@ payload = {
     ],
     "temperature": 0.7,
     "top_p": 1.0,
-    "max_tokens": 150
+    "max_tokens": 150 #tester dautres valeurs
 }
 
 response = requests.post(API_URL, json=payload)

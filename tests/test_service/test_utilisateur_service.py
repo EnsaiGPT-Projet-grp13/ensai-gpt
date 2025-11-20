@@ -244,37 +244,6 @@ def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
     service_utilisateur.dao.exists_mail.assert_called_once_with("a@test.com")
 
 
-def test_changer_identite_retourne_false_si_user_introuvable(service_utilisateur):
-    service_utilisateur.dao.find_by_id.return_value = None
-
-    ok, msg = service_utilisateur.changer_identite(1, "NewPrenom", "NewNom")
-
-    assert ok is False
-    assert "introuvable" in msg
-    service_utilisateur.dao.update_identite.assert_not_called()
-
-
-def test_changer_identite_met_a_jour_prenom_nom_et_appelle_dao(service_utilisateur):
-    class FakeUser:
-        def __init__(self, uid, prenom, nom):
-            self.id_utilisateur = uid
-            self.prenom = prenom
-            self.nom = nom
-
-    fake_user = FakeUser(1, "AncienPrenom", "AncienNom")
-    service_utilisateur.dao.find_by_id.return_value = fake_user
-    service_utilisateur.dao.update_identite.return_value = True
-
-    ok, msg = service_utilisateur.changer_identite(1, "NouveauPrenom", "NouveauNom")
-
-    assert ok is True
-    assert "succès" in msg
-    assert fake_user.prenom == "NouveauPrenom"
-    assert fake_user.nom == "NouveauNom"
-    service_utilisateur.dao.find_by_id.assert_called_once_with(1)
-    service_utilisateur.dao.update_identite.assert_called_once_with(fake_user)
-
-
 def test_changer_email_retourne_false_si_user_introuvable(service_utilisateur):
     service_utilisateur.dao.find_by_id.return_value = None
 

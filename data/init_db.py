@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS utilisateur (
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     temperature      REAL,
     top_p            REAL,
-    max_tokens       INTEGER NOT NULL DEFAULT 1000
+    max_tokens       INTEGER NOT NULL DEFAULT 300
 );
 
 -- ================================

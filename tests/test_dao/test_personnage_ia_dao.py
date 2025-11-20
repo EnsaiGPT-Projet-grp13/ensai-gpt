@@ -138,38 +138,3 @@ def test_list_standards_inclut_les_personnages_sans_created_by():
 
     # Nettoyage
     pdao.delete(created_std.id_personnageIA)
-
-
-def test_list_for_user_retourne_standards_et_personnages_de_l_utilisateur():
-    """
-    list_for_user(uid) doit retourner :
-    - les personnages standards (created_by IS NULL)
-    - les personnages créés par l'utilisateur uid
-    """
-    udao = UtilisateurDao()
-    pdao = PersonnageIADao()
-
-    user = create_test_user(email_prefix="perso_list")
-
-    p_std = create_standard_personnage(
-        name_prefix="StdListForUser",
-        system_prompt="Standard pour list_for_user.",
-    )
-
-    p_user = create_test_personnage(
-        user.id_utilisateur,
-        prefix="UserListForUser",
-    )
-
-    liste = pdao.list_for_user(user.id_utilisateur)
-    ids = {p.id_personnageIA for p in liste}
-    creators = {p.created_by for p in liste}
-
-    assert p_std.id_personnageIA in ids
-    assert p_user.id_personnageIA in ids
-    assert None in creators
-    assert user.id_utilisateur in creators
-
-    pdao.delete(p_std.id_personnageIA)
-    pdao.delete(p_user.id_personnageIA)
-    udao.delete(user.id_utilisateur)

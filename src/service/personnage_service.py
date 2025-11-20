@@ -4,6 +4,14 @@ from typing import Dict, Any, List, Optional
 from objects.personnage_ia import PersonnageIA
 from dao.personnage_ia_dao import PersonnageIADao
 from utils.log_decorator import log
+import os, psycopg2
+
+try:
+    import dotenv; dotenv.load_dotenv(override=True)
+except Exception:
+    pass
+
+LLM_MAX_TOKENS = os.getenv("LLM_MAX_TOKENS", 300)
 
 
 class PersonnageService:
@@ -88,7 +96,7 @@ class PersonnageService:
         user_messages: List[Dict[str, str]],
         temperature: float = 0.7,
         top_p: float = 1.0,
-        max_tokens: int = 150,
+        max_tokens: int = LLM_MAX_TOKENS,
     ) -> Dict[str, Any]:
         """
         Construit l’historique complet pour l’appel à l’API IA.

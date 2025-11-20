@@ -55,7 +55,7 @@ pip install -r requirements.txt
 WEBSERVICE_HOST=https://ensai-gpt-109912438483.europe-west4.run.app
 LLM_TEMPERATURE=0.7
 LLM_TOP_P=1.0
-LLM_MAX_TOKENS=300
+LLM_MAX_TOKENS=200
 
 POSTGRES_HOST=           # ⚠️ à remplacer par votre host
 POSTGRES_PORT=5432

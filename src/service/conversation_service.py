@@ -12,6 +12,14 @@ from dao.conversation_dao import ConversationDao
 from dao.message_dao import MessageDao
 from dao.personnage_ia_dao import PersonnageIADao
 from objects.session import Session
+import os, psycopg2
+
+try:
+    import dotenv; dotenv.load_dotenv(override=True)
+except Exception:
+    pass
+
+LLM_MAX_TOKENS = os.getenv("LLM_MAX_TOKENS", 300)
 
 
 
@@ -46,15 +54,11 @@ class ConversationService:
         titre: Optional[str] = None,
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
-        max_tokens: Optional[int] = None,
+        max_tokens: Optional[int] = LLM_MAX_TOKENS,
         is_collab: bool = False,
         token_override: Optional[str] = None,
     ) -> Conversation:
-        # ⚠️ Normaliser les valeurs avant de créer l’objet
-        if max_tokens is None:
-            max_tokens = 150  # aligne-toi sur le DEFAULT DB
-        # (optionnel) caster pour éviter surprises
-        if temperature is not None:
+        if temperature is not None:#supp
             temperature = float(temperature)
         if top_p is not None:
             top_p = float(top_p)
@@ -68,7 +72,7 @@ class ConversationService:
             titre=titre,
             temperature=temperature,
             top_p=top_p,
-            max_tokens=max_tokens,   # ✅ jamais None
+            max_tokens=max_tokens,
             is_collab=is_collab,
             token_collab=token,
         )
@@ -140,7 +144,7 @@ class ConversationService:
         cid: int,
         temperature: float,
         top_p: float,
-        max_tokens: int,
+        max_tokens: LLM_MAX_TOKENS,
         stop: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
@@ -271,7 +275,7 @@ class ConversationService:
         *,
         temperature: float = 0.7,
         top_p: float = 1.0,
-        max_tokens: int = 150,
+        max_tokens: int = LLM_MAX_TOKENS,
         stop: Optional[List[str]] = None,
     ) -> Tuple[str, Dict[str, Any]]:
         """
@@ -342,7 +346,7 @@ class ConversationService:
         # 3) valeurs par défaut depuis l'objet utilisateur (ou fallback)
         temperature = float(getattr(s.utilisateur, "temperature", 0.7) or 0.7)
         top_p = float(getattr(s.utilisateur, "top_p", 1.0) or 1.0)
-        max_tokens = int(getattr(s.utilisateur, "max_tokens", 150) or 150)
+        max_tokens = int(getattr(s.utilisateur, "max_tokens", 300) or 300)
 
         # 4) création de la conversation
         conv = self.start(
