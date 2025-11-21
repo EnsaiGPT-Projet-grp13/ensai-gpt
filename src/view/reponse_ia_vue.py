@@ -24,34 +24,23 @@ class ReponseIAVue(VueAbstraite):
     def choisir_menu(self):
         try:
             s = Session()
-
-            # Assure l'existence de la conversation (met à jour s.* si besoin)
             self.service._ensure_conversation(s)
 
             # Garde-fous
-            if not isinstance(s.utilisateur, dict) or not s.utilisateur.get(
-                "id_utilisateur"
-            ):
+            if not isinstance(s.utilisateur, dict) or not s.utilisateur.get("id_utilisateur"):
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
-
                 return MenuUtilisateurVue("Connecte-toi d'abord.")
-            if not isinstance(s.personnage, dict) or not s.personnage.get(
-                "id_personnageIA"
-            ):
-                from view.menu_utilisateur_vue import MenuUtilisateurVue
 
+            if not isinstance(s.personnage, dict) or not s.personnage.get("id_personnageIA"):
+                from view.menu_utilisateur_vue import MenuUtilisateurVue
                 return MenuUtilisateurVue("Sélectionne un personnage d'abord.")
+
             if not s.conversation_id:
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
+                return MenuUtilisateurVue("Impossible de créer la conversation (voir logs).")
 
-                return MenuUtilisateurVue(
-                    "Impossible de créer la conversation (voir logs)."
-                )
-
-            # bannière
             self._print_banner(s)
 
-            # premier tour automatique
             if self._first:
                 ia_text, _ = self.service.send_user_and_get_ai(
                     cid=s.conversation_id,
@@ -65,7 +54,6 @@ class ReponseIAVue(VueAbstraite):
                 self._first = ""
                 self._print_banner(s)
 
-            # boucle de chat (Entrée vide pour quitter)
             while True:
                 pname = s.personnage.get("name", "Assistant")
                 user_msg = (

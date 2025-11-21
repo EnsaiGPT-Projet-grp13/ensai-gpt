@@ -1,5 +1,3 @@
-# view/parametres_utilisateur_vue.py
-
 import traceback
 from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
@@ -37,31 +35,22 @@ class ParametresUtilisateurVue(VueAbstraite):
             mail = s.utilisateur.get("mail")
             svc = UtilisateurService()
 
-            # -----------------------------
-            # Changer mot de passe
-            # -----------------------------
             if choix == "Changer mot de passe":
-                # Récupération de l'email courant pour la vérif
                 mail = s.utilisateur.get("mail")
 
-                # 1) Ancien mot de passe
                 ancien = (
                     inquirer.secret(message="Ancien mot de passe :").execute() or ""
                 )
 
-                # Si vide -> on annule proprement
                 if not ancien:
                     return ParametresUtilisateurVue(
                         "Changement de mot de passe annulé."
                     )
 
-                # Vérifier immédiatement l’ancien mot de passe
                 user_ok = UtilisateurService().se_connecter(mail, ancien)
                 if user_ok is None:
-                    # ⬅️ ICI on s'arrête DIRECT si ancien mdp faux
                     return ParametresUtilisateurVue("Ancien mot de passe incorrect.")
 
-                # 2) Nouveau mot de passe
                 nouveau = (
                     inquirer.secret(message="Nouveau mot de passe :").execute() or ""
                 )
@@ -78,13 +67,9 @@ class ParametresUtilisateurVue(VueAbstraite):
                         "Les mots de passe ne correspondent pas."
                     )
 
-                # 3) Appel du service (validation + hash + update)
                 ok, msg = svc.changer_mot_de_passe(uid, ancien, nouveau)
                 return ParametresUtilisateurVue(msg)
 
-            # -----------------------------
-            # Changer e-mail
-            # -----------------------------
             if choix == "Changer e-mail":
                 nouvel_email = (
                     inquirer.text(
@@ -109,9 +94,6 @@ class ParametresUtilisateurVue(VueAbstraite):
                 ok, msg = svc.changer_email(uid, nouvel_email, mdp)
                 return ParametresUtilisateurVue(msg)
 
-            # ----------------------------- #
-            # Changer identité (prénom + nom)
-            # -----------------------------
             if choix == "Changer identité (prénom + nom)":
                 nouveau_prenom = (
                     inquirer.text(message="Nouveau prénom :").execute() or ""
@@ -121,9 +103,6 @@ class ParametresUtilisateurVue(VueAbstraite):
 
                 return ParametresUtilisateurVue(msg)
 
-            # -----------------------------
-            # Retour
-            # -----------------------------
             if choix == "Retour":
                 return MenuUtilisateurVue()
 

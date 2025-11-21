@@ -38,7 +38,6 @@ class ParametresVue(VueAbstraite):
 
                 return ParametresPersoIAVue()
 
-            # Annuler
             return MenuUtilisateurVue()
 
         except Exception as e:

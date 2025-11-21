@@ -14,7 +14,6 @@ class VueAbstraite(ABC):
             print("")
 
     def afficher(self) -> None:
-        """Affiche le message si présent, sans planter si absent."""
         self.nettoyer_console()
         msg = getattr(self, "message", "")
         if msg:

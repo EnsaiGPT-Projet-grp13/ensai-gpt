@@ -16,7 +16,6 @@ class RechercheConversationTitreVue(VueAbstraite):
             print(self.message)
 
     def choisir_menu(self):
-        """Recherche de conversations par mots dans le titre."""
         print(
             "\n" + "-" * 50 + "\nRecherche conversation par titre\n" + "-" * 50 + "\n"
         )
@@ -25,7 +24,6 @@ class RechercheConversationTitreVue(VueAbstraite):
 
         conv_svc = ConversationService()
 
-        # On vérifie qu'il existe au moins une conversation accessible
         conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(
             id_utilisateur
         )
@@ -34,7 +32,6 @@ class RechercheConversationTitreVue(VueAbstraite):
 
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
 
-        # Saisie du motif dans le titre
         mots = (
             (inquirer.text(message="Quel titre recherchez-vous ? :").execute() or "")
             .strip()
@@ -46,7 +43,6 @@ class RechercheConversationTitreVue(VueAbstraite):
 
             return HistoriqueVue("Recherche annulée (titre vide).")
 
-        # Recherche des conversations dont le titre contient ces mots
         listes_titres = conv_svc.recherche_mots_titre(id_utilisateur, mots)
 
         if not listes_titres:
@@ -56,7 +52,6 @@ class RechercheConversationTitreVue(VueAbstraite):
                 "Aucune conversation ne contient ces mots dans le titre."
             )
 
-        # Construction des choix pour Inquirer (sans afficher l'ID)
         choices = []
         for c in listes_titres:
             cid = c.get("id_conversation")
@@ -82,7 +77,6 @@ class RechercheConversationTitreVue(VueAbstraite):
 
             return HistoriqueVue()
 
-        # On mémorise simplement l'id de la conversation en session
         s.conversation_id = cid_choisi
 
         from view.parametres_conversation_vue import ParametresConversationVue

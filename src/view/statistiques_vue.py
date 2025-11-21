@@ -12,7 +12,6 @@ class StatistiquesVue(VueAbstraite):
         self.stats_service = StatsService()
 
     def afficher(self):
-        # On récupère toutes les stats en une fois depuis le service
         stats = self.stats_service.get_user_statistics()
 
         total_messages = stats["total_messages"]

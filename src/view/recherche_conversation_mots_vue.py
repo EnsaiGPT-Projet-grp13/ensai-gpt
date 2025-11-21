@@ -17,7 +17,6 @@ class RechercheConversationMotsVue(VueAbstraite):
             print(self.message)
 
     def choisir_menu(self):
-        """Recherche de conversations par mots-clés dans les messages."""
         print("\n" + "-" * 50 + "\nHistorique\n" + "-" * 50 + "\n")
         s = Session()
         id_utilisateur = s.utilisateur.get("id_utilisateur")
@@ -25,7 +24,6 @@ class RechercheConversationMotsVue(VueAbstraite):
         conv_svc = ConversationService()
         msg_svc = MessageService()
 
-        # On récupère les conversations accessibles (résumées)
         conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(
             id_utilisateur
         )
@@ -34,7 +32,6 @@ class RechercheConversationMotsVue(VueAbstraite):
 
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
 
-        # Saisie des mots-clés
         mots = (
             (
                 inquirer.text(
@@ -51,7 +48,6 @@ class RechercheConversationMotsVue(VueAbstraite):
 
             return HistoriqueVue("Recherche annulée (mots-clés vides).")
 
-        # Recherche des messages contenant ces mots
         listes_message = msg_svc.recherche_mots_message(id_utilisateur, mots)
 
         if not listes_message:
@@ -59,17 +55,13 @@ class RechercheConversationMotsVue(VueAbstraite):
 
             return HistoriqueVue("Aucune conversation ne contient ces mots.")
 
-        # Comptage du nombre de messages correspondants par conversation
-        # conv_counts: { id_conversation -> nb_messages_trouvés }
         conv_counts: dict[int, int] = {}
         for m in listes_message:
             cid = m.get("id_conversation")
             conv_counts[cid] = conv_counts.get(cid, 0) + 1
 
-        # Index des conversations résumées par id_conversation
         conv_index = {c.get("id_conversation"): c for c in conversations}
 
-        # Construction des choix pour Inquirer
         choices = []
         for cid, count in conv_counts.items():
             c = conv_index.get(cid)
