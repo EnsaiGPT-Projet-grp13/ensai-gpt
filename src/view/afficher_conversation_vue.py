@@ -27,7 +27,6 @@ class AfficherConversationVue(VueAbstraite):
             uid = s.utilisateur.get("id_utilisateur")
 
             conv_svc = ConversationService()
-            # Renvoie une liste de RealDictRow (donc des dict)
             conversations = conv_svc.liste_resumee_proprietaire_pour_utilisateur(
                 uid, limite=25
             )
@@ -37,7 +36,6 @@ class AfficherConversationVue(VueAbstraite):
 
             choices = []
             for conv in conversations:
-                # conv est un dict: clés = id_conversation, titre, updated_at, personnageIA_name
                 titre = conv.get("titre") or "(sans titre)"
                 perso = conv.get("personnageIA_name")
                 date = conv.get("updated_at")
@@ -51,7 +49,7 @@ class AfficherConversationVue(VueAbstraite):
                 choices.append(
                     {
                         "name": label,
-                        "value": conv["id_conversation"],  # on passe l'ID en value
+                        "value": conv["id_conversation"],
                     }
                 )
 
@@ -64,8 +62,7 @@ class AfficherConversationVue(VueAbstraite):
 
             if conv_id is None:
                 return MenuUtilisateurVue("Retour au menu principal.")
-
-            # On stocke directement l'ID choisi dans la session, SANS parser le label
+                
             s.conversation_id = conv_id
 
             return ParametresConversationVue()

@@ -14,7 +14,6 @@ class AccueilVue(VueAbstraite):
             print(self.message)
 
     def choisir_menu(self):
-        """Choix du menu suivant"""
         print("\n" + "-" * 50 + "\nAccueil\n" + "-" * 50 + "\n")
 
         choix = inquirer.select(
@@ -28,15 +27,15 @@ class AccueilVue(VueAbstraite):
 
         match choix:
             case "Quitter":
-                return  # fin
+                return
 
             case "Se connecter":
-                from view.connexion_vue import ConnexionVue  # import local
+                from view.connexion_vue import ConnexionVue
 
                 return ConnexionVue()
 
             case "Créer un compte":
-                from view.inscription_vue import InscriptionVue  # import local
+                from view.inscription_vue import InscriptionVue
 
                 return InscriptionVue()
 

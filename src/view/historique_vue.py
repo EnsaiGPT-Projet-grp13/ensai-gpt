@@ -29,30 +29,17 @@ class HistoriqueVue(VueAbstraite):
 
         match choix:
             case "Afficher toutes les conversations":
-                # Retroune vers la vue de recherche d'une conversation par son titre
                 from view.afficher_conversation_vue import AfficherConversationVue
-
                 return AfficherConversationVue()
 
             case "Rechercher une conversation (par titre)":
-                # Retroune vers la vue de recherche d'une conversation par son titre
-                from view.recherche_conversation_titre_vue import (
-                    RechercheConversationTitreVue,
-                )
-
+                from view.recherche_conversation_titre_vue import RechercheConversationTitreVue
                 return RechercheConversationTitreVue()
 
             case "Rechercher une conversation (par mots clés)":
-                # Retroune vers la vue de recherche d'une conversation par son titre
-                pass
-                from view.recherche_conversation_mots_vue import (
-                    RechercheConversationMotsVue,
-                )
-
+                from view.recherche_conversation_mots_vue import RechercheConversationMotsVue
                 return RechercheConversationMotsVue()
 
             case "Retour":
-                # Retourne vers la vue du menue de l'utilisateur
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
-
                 return MenuUtilisateurVue()

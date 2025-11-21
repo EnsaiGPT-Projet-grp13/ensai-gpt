@@ -36,7 +36,6 @@ class ChoisirPersonnageVue(VueAbstraite):
                     "Aucun personnage disponible. Créez-en un d'abord."
                 )
 
-            # 1) Sélection du personnage (+ option Retour)
             choices = [p.name for p in persos] + ["Retour"]
             label = inquirer.select(
                 message="Choisir un personnage :", choices=choices
@@ -45,21 +44,20 @@ class ChoisirPersonnageVue(VueAbstraite):
             if label == "Retour":
                 return MenuUtilisateurVue("Retour au menu.")
 
-            # On retrouve le personnage par son nom
             perso = next((p for p in persos if p.name == label), None)
             if perso is None:
                 return MenuUtilisateurVue("Personnage introuvable, veuillez réessayer.")
 
             pid = perso.id_personnageIA
 
-            # 2) Mémoriser le personnage en session
+            # Mémoriser le personnage en session
             self.session_svc.set_personnage(
                 pid=pid,
                 name=perso.name,
                 system_prompt=perso.system_prompt,
             )
 
-            # 3) Titre
+            # Titre
             default_title = f"Chat avec {perso.name}"
             titre = (
                 inquirer.text(
@@ -68,7 +66,7 @@ class ChoisirPersonnageVue(VueAbstraite):
                 or ""
             ).strip() or default_title
 
-            # 4) Mode (+ option Retour)
+            # Mode
             mode = inquirer.select(
                 message="Voulez-vous un chat privé ou collaboratif ?",
                 choices=["Privé", "Collaboratif", "Retour"],
@@ -79,7 +77,6 @@ class ChoisirPersonnageVue(VueAbstraite):
 
             is_collab = mode == "Collaboratif"
 
-            # 5) Création de la conversation via le SERVICE
             conv = self.conv_svc.start(
                 id_user=uid,
                 personnage={
@@ -91,7 +88,6 @@ class ChoisirPersonnageVue(VueAbstraite):
                 is_collab=is_collab,
             )
 
-            # 6) Infos conversation en session
             self.session_svc.set_conversation_info(
                 cid=conv.id_conversation,
                 titre=titre,
@@ -99,7 +95,7 @@ class ChoisirPersonnageVue(VueAbstraite):
                 token=getattr(conv, "token_collab", None),
             )
 
-            # 7) Première question (Entrée vide pour quitter)
+            # Première question
             texte = (
                 inquirer.text(
                     message=f"[{perso.name}] Première question ? (Entrée vide pour quitter) :"

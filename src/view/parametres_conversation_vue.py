@@ -23,7 +23,6 @@ class ParametresConversationVue(VueAbstraite):
             print(self.message)
 
     def choisir_menu(self):
-        """Choix du menu suivant"""
         try:
             print("\n" + "-" * 50 + "\nOptions de la conversation\n" + "-" * 50 + "\n")
 
@@ -50,9 +49,6 @@ class ParametresConversationVue(VueAbstraite):
                 ],
             ).execute()
 
-            # -------------------------------------------------
-            # Reprendre la conversation
-            # -------------------------------------------------
             if choix == "Reprendre la conversation":
                 id_personnage = conversation.id_personnageIA
                 personnage = PersonnageService().get_by_id(id_personnage)
@@ -69,9 +65,6 @@ class ParametresConversationVue(VueAbstraite):
 
                     return MenuUtilisateurVue("Personnage non trouvé")
 
-            # -------------------------------------------------
-            # Afficher la conversation entière
-            # -------------------------------------------------
             if choix == "Afficher l'entièreté de la conversation":
                 print(
                     "\n"
@@ -85,9 +78,6 @@ class ParametresConversationVue(VueAbstraite):
                 input("\nAppuyez sur Entrée pour revenir aux paramètres...")
                 return ParametresConversationVue()
 
-            # -------------------------------------------------
-            # Changer le titre
-            # -------------------------------------------------
             if choix == "Changer le titre":
                 nouveau_titre = inquirer.text(
                     message="Comment voulez-vous renommer votre conversation ? :"
@@ -97,9 +87,6 @@ class ParametresConversationVue(VueAbstraite):
                     f"Vous avez modifié « {titre} » en « {nouveau_titre} »."
                 )
 
-            # -------------------------------------------------
-            # Télécharger la conversation
-            # -------------------------------------------------
             if choix == "Télécharger la conversation":
                 start_flask_server()
                 nom_fichier = inquirer.text(
@@ -135,9 +122,6 @@ class ParametresConversationVue(VueAbstraite):
 
                 return MenuUtilisateurVue(message)
 
-            # -------------------------------------------------
-            # Supprimer la conversation
-            # -------------------------------------------------
             if choix == "Supprimer la conversation":
                 ConversationService().supprimer(conversation)
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
@@ -146,16 +130,11 @@ class ParametresConversationVue(VueAbstraite):
                     f"Vous avez supprimé la conversation « {titre} »."
                 )
 
-            # -------------------------------------------------
-            # Retour
-            # -------------------------------------------------
             if choix == "Retour":
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
-
                 return MenuUtilisateurVue()
 
             from view.menu_utilisateur_vue import MenuUtilisateurVue
-
             return MenuUtilisateurVue()
 
         except Exception as e:

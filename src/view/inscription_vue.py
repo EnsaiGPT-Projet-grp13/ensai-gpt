@@ -6,16 +6,16 @@ from view.accueil_vue import AccueilVue
 
 
 class InscriptionVue(VueAbstraite):
-    """Vue d'inscription (DB)"""
+    """Vue d'inscription"""
 
     def choisir_menu(self):
+
         def quitter_si_vide(val: str):
             """Quitte l'inscription si l'utilisateur appuie sur Entrée sans rien écrire."""
             if not val.strip():
                 raise KeyboardInterrupt
 
         try:
-            # --- Prénom ---
             while True:
                 prenom = (
                     inquirer.text(
@@ -28,7 +28,6 @@ class InscriptionVue(VueAbstraite):
                     break
                 print("Le prénom ne peut pas être vide.\n")
 
-            # --- Nom ---
             while True:
                 nom = (
                     inquirer.text(message="Nom (Entrée vide pour quitter) :").execute()
@@ -39,9 +38,7 @@ class InscriptionVue(VueAbstraite):
                     break
                 print("Le nom ne peut pas être vide.\n")
 
-            # --- Email ---
             from service.utilisateur_service import UtilisateurService
-
             service = UtilisateurService()
 
             while True:
@@ -63,14 +60,12 @@ class InscriptionVue(VueAbstraite):
                     print(f"{e}\nRéessaie.\n")
                     continue
 
-                # Vérifier si l’email est déjà utilisé
                 if service.mail_deja_utilise(mail):
                     print("Cet email est déjà utilisé.\n")
                     continue
 
                 break
 
-            # --- Mot de passe ---
             while True:
                 mdp = (
                     inquirer.secret(
@@ -111,7 +106,6 @@ class InscriptionVue(VueAbstraite):
                 if ok:
                     break
 
-            # --- Date de naissance ---
             while True:
                 naiss_str = (
                     inquirer.text(
@@ -126,7 +120,6 @@ class InscriptionVue(VueAbstraite):
                 except Exception:
                     print("Date invalide. Format attendu : YYYY-MM-DD\n")
 
-            # --- Inscription ---
             try:
                 user = service.creer(prenom, nom, mail, mdp, naiss)
             except ValueError as e:

@@ -27,7 +27,6 @@ class JoindreConversationVue(VueAbstraite):
             if not user_id:
                 return MenuUtilisateurVue("Utilisateur invalide en session.")
 
-            # Boucle de saisie du token (pour permettre de réessayer)
             while True:
                 token = inquirer.text(
                     message="Entrer le token de la conversation (Entrée vide pour annuler) :"
@@ -35,24 +34,20 @@ class JoindreConversationVue(VueAbstraite):
 
                 token = (token or "").strip().upper()
 
-                # Annulation
                 if not token:
                     return MenuUtilisateurVue("Opération annulée.")
 
-                # On tente de rejoindre la conversation via le SERVICE
                 conv = self.service.join_by_token(user_id, token)
                 if not conv:
                     print(
                         "Token invalide ou conversation non collaborative. Réessaie.\n"
                     )
-                    continue  # on redemande un token
+                    continue
 
-                # Conversation OK : mise à jour de la session
                 s.conversation_id = conv.id_conversation
                 s.conversation_is_collab = bool(conv.is_collab)
                 s.conversation_token = conv.token_collab
 
-                # Récupérer le personnage via le SERVICE (plus de DAO ici)
                 perso_dict = self.service.get_personnage_for_conversation(conv)
                 if perso_dict:
                     s.personnage = perso_dict
