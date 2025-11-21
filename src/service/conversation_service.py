@@ -34,7 +34,6 @@ class ConversationService:
     """
     Service applicatif : gère la création et la persistance des conversations,
     la construction de l'historique, l'appel à l'API et l'enregistrement des messages.
-    Aucune logique d'interface (pas d'InquirerPy ici).
     """
 
     def __init__(self) -> None:
@@ -42,9 +41,6 @@ class ConversationService:
         self.msg_dao = MessageDao()
         self.perso_dao = PersonnageIADao()
 
-    # --------------------------------------------------------------------- #
-    # CRUD / accès conversations
-    # --------------------------------------------------------------------- #
     def start(
         self,
         id_user: int,
@@ -72,7 +68,6 @@ class ConversationService:
         return self.conv_dao.create(conv)
 
     def join_by_token(self, id_user: int, token: str) -> Optional[Conversation]:
-        """Rejoint une conversation collaborative via token (et ajoute l'utilisateur aux participants)."""
         token = (token or "").strip().upper()
         if not token:
             return None
@@ -86,14 +81,11 @@ class ConversationService:
         return self.conv_dao.find_by_id(cid)
 
     def modifier(self, c: Conversation, nouveau_titre: str) -> Optional[Conversation]:
-        """Mettre à jour une conversation."""
         id_conversation = c.id_conversation
         return self.conv_dao.update_titre(id_conversation, nouveau_titre)
 
     def supprimer(self, c: Conversation) -> bool:
-        """Supprimer une conversation."""
         return self.conv_dao.delete(c.id_conversation)
-
 
     def liste_resumee_proprietaire_pour_utilisateur(
         self, id_utilisateur: int, limite: int = 25
@@ -114,10 +106,26 @@ class ConversationService:
     def recherche_mots_titre(self, id_utilisateur: int, mots: str, limite: int = 50):
         """Renvoie la liste des conversations dans lesquelles mots est présent dans le titre"""
         return self.conv_dao.recherche_mots_titre(id_utilisateur, mots, limite=limite)
+    
+    def get_personnage_for_conversation(self, conv: Conversation) -> Optional[dict]:
+        """
+        Retourne le personnage associé à une conversation
+        sous forme de dict prêt à mettre en session, ou None si introuvable.
+        """
+        if not conv or not getattr(conv, "id_personnageIA", None):
+            return None
 
-    # --------------------------------------------------------------------- #
-    # Construction payload API
-    # --------------------------------------------------------------------- #
+        perso = self.perso_dao.find_by_id(conv.id_personnageIA)
+        if not perso:
+            return None
+
+        return {
+            "id_personnageIA": perso.id_personnageIA,
+            "name": perso.name,
+            "system_prompt": perso.system_prompt,
+        }
+
+
     def build_history(
         self, personnage: Dict[str, Any], cid: int
     ) -> List[Dict[str, str]]:
@@ -162,10 +170,6 @@ class ConversationService:
             payload["stop"] = stop
         return payload
 
-    # --------------------------------------------------------------------- #
-    # Appel API + extraction robuste du texte
-    # --------------------------------------------------------------------- #
-    @staticmethod
     def _extract_ai_text(resp) -> str:
         """
         Extrait un texte lisible depuis la réponse de l'API (ou depuis un objet déjà décodé).
@@ -258,9 +262,7 @@ class ConversationService:
         # 5) Tout le reste : fallback générique
         return (str(data) or "").strip() or "[IA] Réponse vide."
 
-    # --------------------------------------------------------------------- #
-    # Cycle complet : save user -> call API -> save IA
-    # --------------------------------------------------------------------- #
+
     def send_user_and_get_ai(
         self,
         cid: int,
@@ -370,20 +372,4 @@ class ConversationService:
         # reset du titre proposé (temporaire)
         s.conversation_title = None
 
-    def get_personnage_for_conversation(self, conv: Conversation) -> Optional[dict]:
-        """
-        Retourne le personnage associé à une conversation
-        sous forme de dict prêt à mettre en session, ou None si introuvable.
-        """
-        if not conv or not getattr(conv, "id_personnageIA", None):
-            return None
-
-        perso = self.perso_dao.find_by_id(conv.id_personnageIA)
-        if not perso:
-            return None
-
-        return {
-            "id_personnageIA": perso.id_personnageIA,
-            "name": perso.name,
-            "system_prompt": perso.system_prompt,
-        }
+    

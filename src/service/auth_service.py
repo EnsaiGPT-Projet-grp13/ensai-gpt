@@ -3,8 +3,7 @@ import re
 
 class AuthService:
     """
-    Service d'authentification minimal :
-    uniquement la validation des emails et des mots de passe.
+    Service d'authentification : validation des emails et des mots de passe.
     """
 
     @staticmethod
@@ -33,11 +32,9 @@ class AuthService:
             raise ValueError("Format email invalide.")
 
 
-# Fonctions utilitaires pour rester compatibles avec le code existant
 def is_valid_password(pwd: str) -> None:
     """Alias vers AuthService.is_valid_password."""
     return AuthService.is_valid_password(pwd)
-
 
 def is_valid_email(email: str) -> None:
     """Alias vers AuthService.is_valid_email."""
