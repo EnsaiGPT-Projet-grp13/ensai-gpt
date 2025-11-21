@@ -1,23 +1,24 @@
 # tests/conftest.py
 import os
 import sys
-import pytest
 from unittest import mock
 from unittest.mock import patch
 
+import pytest
+# === Imports du projet ===
+from dao.utilisateur_dao import UtilisateurDao
+from objects.utilisateur import Utilisateur
+from utils.reset_database import ResetDatabase
+from utils.securite import hash_password
+
 # === Ajouter src/ au PYTHONPATH ===
-THIS_DIR = os.path.dirname(__file__)                 # .../ensai-gpt/tests
+THIS_DIR = os.path.dirname(__file__)  # .../ensai-gpt/tests
 PROJECT_ROOT = os.path.abspath(os.path.join(THIS_DIR, ".."))  # .../ensai-gpt
 SRC_DIR = os.path.join(PROJECT_ROOT, "src")
 
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
 
-# === Imports du projet ===
-from utils.reset_database import ResetDatabase
-from utils.securite import hash_password
-from dao.utilisateur_dao import UtilisateurDao
-from objects.utilisateur import Utilisateur
 
 
 @pytest.fixture(scope="session", autouse=True)

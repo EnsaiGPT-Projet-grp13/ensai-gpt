@@ -1,21 +1,21 @@
 from __future__ import annotations
-from typing import Optional, Iterable
+
+import os
+import sys
+from typing import Iterable, Optional
+
 from tabulate import tabulate
 
-import re
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from dao.personnage_ia_dao import PersonnageIADao
+from dao.utilisateur_dao import UtilisateurDao
+from objects.personnage_ia import PersonnageIA
+from objects.utilisateur import Utilisateur
+from service.auth_service import is_valid_email, is_valid_password
+from utils.default_persoIA import DEFAULT_PERSONAS
 from utils.log_decorator import log
 from utils.securite import hash_password  # compat: voir utils/securite.py plus bas
-
-from objects.utilisateur import Utilisateur
-from dao.utilisateur_dao import UtilisateurDao
-from utils.default_persoIA import DEFAULT_PERSONAS
-from objects.personnage_ia import PersonnageIA
-from dao.personnage_ia_dao import PersonnageIADao
-from service.auth_service import is_valid_email, is_valid_password
 
 
 class UtilisateurService:
@@ -58,7 +58,6 @@ class UtilisateurService:
 
         return user
 
-
     @log
     def lister_tous(self, inclure_mdp=False) -> list[Utilisateur]:
         """
@@ -85,7 +84,9 @@ class UtilisateurService:
         alors on le re-hash avant update (sinon on considère que mdp_hash est déjà un hash).
         """
         if rehash_password and u.mdp_hash:
-            u.mdp_hash = hash_password(u.mdp_hash)  # <— prudence: ici u.mdp_hash contient le mdp en clair
+            u.mdp_hash = hash_password(
+                u.mdp_hash
+            )  # <— prudence: ici u.mdp_hash contient le mdp en clair
         ok = self.dao.update(u)
         return u if ok else None
 
@@ -106,8 +107,7 @@ class UtilisateurService:
         users = self.dao.lister_tous()
         # transforme en listes pour tabulate
         rows: Iterable[list] = (
-            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)]
-            for u in users
+            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)] for u in users
         )
         out = "-" * 100
         out += "\nListe des utilisateurs\n"
@@ -152,7 +152,7 @@ class UtilisateurService:
                     system_prompt=perso["system_prompt"],
                     created_by=user_id,
                 )
-                self.persona_dao.create(p)   # <-- UPSERT côté DAO
+                self.persona_dao.create(p)  # <-- UPSERT côté DAO
                 inserted += 1
             except Exception as e:
                 # LOG + rollback pour sortir de l'état 'transaction aborted'
@@ -274,4 +274,3 @@ class UtilisateurService:
             return False, "Échec de la mise à jour en base."
 
         return True, "Email modifié avec succès."
-

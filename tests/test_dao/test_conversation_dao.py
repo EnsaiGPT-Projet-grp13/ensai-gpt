@@ -1,12 +1,12 @@
 import uuid
 
-from dao.utilisateur_dao import UtilisateurDao
 from dao.conversation_dao import ConversationDao
-from dao.db import DBConnection
-
-from objects.conversation import Conversation
-
-from tests.test_dao.helpers_dao import create_test_user, create_test_personnage, create_test_conversation
+from dao.utilisateur_dao import UtilisateurDao
+from tests.test_dao.helpers_dao import (
+    create_test_conversation,
+    create_test_personnage,
+    create_test_user,
+)
 
 
 def test_create_et_find_by_id_retournent_la_meme_conversation():

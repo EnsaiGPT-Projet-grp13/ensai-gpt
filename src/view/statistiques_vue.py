@@ -1,8 +1,8 @@
-from InquirerPy import inquirer  # si tu ne l'utilises pas ici, tu peux le supprimer
-from view.vue_abstraite import VueAbstraite
-from service.stats_service import StatsService
 from tabulate import tabulate
+
 from objects.session import Session
+from service.stats_service import StatsService
+from view.vue_abstraite import VueAbstraite
 
 
 class StatistiquesVue(VueAbstraite):
@@ -49,4 +49,5 @@ class StatistiquesVue(VueAbstraite):
 
     def choisir_menu(self):
         from view.menu_utilisateur_vue import MenuUtilisateurVue
+
         return MenuUtilisateurVue()

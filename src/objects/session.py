@@ -1,6 +1,7 @@
+from typing import Any, Dict, Optional
+
 from utils.singleton import Singleton
-from typing import Optional, Dict, Any
-from datetime import datetime
+
 
 class Session(metaclass=Singleton):
     def __init__(self) -> None:

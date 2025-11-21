@@ -1,11 +1,9 @@
-import pytest
 import psycopg2
-import os
-import sys
 
 from data import init_db
 
-class TestStructureDB():
+
+class TestStructureDB:
     @classmethod
     def setup_class(cls):
         """Créé une connexion unique qui sera utilisée par tous les tests"""
@@ -14,7 +12,7 @@ class TestStructureDB():
             port=init_db.PG_PORT,
             dbname=init_db.PG_DB,
             user=init_db.PG_USER,
-            password=init_db.PG_PWD
+            password=init_db.PG_PWD,
         )
         cls.conn.autocommit = True
         cls.cur = cls.conn.cursor()
@@ -28,17 +26,24 @@ class TestStructureDB():
     ### Tests d'existence
     def test_schema_existe(self):
         """Vérifie que le schéma projetGPT existe bien"""
-        self.cur.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name='projetgpt';")
+        self.cur.execute(
+            "SELECT schema_name FROM information_schema.schemata WHERE schema_name='projetgpt';"
+        )
         assert self.cur.fetchone(), "Le schéma 'projetGPT' n'existe pas"
-
 
     def test_tables_existent(self):
         """Vérifie que toutes les tables ont bien été créées"""
         tables_attendues = {
-            'utilisateur', 'personnageia', 'session', 'conversation',
-            'message', 'conv_utilisateur'
+            "utilisateur",
+            "personnageia",
+            "session",
+            "conversation",
+            "message",
+            "conv_utilisateur",
         }
-        self.cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='projetgpt';")
+        self.cur.execute(
+            "SELECT table_name FROM information_schema.tables WHERE table_schema='projetgpt';"
+        )
         tables_existantes = {table[0] for table in self.cur.fetchall()}
         manquantes = tables_attendues - tables_existantes
         assert not manquantes, f"Il manque les tables suivantes : {manquantes}"
@@ -46,15 +51,15 @@ class TestStructureDB():
     def test_idex_existent(self):
         """Vérifie que tous les index attendus ont été créés"""
         index_attendus = {
-            'idx_utilisateur_mail',
-            'idx_session_user',
-            'idx_conversation_personnageia',
-            'idx_message_conversation_time',
-            'idx_conversation_proprio',
-            'idx_conv_utilisateur_user',
-            'idx_conv_utilisateur_conversation',
-            'idx_persoia_utilisateur_user',
-            'idx_persoia_utilisateur_perso'
+            "idx_utilisateur_mail",
+            "idx_session_user",
+            "idx_conversation_personnageia",
+            "idx_message_conversation_time",
+            "idx_conversation_proprio",
+            "idx_conv_utilisateur_user",
+            "idx_conv_utilisateur_conversation",
+            "idx_persoia_utilisateur_user",
+            "idx_persoia_utilisateur_perso",
         }
 
         self.cur.execute("""
@@ -68,7 +73,7 @@ class TestStructureDB():
 
     def test_triggers_existent(self):
         """Vérifie que tous les triggers 'set_updated_at' existent"""
-        tables = ['utilisateur', 'conversation', 'personnageIA']
+        tables = ["utilisateur", "conversation", "personnageIA"]
         for table in tables:
             self.cur.execute(f"""
                 SELECT trigger_name
@@ -76,7 +81,9 @@ class TestStructureDB():
                 WHERE event_object_schema='projetgpt' AND event_object_table='{table.lower()}';
             """)
             triggers_existants = {trigger[0] for trigger in self.cur.fetchall()}
-            assert any('set_updated_at' in trig for trig in triggers_existants), f"Le trigger set_updated_at est manquant dans la table {table}"
+            assert any("set_updated_at" in trig for trig in triggers_existants), (
+                f"Le trigger set_updated_at est manquant dans la table {table}"
+            )
 
     def test_colonnes_utilisateur(self):
         """Vérifie que les colonnes importantes de 'utilisateur' existent"""
@@ -85,10 +92,9 @@ class TestStructureDB():
             WHERE table_schema='projetgpt' AND table_name='utilisateur';
         """)
         colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_utilisateur', 'mail', 'mdp'}
+        attendues = {"id_utilisateur", "mail", "mdp"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans utilisateur : {manquantes}"
-
 
     def test_colonnes_personnageIA(self):
         """Vérifie que les colonnes importantes de 'personnageIA' existent"""
@@ -97,10 +103,9 @@ class TestStructureDB():
             WHERE table_schema='projetgpt' AND table_name='personnageia';
         """)
         colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_personnageia', 'name', 'system_prompt'}
+        attendues = {"id_personnageia", "name", "system_prompt"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans personnageIA : {manquantes}"
-
 
     def test_colonnes_session(self):
         """Vérifie que les colonnes importantes de 'session' existent"""
@@ -109,10 +114,9 @@ class TestStructureDB():
             WHERE table_schema='projetgpt' AND table_name='session';
         """)
         colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_session', 'id_utilisateur'}
+        attendues = {"id_session", "id_utilisateur"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans session : {manquantes}"
-
 
     def test_colonnes_conversation(self):
         """Vérifie que les colonnes importantes de 'conversation' existent"""
@@ -121,10 +125,9 @@ class TestStructureDB():
             WHERE table_schema='projetgpt' AND table_name='conversation';
         """)
         colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_conversation', 'id_proprio', 'id_personnageia', 'titre'}
+        attendues = {"id_conversation", "id_proprio", "id_personnageia", "titre"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans conversation : {manquantes}"
-
 
     def test_colonnes_message(self):
         """Vérifie que les colonnes importantes de 'message' existent"""
@@ -133,10 +136,9 @@ class TestStructureDB():
             WHERE table_schema='projetgpt' AND table_name='message';
         """)
         colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_message', 'id_conversation', 'contenu'}
+        attendues = {"id_message", "id_conversation", "contenu"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans message : {manquantes}"
-
 
     def test_colonnes_conv_utilisateur(self):
         """Vérifie que les colonnes importantes de 'conv_utilisateur' existent"""
@@ -145,9 +147,6 @@ class TestStructureDB():
             WHERE table_schema='projetgpt' AND table_name='conv_utilisateur';
         """)
         colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {'id_utilisateur', 'id_conversation'}
+        attendues = {"id_utilisateur", "id_conversation"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans conv_utilisateur : {manquantes}"
-
-
-    
