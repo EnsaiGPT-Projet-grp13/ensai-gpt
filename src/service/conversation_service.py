@@ -170,6 +170,7 @@ class ConversationService:
             payload["stop"] = stop
         return payload
 
+    @staticmethod
     def _extract_ai_text(resp) -> str:
         """
         Extrait un texte lisible depuis la réponse de l'API (ou depuis un objet déjà décodé).
