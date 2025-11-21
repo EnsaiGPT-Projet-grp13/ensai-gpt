@@ -6,7 +6,6 @@ from objects.message import Message
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
-
 class MessageDao:
     def __init__(self):
         self.conn = DBConnection().connection

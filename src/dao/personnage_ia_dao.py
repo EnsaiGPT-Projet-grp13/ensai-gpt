@@ -6,20 +6,11 @@ from objects.personnage_ia import PersonnageIA
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
-
 class PersonnageIADao:
-    """DAO pour la table personnageIA (sans table d'association)."""
-
     def __init__(self) -> None:
         self.conn = DBConnection().connection
 
-    # --- CRUD personnageIA ---------------------------------------------------
     def create(self, p: PersonnageIA) -> PersonnageIA:
-        """
-        UPSERT sur (name, created_by) :
-        - insert si nouveau
-        - update system_prompt si déjà existant
-        """
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""
@@ -89,11 +80,7 @@ class PersonnageIADao:
 
     def delete(self, pid: int) -> bool:
         """
-        Supprime un personnage IA et tout ce qui est lié :
-          - messages des conversations du personnage
-          - liens conv_utilisateur
-          - conversations du personnage
-          - le personnage lui-même
+        Supprime un personnage IA et tout ce qui est lié (messages et conversations)
         """
         try:
             with self.conn.cursor() as cur:
@@ -149,27 +136,7 @@ class PersonnageIADao:
             self.conn.rollback()
             raise
 
-    # --- Listes --------------------------------------------------------------
-    def list_standards(self) -> List[PersonnageIA]:
-        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"""
-                SELECT
-                  id_personnageIA AS "id_personnageIA",
-                  name,
-                  system_prompt,
-                  created_by,
-                  created_at,
-                  updated_at
-                FROM {SCHEMA}.personnageIA
-                WHERE created_by IS NULL
-                ORDER BY lower(name)
-                """
-            )
-            rows = cur.fetchall() or []
-        return [PersonnageIA(**r) for r in rows]
-
-    def list_by_creator(self, uid: int) -> List[PersonnageIA]:
+    def lister_personnages_ia_crees_par(self, uid: int) -> List[PersonnageIA]:
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 f"""

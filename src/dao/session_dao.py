@@ -5,19 +5,11 @@ from dao.db import DBConnection
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
-
 class SessionDao:
-    """
-    DAO pour gérer les sessions utilisateurs :
-    - ouverture d'une session
-    - fermeture d'une session
-    - récupération des sessions actives / historiques
-    """
-
     def __init__(self):
         self.conn = DBConnection().connection
 
-    def open(self, id_utilisateur: int) -> Optional[int]:
+    def open(self, id_utilisateur: int) -> Optional[int]:#
         """Crée une nouvelle session en BDD et retourne son id."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(

@@ -52,24 +52,6 @@ class UtilisateurDao:
         return Utilisateur(**row) if row else None
 
     def exists_mail(self, mail: str) -> bool:
-        conn = (
-            DBConnection.get_conn()
-            if hasattr(DBConnection, "get_conn")
-            else DBConnection().connection
-        )
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT id_utilisateur, prenom, nom, mail, mdp AS mdp_hash, naiss
-                FROM utilisateur
-                WHERE id_utilisateur = %s
-            """,
-                (id_utilisateur,),
-            )
-            row = cur.fetchone()
-        return Utilisateur(**row) if row else None
-
-    def exists_mail(self, mail: str) -> bool:
         conn = DBConnection().connection
         with conn.cursor() as cur:
             cur.execute("SELECT 1 FROM utilisateur WHERE mail = %s", (mail,))

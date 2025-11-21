@@ -90,9 +90,9 @@ def test_delete_retourne_true_quand_un_personnage_est_supprime():
     udao.delete(user.id_utilisateur)
 
 
-def test_list_by_creator_ne_retourne_que_les_personnages_de_ce_user():
+def test_lister_personnages_ia_crees_par_ne_retourne_que_les_personnages_de_ce_user():
     """
-    list_by_creator(uid) doit lister uniquement les personnages créés par cet utilisateur.
+    lister_personnages_ia_crees_par(uid) doit lister uniquement les personnages créés par cet utilisateur.
     """
     udao = UtilisateurDao()
     pdao = PersonnageIADao()
@@ -103,7 +103,7 @@ def test_list_by_creator_ne_retourne_que_les_personnages_de_ce_user():
     p1 = create_test_personnage(user1.id_utilisateur, prefix="BotUser1")
     p2 = create_test_personnage(user2.id_utilisateur, prefix="BotUser2")
 
-    liste1 = pdao.list_by_creator(user1.id_utilisateur)
+    liste1 = pdao.lister_personnages_ia_crees_par(user1.id_utilisateur)
     noms1 = {p.name for p in liste1}
     creators1 = {p.created_by for p in liste1}
 

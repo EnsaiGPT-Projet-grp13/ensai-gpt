@@ -34,13 +34,9 @@ class PersonnageService:
         """
         return self.dao.list_for_user(uid)
 
-    def list_standards(self) -> List[PersonnageIA]:
-        """Retourne les personnages standards (créés par le système)."""
-        return self.dao.list_standards()
-
-    def list_by_creator(self, uid: int) -> List[PersonnageIA]:
+    def lister_personnages_ia_crees_par(self, uid: int) -> List[PersonnageIA]:
         """Retourne les personnages créés par un utilisateur spécifique."""
-        return self.dao.list_by_creator(uid)
+        return self.dao.lister_personnages_ia_crees_par(uid)
 
     def get_by_id(self, pid: int) -> Optional[PersonnageIA]:
         """Récupère un personnage par son ID."""
@@ -124,14 +120,6 @@ class PersonnageService:
         }
 
     @log
-    def lister_personnages_ia_crees_par(self, user_id: int) -> list[PersonnageIA]:
-        """
-        Retourne la liste des personnages IA créés par un utilisateur.
-        (wrapping de PersonnageIADao.list_by_creator)
-        """
-        return self.dao.list_by_creator(user_id)
-
-    @log
     def supprimer_personnage_ia(self, user_id: int, personnage_id: int) -> bool:
         """
         Supprime un personnage IA appartenant à l'utilisateur, ainsi que
@@ -139,7 +127,7 @@ class PersonnageService:
         Retourne True si la suppression a réussi, False sinon.
         """
         # Vérifier que ce personnage appartient bien à cet utilisateur
-        persos = self.dao.list_by_creator(user_id)
+        persos = self.dao.lister_personnages_ia_crees_par(user_id)
         if not any(p.id_personnageIA == personnage_id for p in persos):
             # Le personnage n'est pas à lui → on ne supprime pas
             return False

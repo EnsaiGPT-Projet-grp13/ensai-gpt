@@ -16,13 +16,13 @@ class StatsDao:
         s = Session()
         user_id = s.utilisateur.get(
             "id_utilisateur"
-        )  # Récupère l'ID de l'utilisateur depuis la session
+        )
         utilisateur_service = UtilisateurService()
         user = utilisateur_service.trouver_par_id(
             user_id
-        )  # Appel de la méthode avec le bon paramètre
+        )
         if not user:
-            return 0  # Si l'utilisateur n'existe pas, renvoie 0
+            return 0
 
         query = f"""
         SELECT COUNT(*) AS count
@@ -42,11 +42,11 @@ class StatsDao:
         s = Session()
         user_id = s.utilisateur.get(
             "id_utilisateur"
-        )  # Récupère l'ID de l'utilisateur depuis la session
+        )
         utilisateur_service = UtilisateurService()
         user = utilisateur_service.trouver_par_id(user_id)
         if not user:
-            return 0  # Si l'utilisateur n'existe pas, renvoie 0
+            return 0
 
         query = f"""
         SELECT COUNT(*) AS count
@@ -66,11 +66,11 @@ class StatsDao:
         s = Session()
         user_id = s.utilisateur.get(
             "id_utilisateur"
-        )  # Récupère l'ID de l'utilisateur depuis la session
+        )
         utilisateur_service = UtilisateurService()
         user = utilisateur_service.trouver_par_id(user_id)
         if not user:
-            return 0  # Si l'utilisateur n'existe pas, renvoie 0
+            return 0
 
         query = f"""
         SELECT id_conversation, COUNT(*) as message_count

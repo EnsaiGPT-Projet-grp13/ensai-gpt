@@ -94,19 +94,6 @@ class ConversationService:
         """Supprimer une conversation."""
         return self.conv_dao.delete(c.id_conversation)
 
-    def liste_proprietaire_pour_utilisateur(
-        self, id_utilisateur: int, limite: int = 25
-    ):
-        """Liste des conversations dont l'utilisateur est propriétaire."""
-        return self.conv_dao.liste_proprietaire_pour_utilisateur(
-            id_utilisateur, limite=limite
-        )
-
-    def liste_accessible_pour_utilisateur(self, id_utilisateur: int, limite: int = 50):
-        """Liste des conversations accessibles."""
-        return self.conv_dao.liste_accessible_pour_utilisateur(
-            id_utilisateur, limite=limite
-        )
 
     def liste_resumee_proprietaire_pour_utilisateur(
         self, id_utilisateur: int, limite: int = 25

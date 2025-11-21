@@ -32,15 +32,15 @@ def test_list_standards_appelle_dao(service_personnage):
     dao_mock.list_standards.assert_called_once_with()
 
 
-def test_list_by_creator_appelle_dao(service_personnage):
+def test_lister_personnages_ia_crees_par_appelle_dao(service_personnage):
     dao_mock = Mock()
-    dao_mock.list_by_creator.return_value = ["persoA", "persoB"]
+    dao_mock.lister_personnages_ia_crees_par.return_value = ["persoA", "persoB"]
     service_personnage.dao = dao_mock
 
-    res = service_personnage.list_by_creator(10)
+    res = service_personnage.lister_personnages_ia_crees_par(10)
 
     assert res == ["persoA", "persoB"]
-    dao_mock.list_by_creator.assert_called_once_with(10)
+    dao_mock.lister_personnages_ia_crees_par.assert_called_once_with(10)
 
 
 def test_get_by_id_retourne_personnage_si_trouve(service_personnage):
