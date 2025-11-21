@@ -11,7 +11,6 @@ class StatsService:
     def get_user_statistics(self) -> Dict[str, Any]:
         """
         Récupère les stats pour l'utilisateur connecté
-        (l'utilisateur est déterminé par la Session utilisée dans StatsDao).
         """
         total_messages = self.stats_dao.nbre_msgs_utilisateur()
         total_conversations = self.stats_dao.nbre_conv_utilisateurs()

@@ -4,8 +4,7 @@ from dao.message_dao import MessageDao
 
 class MessageService:
     """
-    Gère l'historique local du chat (en mémoire) et l'appel à l'IA.
-    Plus tard, tu pourras brancher ici tes DAO pour persister sessions/messages.
+    Gère l'historique local du chat et l'appel à l'IA.
     """
 
     def __init__(self, system_prompt: str = "Tu es un assistant utile.") -> None:

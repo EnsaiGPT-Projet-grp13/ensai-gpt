@@ -10,15 +10,15 @@ def service_personnage():
     return PersonnageService()
 
 
-def test_list_for_user_appelle_dao_avec_bon_id(service_personnage):
+def test_lister_personnages_ia_pour_utilisateur_appelle_dao_avec_bon_id(service_personnage):
     dao_mock = Mock()
-    dao_mock.list_for_user.return_value = ["perso1", "perso2"]
+    dao_mock.lister_personnages_ia_pour_utilisateur.return_value = ["perso1", "perso2"]
     service_personnage.dao = dao_mock
 
-    res = service_personnage.list_for_user(42)
+    res = service_personnage.lister_personnages_ia_pour_utilisateur(42)
 
     assert res == ["perso1", "perso2"]
-    dao_mock.list_for_user.assert_called_once_with(42)
+    dao_mock.lister_personnages_ia_pour_utilisateur.assert_called_once_with(42)
 
 
 def test_list_standards_appelle_dao(service_personnage):

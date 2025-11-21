@@ -6,7 +6,6 @@ from dao.message_dao import MessageDao
 
 app = Flask(__name__)
 
-
 class ExportService:
     """Gestion du téléchargement/export"""
 
@@ -82,4 +81,4 @@ def start_flask_server():
     thread = threading.Thread(target=run, daemon=True)
     thread.start()
     time.sleep(1)
-    print("🌐 Serveur Flask lancé sur http://127.0.0.1:5000")
+    print("Serveur Flask lancé sur http://127.0.0.1:5000")

@@ -30,7 +30,7 @@ class ChoisirPersonnageVue(VueAbstraite):
     def choisir_menu(self):
         try:
             uid = self.session_svc.get_user_id()
-            persos = self.perso_svc.list_for_user(uid)
+            persos = self.perso_svc.lister_personnages_ia_pour_utilisateur(uid)
             if not persos:
                 return MenuUtilisateurVue(
                     "Aucun personnage disponible. Créez-en un d'abord."

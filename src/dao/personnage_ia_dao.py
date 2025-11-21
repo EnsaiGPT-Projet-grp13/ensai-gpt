@@ -156,7 +156,7 @@ class PersonnageIADao:
             rows = cur.fetchall() or []
         return [PersonnageIA(**r) for r in rows]
 
-    def list_for_user(self, uid: int) -> List[PersonnageIA]:
+    def lister_personnages_ia_pour_utilisateur(self, uid: int) -> List[PersonnageIA]:
         """Retourne les personnages standards + ceux créés par l'utilisateur."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(

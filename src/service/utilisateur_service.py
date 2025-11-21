@@ -15,7 +15,7 @@ from objects.utilisateur import Utilisateur
 from service.auth_service import is_valid_email, is_valid_password
 from utils.default_persoIA import DEFAULT_PERSONAS
 from utils.log_decorator import log
-from utils.securite import hash_password  # compat: voir utils/securite.py plus bas
+from utils.securite import hash_password
 
 
 class UtilisateurService:
@@ -25,24 +25,17 @@ class UtilisateurService:
         self.dao = UtilisateurDao()
         self.persona_dao = PersonnageIADao()
 
-    # -------------------------
-    # Création / Lecture / Maj / Suppression
-    # -------------------------
     @log
     def creer(self, prenom: str, nom: str, mail: str, mdp: str, naiss) -> Utilisateur:
         mail_norm = mail.strip().lower()
 
-        # Vérif email
         is_valid_email(mail_norm)
 
-        # Vérif doublon
         if self.dao.exists_mail(mail_norm):
             raise ValueError("Un compte existe déjà avec cet email")
 
-        # Vérif mdp
         is_valid_password(mdp)
 
-        # Création utilisateur
         u = Utilisateur(
             id_utilisateur=None,
             prenom=prenom,
@@ -53,23 +46,9 @@ class UtilisateurService:
         )
         user = self.dao.create(u)
 
-        # Ajout personas IA par défaut
         self.add_default_persoIA(user.id_utilisateur)
 
         return user
-
-    @log
-    def lister_tous(self, inclure_mdp=False) -> list[Utilisateur]:
-        """
-        Liste tous les utilisateurs.
-        Si inclure_mdp=False, on masque le hash pour l’affichage.
-        """
-        users = self.dao.lister_tous()
-        if not inclure_mdp:
-            for u in users:
-                # on masque le hash en mémoire (affichage / retour)
-                u.mdp_hash = None  # type: ignore[attr-defined]
-        return users
 
     @log
     def trouver_par_id(self, id_utilisateur: int) -> Optional[Utilisateur]:
@@ -77,70 +56,23 @@ class UtilisateurService:
         return self.dao.find_by_id(id_utilisateur)
 
     @log
-    def modifier(
-        self, u: Utilisateur, *, rehash_password: bool = False
-    ) -> Optional[Utilisateur]:
-        """
-        Mettre à jour un utilisateur.
-        Si rehash_password=True et que u.mdp_hash contient un MOT DE PASSE EN CLAIR,
-        alors on le re-hash avant update (sinon on considère que mdp_hash est déjà un hash).
-        """
-        if rehash_password and u.mdp_hash:
-            u.mdp_hash = hash_password(
-                u.mdp_hash
-            )  # <— prudence: ici u.mdp_hash contient le mdp en clair
-        ok = self.dao.update(u)
-        return u if ok else None
-
-    @log
     def supprimer(self, u: Utilisateur) -> bool:
         """Supprimer un utilisateur."""
         return self.dao.delete(u.id_utilisateur)
+        # focntionnalite future : supprimer son compte utilisateur
 
-    # -------------------------
-    # Affichages & utilitaires
-    # -------------------------
-    @log
-    def afficher_tous(self) -> str:
-        """
-        Affiche tous les utilisateurs (tableau).
-        """
-        entetes = ["id", "prenom", "nom", "mail", "naiss"]
-        users = self.dao.lister_tous()
-        # transforme en listes pour tabulate
-        rows: Iterable[list] = (
-            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)]
-            for u in users
-        )
-        out = "-" * 100
-        out += "\nListe des utilisateurs\n"
-        out += "-" * 100 + "\n"
-        out += tabulate(rows, headers=entetes, tablefmt="psql")
-        out += "\n"
-        return out
-
-    # -------------------------
-    # Connexion & vérifs
-    # -------------------------
     @log
     def se_connecter(self, mail: str, mdp: str) -> Optional[Utilisateur]:
         mail_norm = mail.strip().lower()
         u = self.dao.find_by_mail(mail_norm)
         if not u:
             return None
-
-        # 1) Cas normal : hash salé avec l'email
         if u.mdp_hash == hash_password(mdp, mail_norm):
             return u
-
-        # 2) Compatibilité ancienne version : hash sans sel
-        if u.mdp_hash == hash_password(mdp):
-            return u
-
         return None
 
     def add_default_persoIA(self, user_id: int):
-        """Crée/Met à jour les personas par défaut pour un utilisateur."""
+        """Crée les personas par défaut pour un utilisateur."""
         inserted = 0
         for perso in DEFAULT_PERSONAS:
             try:
@@ -150,7 +82,7 @@ class UtilisateurService:
                     system_prompt=perso["system_prompt"],
                     created_by=user_id,
                 )
-                self.persona_dao.create(p)  # <-- UPSERT côté DAO
+                self.persona_dao.create(p)
                 inserted += 1
             except Exception as e:
                 # LOG + rollback pour sortir de l'état 'transaction aborted'
@@ -193,7 +125,6 @@ class UtilisateurService:
     ):
         """
         Change le mot de passe d'un utilisateur.
-        Retourne (bool, message).
         """
         u = self.dao.find_by_id(id_utilisateur)
         if not u:
@@ -224,7 +155,6 @@ class UtilisateurService:
     def changer_email(self, id_utilisateur: int, nouvel_email: str, mdp: str):
         """
         Change l'email d'un utilisateur en gardant le sel = email.
-        Retourne (bool, message).
         """
         u = self.dao.find_by_id(id_utilisateur)
         if not u:
@@ -240,31 +170,25 @@ class UtilisateurService:
         if u.mdp_hash != hash_salt_old and u.mdp_hash != hash_nosalt_old:
             return False, "Mot de passe incorrect."
 
-        # Valider le nouvel email
         try:
             is_valid_email(nouvel_email_norm)
         except ValueError as e:
             return False, f"Email invalide : {e}"
 
-        # Vérifier qu'il n'est pas déjà pris
         if nouvel_email_norm != mail_norm and self.dao.exists_mail(nouvel_email_norm):
             return False, "Un compte existe déjà avec ce nouvel email."
 
         # Nouveau hash avec le NOUVEL email comme sel
         new_hash = hash_password(mdp, nouvel_email_norm)
 
-        # Mise à jour des données
         u.mail = nouvel_email_norm
         ok1 = self.dao.update_mail_utilisateur(u)
-        # on ne durcit pas sur ok2 (certains DAO renvoient None)
+
         try:
             ok2 = self.dao.update_mot_de_passe(id_utilisateur, new_hash)
         except Exception:
-            ok2 = False  # on loguerait en vrai, mais on ne casse pas tout
+            ok2 = False
 
-        # Si l'email n'a pas été mis à jour, là oui c'est un échec
         if not ok1:
             return False, "Échec de la mise à jour en base."
-
-        # Sinon, on considère que le changement est effectué
         return True, "Email modifié avec succès."

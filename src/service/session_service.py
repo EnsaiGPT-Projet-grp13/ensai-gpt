@@ -9,11 +9,9 @@ class SessionService:
     def __init__(self) -> None:
         self._s = Session()
 
-    # --- Utilisateur ---
     def get_user_id(self) -> int:
         return int(self._s.utilisateur.get("id_utilisateur"))
 
-    # --- Personnage courant ---
     def set_personnage(self, pid: int, name: str, system_prompt: str) -> None:
         self._s.personnage = {
             "id_personnageIA": pid,
@@ -24,7 +22,6 @@ class SessionService:
     def get_personnage(self) -> Optional[Dict[str, Any]]:
         return getattr(self._s, "personnage", None)
 
-    # --- Conversation courante ---
     def set_conversation_info(
         self,
         cid: int,
