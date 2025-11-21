@@ -45,8 +45,7 @@ class ParametresPersoIAVue(VueAbstraite):
                         )
 
                     choices = [
-                        {"name": p.name, "value": p.id_personnageIA}
-                        for p in persos
+                        {"name": p.name, "value": p.id_personnageIA} for p in persos
                     ]
                     choices.append({"name": "Annuler", "value": None})
 
@@ -87,18 +86,24 @@ class ParametresPersoIAVue(VueAbstraite):
                         )
 
             if sous == "Créer un nouveau personnage IA":
-                name = (inquirer.text(
-                    message="Nom du personnage (Entrée vide pour annuler) :"
-                ).execute() or "").strip()
+                name = (
+                    inquirer.text(
+                        message="Nom du personnage (Entrée vide pour annuler) :"
+                    ).execute()
+                    or ""
+                ).strip()
                 if not name:
                     return MenuUtilisateurVue("Création annulée.")
 
-                prompt = (inquirer.text(
-                    message=(
-                        "Prompt système (rôle, style, limites, format de réponse — "
-                        "Entrée vide pour annuler) :"
-                    )
-                ).execute() or "").strip()
+                prompt = (
+                    inquirer.text(
+                        message=(
+                            "Prompt système (rôle, style, limites, format de réponse — "
+                            "Entrée vide pour annuler) :"
+                        )
+                    ).execute()
+                    or ""
+                ).strip()
                 if not prompt:
                     return MenuUtilisateurVue("Création annulée.")
 
@@ -116,8 +121,7 @@ class ParametresPersoIAVue(VueAbstraite):
                         )
 
                     choices = [
-                        {"name": p.name, "value": p.id_personnageIA}
-                        for p in persos
+                        {"name": p.name, "value": p.id_personnageIA} for p in persos
                     ]
                     choices.append({"name": "Retour", "value": None})
 

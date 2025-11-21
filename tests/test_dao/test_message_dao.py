@@ -4,7 +4,11 @@ from dao.message_dao import MessageDao
 
 from objects.message import Message
 
-from tests.test_dao.helpers_dao import create_test_user, create_test_personnage, create_test_conversation
+from tests.test_dao.helpers_dao import (
+    create_test_user,
+    create_test_personnage,
+    create_test_conversation,
+)
 
 
 def test_add_insere_message_et_renseigne_id_et_created_at():

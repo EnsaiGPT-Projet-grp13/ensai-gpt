@@ -155,7 +155,6 @@ FOR EACH ROW EXECUTE PROCEDURE set_updated_at();
 
 
 def ensure_database_exists():
-    # Se connecte à "postgres" pour gérer l'existence de PG_DB
     admin_conn = psycopg2.connect(
         host=PG_HOST, port=PG_PORT, dbname="postgres", user=PG_USER, password=PG_PWD
     )
@@ -170,8 +169,10 @@ def ensure_database_exists():
 
 
 def main():
-    ensure_database_exists()  # <-- clé
-    conn = psycopg2.connect(host=PG_HOST, port=PG_PORT, dbname=PG_DB, user=PG_USER, password=PG_PWD)
+    ensure_database_exists()
+    conn = psycopg2.connect(
+        host=PG_HOST, port=PG_PORT, dbname=PG_DB, user=PG_USER, password=PG_PWD
+    )
     conn.autocommit = True
     with conn.cursor() as cur:
         cur.execute(DDL)

@@ -1,7 +1,9 @@
 import hashlib
 
+
 def _sha256(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
 
 def hash_password(pwd: str, sel: str | None = None) -> str:
     """

@@ -75,6 +75,7 @@ def test_get_by_id_retourne_none_si_inexistant(service_personnage):
 # Tests de create_personnage
 # =========================
 
+
 def test_create_personnage_construit_objet_et_appelle_create(service_personnage):
     dao_mock = Mock()
     fake_perso = PersonnageIA(
@@ -101,6 +102,7 @@ def test_create_personnage_construit_objet_et_appelle_create(service_personnage)
     assert perso_cree.system_prompt == "Je suis un bot."
     assert perso_cree.created_by == 5
     assert perso_cree.id_personnageIA is None
+
 
 def test_update_personnage_retourne_none_si_id_inexistant(service_personnage):
     dao_mock = Mock()
@@ -230,6 +232,7 @@ def test_delete_personnage_appelle_dao_delete(service_personnage):
 
     assert res is True
     dao_mock.delete.assert_called_once_with(50)
+
 
 def test_build_payload_avec_personnage_objet():
     perso = PersonnageIA(

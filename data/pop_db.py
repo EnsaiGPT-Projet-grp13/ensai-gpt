@@ -4,10 +4,10 @@ import sys
 from dao.db import DBConnection
 from service.utilisateur_service import UtilisateurService
 from utils.securite import hash_password
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SRC_DIR = os.path.join(BASE_DIR, "src")
 sys.path.append(SRC_DIR)
-
 
 
 USERS = [

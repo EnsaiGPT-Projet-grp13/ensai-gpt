@@ -73,8 +73,6 @@ def test_start_cree_conversation_simple(service_conversation):
     assert conv.id_conversation == 10
 
 
-
-
 def test_join_by_token_retourne_none_si_token_vide(service_conversation):
     """join_by_token doit renvoyer None si le token est vide ou seulement des espaces."""
     res = service_conversation.join_by_token(id_user=5, token="   ")
@@ -107,7 +105,9 @@ def test_join_by_token_ajoute_participant_quand_token_valide(service_conversatio
 
     res = service_conversation.join_by_token(id_user=9, token="  abcdef1234567890  ")
 
-    service_conversation.conv_dao.find_by_token.assert_called_once_with("ABCDEF1234567890")
+    service_conversation.conv_dao.find_by_token.assert_called_once_with(
+        "ABCDEF1234567890"
+    )
     service_conversation.conv_dao.add_participant.assert_called_once_with(9, 42)
     assert res is conv_factice
 
@@ -226,4 +226,3 @@ def test_extract_ai_text_detail_erreur():
     assert texte.startswith("[API] ")
     assert "Champ requis manquant" in texte
     assert "Autre erreur" in texte
-

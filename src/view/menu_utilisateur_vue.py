@@ -3,6 +3,7 @@ from InquirerPy import inquirer
 from view.vue_abstraite import VueAbstraite
 from objects.session import Session
 
+
 class MenuUtilisateurVue(VueAbstraite):
     def __init__(self, message: str = "") -> None:
         self.message = message
@@ -29,18 +30,22 @@ class MenuUtilisateurVue(VueAbstraite):
             if choix == "Se déconnecter":
                 Session().deconnexion()
                 from view.accueil_vue import AccueilVue
+
                 return AccueilVue("Déconnecté. À bientôt !")
 
             if choix == "Paramètres":
                 from view.parametres_vue import ParametresVue
+
                 return ParametresVue()
 
             if choix == "Historique":
                 from view.historique_vue import HistoriqueVue
+
                 return HistoriqueVue()
 
             if choix == "Statistiques":
                 from view.statistiques_vue import StatistiquesVue
+
                 return StatistiquesVue()
 
             if choix == "Démarrer une conversation":
@@ -55,16 +60,19 @@ class MenuUtilisateurVue(VueAbstraite):
 
                 if sous == "Choisir un personnage":
                     from view.choisir_personnage_vue import ChoisirPersonnageVue
+
                     return ChoisirPersonnageVue()
 
                 if sous == "Créer un personnage":
                     from view.creer_personnage_vue import CreerPersonnageVue
+
                     return CreerPersonnageVue()
 
                 return MenuUtilisateurVue("Opération annulée.")
 
             if choix == "Rejoindre une conversation":
                 from view.joindre_conversation_vue import JoindreConversationVue
+
                 return JoindreConversationVue()
 
             return MenuUtilisateurVue()
@@ -73,4 +81,5 @@ class MenuUtilisateurVue(VueAbstraite):
             print("\n[MenuUtilisateurVue] Exception :", repr(e))
             print(traceback.format_exc())
             from view.accueil_vue import AccueilVue
+
             return AccueilVue("Erreur dans le menu utilisateur (voir terminal).")

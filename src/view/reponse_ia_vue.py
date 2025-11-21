@@ -4,6 +4,7 @@ from objects.session import Session
 from service.conversation_service import ConversationService
 import traceback
 
+
 class ReponseIAVue(VueAbstraite):
     def __init__(self, first_user_message: str | None = None):
         super().__init__(message="")
@@ -15,9 +16,10 @@ class ReponseIAVue(VueAbstraite):
             print("====================================")
             print("  Conversation COLLABORATIVE")
             print(f"  Token : {s.conversation_token}")
-            print("  Partagez ce token pour inviter d'autres utilisateurs à rejoindre cette conversation collaborative.")
+            print(
+                "  Partagez ce token pour inviter d'autres utilisateurs à rejoindre cette conversation collaborative."
+            )
             print("====================================\n")
-
 
     def choisir_menu(self):
         try:
@@ -27,15 +29,24 @@ class ReponseIAVue(VueAbstraite):
             self.service._ensure_conversation(s)
 
             # Garde-fous
-            if not isinstance(s.utilisateur, dict) or not s.utilisateur.get("id_utilisateur"):
+            if not isinstance(s.utilisateur, dict) or not s.utilisateur.get(
+                "id_utilisateur"
+            ):
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                 return MenuUtilisateurVue("Connecte-toi d'abord.")
-            if not isinstance(s.personnage, dict) or not s.personnage.get("id_personnageIA"):
+            if not isinstance(s.personnage, dict) or not s.personnage.get(
+                "id_personnageIA"
+            ):
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                 return MenuUtilisateurVue("Sélectionne un personnage d'abord.")
             if not s.conversation_id:
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
-                return MenuUtilisateurVue("Impossible de créer la conversation (voir logs).")
+
+                return MenuUtilisateurVue(
+                    "Impossible de créer la conversation (voir logs)."
+                )
 
             # bannière
             self._print_banner(s)
@@ -57,12 +68,16 @@ class ReponseIAVue(VueAbstraite):
             # boucle de chat (Entrée vide pour quitter)
             while True:
                 pname = s.personnage.get("name", "Assistant")
-                user_msg = inquirer.text(
-                    message=f"[{pname}] Ton message (Entrée vide pour quitter) :"
-                ).execute() or ""
+                user_msg = (
+                    inquirer.text(
+                        message=f"[{pname}] Ton message (Entrée vide pour quitter) :"
+                    ).execute()
+                    or ""
+                )
 
                 if not user_msg.strip():
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                     return MenuUtilisateurVue("Conversation terminée.")
 
                 ia_text, _ = self.service.send_user_and_get_ai(
@@ -80,4 +95,5 @@ class ReponseIAVue(VueAbstraite):
             print("\n[ReponseIAVue] Exception :", repr(e))
             print(traceback.format_exc())
             from view.menu_utilisateur_vue import MenuUtilisateurVue
+
             return MenuUtilisateurVue("Erreur dans le chat (voir terminal).")

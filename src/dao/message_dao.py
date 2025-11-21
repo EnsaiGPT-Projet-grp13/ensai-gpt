@@ -6,10 +6,10 @@ from objects.message import Message
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
+
 class MessageDao:
     def __init__(self):
         self.conn = DBConnection().connection
-
 
     def add(self, msg: Message) -> Message:
         contenu = (msg.contenu or "").strip()
@@ -31,7 +31,6 @@ class MessageDao:
         self.conn.commit()
         return msg
 
-
     def list_for_conversation(self, cid: int) -> List[Message]:
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
@@ -48,7 +47,9 @@ class MessageDao:
             rows = cur.fetchall() or []
         return [Message(**r) for r in rows]
 
-    def recherche_mots_message(self, id_utilisateur: int, mots: str, limite: int = 5) -> List[Dict[str, Any]]:
+    def recherche_mots_message(
+        self, id_utilisateur: int, mots: str, limite: int = 5
+    ) -> List[Dict[str, Any]]:
         """Recherche une suite de caractères dans les messages d'un utilisateur et renvoie les messages associés"""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
@@ -66,7 +67,7 @@ class MessageDao:
                 ORDER BY created_at DESC
                 LIMIT %s
                 """,
-                (id_utilisateur, f'%{mots}%', limite),
+                (id_utilisateur, f"%{mots}%", limite),
             )
             return cur.fetchall() or []
 

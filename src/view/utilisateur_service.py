@@ -77,7 +77,9 @@ class UtilisateurService:
         return self.dao.find_by_id(id_utilisateur)
 
     @log
-    def modifier(self, u: Utilisateur, *, rehash_password: bool = False) -> Optional[Utilisateur]:
+    def modifier(
+        self, u: Utilisateur, *, rehash_password: bool = False
+    ) -> Optional[Utilisateur]:
         """
         Mettre à jour un utilisateur.
         Si rehash_password=True et que u.mdp_hash contient un MOT DE PASSE EN CLAIR,
@@ -107,7 +109,8 @@ class UtilisateurService:
         users = self.dao.lister_tous()
         # transforme en listes pour tabulate
         rows: Iterable[list] = (
-            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)] for u in users
+            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)]
+            for u in users
         )
         out = "-" * 100
         out += "\nListe des utilisateurs\n"
@@ -171,14 +174,18 @@ class UtilisateurService:
         """
         if rehash_password and u.mdp_hash:
             u.mdp_hash = hash_password(u.mdp_hash, u.mail)
-        ok = self.dao.update_identite(u)  # ou une méthode update globale si tu en as une
+        ok = self.dao.update_identite(
+            u
+        )  # ou une méthode update globale si tu en as une
         return u if ok else None
 
     # -------------------------------------------------
     # 1) CHANGER MOT DE PASSE
     # -------------------------------------------------
     @log
-    def changer_mot_de_passe(self, id_utilisateur: int, ancien_mdp: str, nouveau_mdp: str):
+    def changer_mot_de_passe(
+        self, id_utilisateur: int, ancien_mdp: str, nouveau_mdp: str
+    ):
         """
         Change le mot de passe d'un utilisateur.
         Retourne (bool, message).
@@ -210,7 +217,9 @@ class UtilisateurService:
     # 2) CHANGER IDENTITÉ (PRÉNOM + NOM)
     # -------------------------------------------------
     @log
-    def changer_identite(self, id_utilisateur: int, nouveau_prenom: str, nouveau_nom: str):
+    def changer_identite(
+        self, id_utilisateur: int, nouveau_prenom: str, nouveau_nom: str
+    ):
         """
         Change prénom + nom.
         Retourne (bool, message).

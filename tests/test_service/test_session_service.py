@@ -14,6 +14,7 @@ def test_get_user_id_retourne_un_entier(service_session):
     assert isinstance(uid, int)
     assert uid == 42
 
+
 def test_set_personnage_enregistre_un_dict_correct(service_session):
     service_session.set_personnage(
         pid=3,

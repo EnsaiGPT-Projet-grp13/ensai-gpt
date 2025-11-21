@@ -68,8 +68,12 @@ def test_liste_proprietaire_pour_utilisateur_retourne_ses_conversations():
     user = create_test_user(email_prefix="conv_owner")
     perso = create_test_personnage(user.id_utilisateur, prefix="BotConv")
 
-    conv1 = create_test_conversation(user.id_utilisateur, perso.id_personnageIA, titre="conv A")
-    conv2 = create_test_conversation(user.id_utilisateur, perso.id_personnageIA, titre="conv B")
+    conv1 = create_test_conversation(
+        user.id_utilisateur, perso.id_personnageIA, titre="conv A"
+    )
+    conv2 = create_test_conversation(
+        user.id_utilisateur, perso.id_personnageIA, titre="conv B"
+    )
 
     liste = cdao.liste_proprietaire_pour_utilisateur(user.id_utilisateur, limite=10)
 

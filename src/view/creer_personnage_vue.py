@@ -29,14 +29,22 @@ class CreerPersonnageVue(VueAbstraite):
             uid = self.session_svc.get_user_id()
 
             # --- Nom du personnage ---
-            name = (inquirer.text(message="Nom du personnage (Entrée vide pour quitter) :").execute() or "").strip()
+            name = (
+                inquirer.text(
+                    message="Nom du personnage (Entrée vide pour quitter) :"
+                ).execute()
+                or ""
+            ).strip()
             if not name:
                 return MenuUtilisateurVue("Création annulée.")
 
             # --- Prompt système ---
-            prompt = (inquirer.text(
-                message="Prompt système (rôle, style, limites, format de réponse — Entrée vide pour quitter) :"
-            ).execute() or "").strip()
+            prompt = (
+                inquirer.text(
+                    message="Prompt système (rôle, style, limites, format de réponse — Entrée vide pour quitter) :"
+                ).execute()
+                or ""
+            ).strip()
             if not prompt:
                 return MenuUtilisateurVue("Création annulée.")
 
@@ -55,4 +63,6 @@ class CreerPersonnageVue(VueAbstraite):
         except Exception as e:
             print("\n[CreerPersonnageVue] Exception :", repr(e))
             print(traceback.format_exc())
-            return MenuUtilisateurVue("Erreur lors de la création du personnage (voir logs).")
+            return MenuUtilisateurVue(
+                "Erreur lors de la création du personnage (voir logs)."
+            )

@@ -6,7 +6,6 @@ from service.conversation_service import ConversationService
 from service.message_service import MessageService
 
 
-
 class RechercheConversationMotsVue(VueAbstraite):
     """Vue de recherche des conversations par des mots clés"""
 
@@ -27,18 +26,29 @@ class RechercheConversationMotsVue(VueAbstraite):
         msg_svc = MessageService()
 
         # On récupère les conversations accessibles (résumées)
-        conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(id_utilisateur)
+        conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(
+            id_utilisateur
+        )
         if not conversations:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
+
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
 
         # Saisie des mots-clés
-        mots = (inquirer.text(
-            message="Quels mots-clés recherchez-vous dans vos anciennes conversations ? :"
-        ).execute() or "").strip().lower()
+        mots = (
+            (
+                inquirer.text(
+                    message="Quels mots-clés recherchez-vous dans vos anciennes conversations ? :"
+                ).execute()
+                or ""
+            )
+            .strip()
+            .lower()
+        )
 
         if not mots:
             from view.historique_vue import HistoriqueVue
+
             return HistoriqueVue("Recherche annulée (mots-clés vides).")
 
         # Recherche des messages contenant ces mots
@@ -46,6 +56,7 @@ class RechercheConversationMotsVue(VueAbstraite):
 
         if not listes_message:
             from view.historique_vue import HistoriqueVue
+
             return HistoriqueVue("Aucune conversation ne contient ces mots.")
 
         # Comptage du nombre de messages correspondants par conversation
@@ -64,14 +75,21 @@ class RechercheConversationMotsVue(VueAbstraite):
             c = conv_index.get(cid)
 
             titre = c.get("titre") or "(sans titre)"
-            perso = c.get("personnageIA_name") or c.get("personnage_name") or "Personnage inconnu"
+            perso = (
+                c.get("personnageIA_name")
+                or c.get("personnage_name")
+                or "Personnage inconnu"
+            )
 
             label = f"{titre} avec {perso} ({count} occurrence(s))"
             choices.append({"name": label, "value": cid})
 
         if not choices:
             from view.historique_vue import HistoriqueVue
-            return HistoriqueVue("Aucune conversation ne contient ces mots (après filtrage).")
+
+            return HistoriqueVue(
+                "Aucune conversation ne contient ces mots (après filtrage)."
+            )
 
         choices.append({"name": "Retour", "value": None})
 
@@ -82,9 +100,11 @@ class RechercheConversationMotsVue(VueAbstraite):
 
         if cid_choisi is None:
             from view.historique_vue import HistoriqueVue
+
             return HistoriqueVue()
-            
+
         s.conversation_id = cid_choisi
 
         from view.parametres_conversation_vue import ParametresConversationVue
+
         return ParametresConversationVue()

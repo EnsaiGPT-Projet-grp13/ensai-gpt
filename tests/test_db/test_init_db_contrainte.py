@@ -20,7 +20,9 @@ class TestContraintesDB:
         cls.conn.autocommit = False
         cls.cur = cls.conn.cursor()
         # On met tout en minuscules pour être cohérent avec pg (schemas non quotés)
-        cls.schema = init_db.SCHEMA.lower() if hasattr(init_db, "SCHEMA") else "projetgpt"
+        cls.schema = (
+            init_db.SCHEMA.lower() if hasattr(init_db, "SCHEMA") else "projetgpt"
+        )
 
     @classmethod
     def teardown_class(cls):
@@ -58,7 +60,9 @@ class TestContraintesDB:
                 (self.schema, table),
             )
             nb_pk = self.cur.fetchone()[0]
-            assert nb_pk == 1, f"Attention : la table {table} ne possède pas de clé primaire."
+            assert (
+                nb_pk == 1
+            ), f"Attention : la table {table} ne possède pas de clé primaire."
 
     def test_mail_utilisateur_unique(self):
         """Test si une erreur est bien signalée si on met deux fois le même mail"""
@@ -275,8 +279,8 @@ class TestContraintesDB:
         )
         created_at, updated_at = self.cur.fetchone()
 
-        assert created_at and updated_at, (
-            "Les champs created_at / updated_at n'ont pas été remplis automatiquement."
-        )
+        assert (
+            created_at and updated_at
+        ), "Les champs created_at / updated_at n'ont pas été remplis automatiquement."
         assert isinstance(created_at, datetime.datetime)
         assert isinstance(updated_at, datetime.datetime)

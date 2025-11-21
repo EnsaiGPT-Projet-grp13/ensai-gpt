@@ -20,21 +20,33 @@ class ConnexionVue(VueAbstraite):
             user_svc = UtilisateurService()
 
             # --- Email ---
-            mail = (inquirer.text(
-                message="Email (Entrée vide pour quitter) :"
-            ).execute() or "").strip().lower()
+            mail = (
+                (
+                    inquirer.text(
+                        message="Email (Entrée vide pour quitter) :"
+                    ).execute()
+                    or ""
+                )
+                .strip()
+                .lower()
+            )
             quitter_si_vide(mail)
 
             # Vérifier si un compte existe avec cet email
             if not user_svc.mail_deja_utilise(mail):
-                return AccueilVue("Aucun compte ne correspond à cet email. Créez un compte.")
+                return AccueilVue(
+                    "Aucun compte ne correspond à cet email. Créez un compte."
+                )
 
             # --- Mot de passe (3 essais) ---
             MAX_TRIES = 3
             for i in range(1, MAX_TRIES + 1):
-                mdp = inquirer.secret(
-                    message=f"Mot de passe (essai {i}/{MAX_TRIES}, Entrée vide pour quitter) :"
-                ).execute() or ""
+                mdp = (
+                    inquirer.secret(
+                        message=f"Mot de passe (essai {i}/{MAX_TRIES}, Entrée vide pour quitter) :"
+                    ).execute()
+                    or ""
+                )
                 quitter_si_vide(mdp)
 
                 user = user_svc.se_connecter(mail, mdp)
@@ -46,10 +58,11 @@ class ConnexionVue(VueAbstraite):
                         "id_utilisateur": user.id_utilisateur,
                         "prenom": user.prenom,
                         "nom": user.nom,
-                        "mail": user.mail
+                        "mail": user.mail,
                     }
                     s.session = None
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                     return MenuUtilisateurVue(f"Bienvenue {user.prenom} {user.nom}!")
 
                 # Mot de passe incorrect

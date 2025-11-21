@@ -62,7 +62,9 @@ class ParametresConversationVue(VueAbstraite):
 
                     return ReponseIAVue()
                 else:
-                    print(f"Erreur : Le personnage avec l'ID {id_personnage} n'existe pas ou plus.")
+                    print(
+                        f"Erreur : Le personnage avec l'ID {id_personnage} n'existe pas ou plus."
+                    )
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
 
                     return MenuUtilisateurVue("Personnage non trouvé")
@@ -72,7 +74,11 @@ class ParametresConversationVue(VueAbstraite):
             # -------------------------------------------------
             if choix == "Afficher l'entièreté de la conversation":
                 print(
-                    "\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n"
+                    "\n"
+                    + "-" * 50
+                    + f"\n Conversation : {conversation.titre}\n"
+                    + "-" * 50
+                    + "\n"
                 )
                 texte = MessageService().affichage_message_conversation(id_conversation)
                 print(texte)
@@ -136,7 +142,9 @@ class ParametresConversationVue(VueAbstraite):
                 ConversationService().supprimer(conversation)
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
 
-                return MenuUtilisateurVue(f"Vous avez supprimé la conversation « {titre} ».")
+                return MenuUtilisateurVue(
+                    f"Vous avez supprimé la conversation « {titre} »."
+                )
 
             # -------------------------------------------------
             # Retour

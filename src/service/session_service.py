@@ -2,8 +2,10 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 from objects.session import Session
 
+
 class SessionService:
     """Wrap léger autour de Session pour centraliser les accès."""
+
     def __init__(self) -> None:
         self._s = Session()
 

@@ -5,6 +5,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
+
 # === Imports du projet ===
 from dao.utilisateur_dao import UtilisateurDao
 from objects.utilisateur import Utilisateur
@@ -18,7 +19,6 @@ SRC_DIR = os.path.join(PROJECT_ROOT, "src")
 
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
-
 
 
 @pytest.fixture(scope="session", autouse=True)

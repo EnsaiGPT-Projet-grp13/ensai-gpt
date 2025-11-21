@@ -4,6 +4,7 @@ from view.vue_abstraite import VueAbstraite
 from service.auth_service import is_valid_email, is_valid_password
 from view.accueil_vue import AccueilVue
 
+
 class InscriptionVue(VueAbstraite):
     """Vue d'inscription (DB)"""
 
@@ -16,7 +17,12 @@ class InscriptionVue(VueAbstraite):
         try:
             # --- Prénom ---
             while True:
-                prenom = (inquirer.text(message="Prénom (Entrée vide pour quitter) :").execute() or "").strip()
+                prenom = (
+                    inquirer.text(
+                        message="Prénom (Entrée vide pour quitter) :"
+                    ).execute()
+                    or ""
+                ).strip()
                 quitter_si_vide(prenom)
                 if prenom:
                     break
@@ -24,7 +30,10 @@ class InscriptionVue(VueAbstraite):
 
             # --- Nom ---
             while True:
-                nom = (inquirer.text(message="Nom (Entrée vide pour quitter) :").execute() or "").strip()
+                nom = (
+                    inquirer.text(message="Nom (Entrée vide pour quitter) :").execute()
+                    or ""
+                ).strip()
                 quitter_si_vide(nom)
                 if nom:
                     break
@@ -32,10 +41,20 @@ class InscriptionVue(VueAbstraite):
 
             # --- Email ---
             from service.utilisateur_service import UtilisateurService
+
             service = UtilisateurService()
 
             while True:
-                mail = (inquirer.text(message="Email (Entrée vide pour quitter) :").execute() or "").strip().lower()
+                mail = (
+                    (
+                        inquirer.text(
+                            message="Email (Entrée vide pour quitter) :"
+                        ).execute()
+                        or ""
+                    )
+                    .strip()
+                    .lower()
+                )
                 quitter_si_vide(mail)
 
                 try:
@@ -53,7 +72,12 @@ class InscriptionVue(VueAbstraite):
 
             # --- Mot de passe ---
             while True:
-                mdp = inquirer.secret(message="Mot de passe (Entrée vide pour quitter) :").execute() or ""
+                mdp = (
+                    inquirer.secret(
+                        message="Mot de passe (Entrée vide pour quitter) :"
+                    ).execute()
+                    or ""
+                )
                 quitter_si_vide(mdp)
                 try:
                     is_valid_password(mdp)
@@ -64,23 +88,37 @@ class InscriptionVue(VueAbstraite):
                 MAX_TRIES = 3
                 ok = False
                 for i in range(1, MAX_TRIES + 1):
-                    mdp2 = inquirer.secret(message="Confirme le mot de passe (Entrée vide pour quitter) :").execute() or ""
+                    mdp2 = (
+                        inquirer.secret(
+                            message="Confirme le mot de passe (Entrée vide pour quitter) :"
+                        ).execute()
+                        or ""
+                    )
                     quitter_si_vide(mdp2)
                     if mdp2 == mdp:
                         ok = True
                         break
                     else:
                         if i < MAX_TRIES:
-                            print(f"Les mots de passe ne correspondent pas. Réessaie. (essai {i}/{MAX_TRIES})\n")
+                            print(
+                                f"Les mots de passe ne correspondent pas. Réessaie. (essai {i}/{MAX_TRIES})\n"
+                            )
                         else:
-                            return AccueilVue("Confirmation de mot de passe incorrecte (3 tentatives).")
+                            return AccueilVue(
+                                "Confirmation de mot de passe incorrecte (3 tentatives)."
+                            )
 
                 if ok:
                     break
 
             # --- Date de naissance ---
             while True:
-                naiss_str = (inquirer.text(message="Date de naissance (YYYY-MM-DD, Entrée vide pour quitter) :").execute() or "").strip()
+                naiss_str = (
+                    inquirer.text(
+                        message="Date de naissance (YYYY-MM-DD, Entrée vide pour quitter) :"
+                    ).execute()
+                    or ""
+                ).strip()
                 quitter_si_vide(naiss_str)
                 try:
                     naiss = date.fromisoformat(naiss_str)
@@ -94,7 +132,9 @@ class InscriptionVue(VueAbstraite):
             except ValueError as e:
                 return AccueilVue(f"Inscription impossible : {e}")
 
-            return AccueilVue(f"Compte créé pour {user.prenom} {user.nom}. Vous pouvez vous connecter.")
+            return AccueilVue(
+                f"Compte créé pour {user.prenom} {user.nom}. Vous pouvez vous connecter."
+            )
 
         except KeyboardInterrupt:
             return AccueilVue("Inscription annulée. Retour à l'accueil.")

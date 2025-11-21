@@ -77,7 +77,9 @@ class UtilisateurService:
         return self.dao.find_by_id(id_utilisateur)
 
     @log
-    def modifier(self, u: Utilisateur, *, rehash_password: bool = False) -> Optional[Utilisateur]:
+    def modifier(
+        self, u: Utilisateur, *, rehash_password: bool = False
+    ) -> Optional[Utilisateur]:
         """
         Mettre à jour un utilisateur.
         Si rehash_password=True et que u.mdp_hash contient un MOT DE PASSE EN CLAIR,
@@ -107,7 +109,8 @@ class UtilisateurService:
         users = self.dao.lister_tous()
         # transforme en listes pour tabulate
         rows: Iterable[list] = (
-            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)] for u in users
+            [u.id_utilisateur, u.prenom, u.nom, u.mail, getattr(u, "naiss", None)]
+            for u in users
         )
         out = "-" * 100
         out += "\nListe des utilisateurs\n"
@@ -162,7 +165,9 @@ class UtilisateurService:
         """Retourne True si un utilisateur existe déjà avec ce mail."""
         return self.dao.exists_mail(mail)
 
-    def changer_identite(self, id_utilisateur: int, nouveau_prenom: str, nouveau_nom: str):
+    def changer_identite(
+        self, id_utilisateur: int, nouveau_prenom: str, nouveau_nom: str
+    ):
         """Change prénom + nom d'un utilisateur."""
         u = self.dao.find_by_id(id_utilisateur)
         if not u:
@@ -183,7 +188,9 @@ class UtilisateurService:
 
         return True, "Identité modifiée avec succès."
 
-    def changer_mot_de_passe(self, id_utilisateur: int, ancien_mdp: str, nouveau_mdp: str):
+    def changer_mot_de_passe(
+        self, id_utilisateur: int, ancien_mdp: str, nouveau_mdp: str
+    ):
         """
         Change le mot de passe d'un utilisateur.
         Retourne (bool, message).

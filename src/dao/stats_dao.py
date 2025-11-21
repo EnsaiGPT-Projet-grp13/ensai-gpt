@@ -6,6 +6,7 @@ from objects.session import Session
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
+
 class StatsDao:
     def __init__(self):
         self.conn = DBConnection().connection
@@ -13,9 +14,13 @@ class StatsDao:
     def nbre_msgs_utilisateur(self):
         """Retourne le nombre de messages envoyés par l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        user_id = s.utilisateur.get(
+            "id_utilisateur"
+        )  # Récupère l'ID de l'utilisateur depuis la session
         utilisateur_service = UtilisateurService()
-        user = utilisateur_service.trouver_par_id(user_id)   # Appel de la méthode avec le bon paramètre
+        user = utilisateur_service.trouver_par_id(
+            user_id
+        )  # Appel de la méthode avec le bon paramètre
         if not user:
             return 0  # Si l'utilisateur n'existe pas, renvoie 0
 
@@ -30,12 +35,14 @@ class StatsDao:
 
         if result is None:
             return 0
-        return result['count']
+        return result["count"]
 
     def nbre_conv_utilisateurs(self):
         """Retourne le nombre de conversations pour l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        user_id = s.utilisateur.get(
+            "id_utilisateur"
+        )  # Récupère l'ID de l'utilisateur depuis la session
         utilisateur_service = UtilisateurService()
         user = utilisateur_service.trouver_par_id(user_id)
         if not user:
@@ -52,14 +59,16 @@ class StatsDao:
 
         if result is None:
             return 0
-        return result['count']
+        return result["count"]
 
     def moyenne_msg_par_conv(self):
         """Retourne la moyenne de messages par conversation pour l'utilisateur connecté."""
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")  # Récupère l'ID de l'utilisateur depuis la session
+        user_id = s.utilisateur.get(
+            "id_utilisateur"
+        )  # Récupère l'ID de l'utilisateur depuis la session
         utilisateur_service = UtilisateurService()
-        user = utilisateur_service.trouver_par_id(user_id) 
+        user = utilisateur_service.trouver_par_id(user_id)
         if not user:
             return 0  # Si l'utilisateur n'existe pas, renvoie 0
 
@@ -72,20 +81,19 @@ class StatsDao:
         with self.conn.cursor() as cur:
             cur.execute(query, (user.id_utilisateur,))
             rows = cur.fetchall()
-        
+
         if len(rows) == 0:
             return 0
 
-        total_messages = sum(row['message_count'] for row in rows)
+        total_messages = sum(row["message_count"] for row in rows)
         total_conversations = len(rows)
 
         return total_messages / total_conversations
 
-  
     def most_used_personas_for_user(self):
         s = Session()
         user_id = s.utilisateur.get("id_utilisateur")
-        
+
         query = f"""
             SELECT c.id_personnageIA, p.name, COUNT(c.id_personnageIA) AS count
             FROM {SCHEMA}.conversation c
@@ -103,31 +111,31 @@ class StatsDao:
             )
             ORDER BY count DESC
         """
-        
+
         with self.conn.cursor() as cur:
             cur.execute(query, (user_id, user_id))
             rows = cur.fetchall()
-        
+
         # Traiter les résultats de la requête
         most_used_personas = []
         for row in rows:
-            most_used_personas.append({
-                "id_personnageia": row["id_personnageia"],
-                "name": row["name"],
-                "count": row["count"]
-            })
-        
+            most_used_personas.append(
+                {
+                    "id_personnageia": row["id_personnageia"],
+                    "name": row["name"],
+                    "count": row["count"],
+                }
+            )
+
         return most_used_personas
-
-
 
     def nbre_personnages_IA_utilises(self):
         s = Session()
-        user_id = s.utilisateur.get("id_utilisateur")  
+        user_id = s.utilisateur.get("id_utilisateur")
         utilisateur_service = UtilisateurService()
         user = utilisateur_service.trouver_par_id(user_id)
         if not user:
-            return 0  
+            return 0
         query = f"""
         SELECT COUNT(DISTINCT c.id_personnageIA) AS count
         FROM {SCHEMA}.conversation c
@@ -139,4 +147,4 @@ class StatsDao:
 
         if result is None:
             return 0
-        return result['count']
+        return result["count"]

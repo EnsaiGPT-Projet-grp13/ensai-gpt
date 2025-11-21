@@ -6,6 +6,7 @@ from objects.personnage_ia import PersonnageIA
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
+
 class PersonnageIADao:
     """DAO pour la table personnageIA (sans table d'association)."""
 
@@ -85,6 +86,7 @@ class PersonnageIADao:
             row = cur.fetchone()
         self.conn.commit()
         return PersonnageIA(**row) if row else None
+
     def delete(self, pid: int) -> bool:
         """
         Supprime un personnage IA et tout ce qui est lié :
@@ -146,9 +148,6 @@ class PersonnageIADao:
         except Exception:
             self.conn.rollback()
             raise
-
-
-        
 
     # --- Listes --------------------------------------------------------------
     def list_standards(self) -> List[PersonnageIA]:

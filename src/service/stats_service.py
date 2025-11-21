@@ -1,6 +1,7 @@
 from typing import Any, Dict
 from dao.stats_dao import StatsDao
 
+
 class StatsService:
     """Service métier pour regrouper les statistiques utilisateur."""
 

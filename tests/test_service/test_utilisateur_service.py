@@ -5,6 +5,7 @@ from service.utilisateur_service import UtilisateurService, DEFAULT_PERSONAS
 from utils.securite import hash_password
 from objects.utilisateur import Utilisateur
 
+
 @pytest.fixture
 def service_utilisateur():
     """
@@ -79,13 +80,17 @@ def test_creer_echoue_si_email_invalide(service_utilisateur, monkeypatch):
     def fake_is_valid_email(mail):
         raise ValueError("email invalide")
 
-    monkeypatch.setattr("service.utilisateur_service.is_valid_email", fake_is_valid_email)
+    monkeypatch.setattr(
+        "service.utilisateur_service.is_valid_email", fake_is_valid_email
+    )
     monkeypatch.setattr("service.utilisateur_service.is_valid_password", lambda p: True)
 
     service_utilisateur.dao.exists_mail.return_value = False
 
     with pytest.raises(ValueError):
-        service_utilisateur.creer("Alice", "Test", "mauvais_mail", "secret", "2000-01-01")
+        service_utilisateur.creer(
+            "Alice", "Test", "mauvais_mail", "secret", "2000-01-01"
+        )
 
     service_utilisateur.dao.create.assert_not_called()
 
@@ -96,7 +101,9 @@ def test_creer_echoue_si_mdp_invalide(service_utilisateur, monkeypatch):
     def fake_is_valid_password(p):
         raise ValueError("mdp invalide")
 
-    monkeypatch.setattr("service.utilisateur_service.is_valid_password", fake_is_valid_password)
+    monkeypatch.setattr(
+        "service.utilisateur_service.is_valid_password", fake_is_valid_password
+    )
 
     service_utilisateur.dao.exists_mail.return_value = False
 
@@ -156,7 +163,9 @@ def test_supprimer_delegue_delete(service_utilisateur):
     service_utilisateur.dao.delete.assert_called_once_with(1)
 
 
-def test_modifier_sans_rehash_appelle_update_et_retourne_utilisateur(service_utilisateur):
+def test_modifier_sans_rehash_appelle_update_et_retourne_utilisateur(
+    service_utilisateur,
+):
     u = Utilisateur(1, "A", "A", "a@test.com", "HASH", "2000-01-01")
     service_utilisateur.dao.update.return_value = True
 
@@ -205,13 +214,17 @@ def test_se_connecter_retourne_user_si_mdp_valide_salt_email(service_utilisateur
     u = Utilisateur(1, "A", "A", mail, hashed, "2000-01-01")
     service_utilisateur.dao.find_by_mail.return_value = u
 
-    user = service_utilisateur.se_connecter("A@test.com", mdp_clair)  # test normalisation
+    user = service_utilisateur.se_connecter(
+        "A@test.com", mdp_clair
+    )  # test normalisation
 
     assert user is u
     service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
 
 
-def test_se_connecter_retourne_user_si_mdp_valide_ancien_hash_sans_sel(service_utilisateur):
+def test_se_connecter_retourne_user_si_mdp_valide_ancien_hash_sans_sel(
+    service_utilisateur,
+):
     mdp_clair = "secret"
     hashed_nosalt = hash_password(mdp_clair)  # ancien format
     u = Utilisateur(1, "A", "A", "a@test.com", hashed_nosalt, "2000-01-01")
@@ -232,7 +245,6 @@ def test_se_connecter_retourne_none_si_mdp_invalide(service_utilisateur):
 
     assert user is None
     service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
-
 
 
 def test_mail_deja_utilise_delegue_exists_mail(service_utilisateur):
@@ -257,7 +269,14 @@ def test_changer_email_retourne_false_si_user_introuvable(service_utilisateur):
 
 def test_changer_email_retourne_false_si_mdp_incorrect(service_utilisateur):
     # utilisateur avec mail old@test.com et hash qui ne correspond pas à "mdp"
-    u = Utilisateur(1, "A", "A", "old@test.com", hash_password("autre", "old@test.com"), "2000-01-01")
+    u = Utilisateur(
+        1,
+        "A",
+        "A",
+        "old@test.com",
+        hash_password("autre", "old@test.com"),
+        "2000-01-01",
+    )
     service_utilisateur.dao.find_by_id.return_value = u
 
     ok, msg = service_utilisateur.changer_email(1, "new@test.com", "mdp")
@@ -268,7 +287,9 @@ def test_changer_email_retourne_false_si_mdp_incorrect(service_utilisateur):
     service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
-def test_changer_email_retourne_false_si_nouvel_email_invalide(service_utilisateur, monkeypatch):
+def test_changer_email_retourne_false_si_nouvel_email_invalide(
+    service_utilisateur, monkeypatch
+):
     old_mail = "old@test.com"
     u = Utilisateur(1, "A", "A", old_mail, hash_password("mdp", old_mail), "2000-01-01")
     service_utilisateur.dao.find_by_id.return_value = u
@@ -276,7 +297,9 @@ def test_changer_email_retourne_false_si_nouvel_email_invalide(service_utilisate
     def fake_is_valid_email(mail):
         raise ValueError("format invalide")
 
-    monkeypatch.setattr("service.utilisateur_service.is_valid_email", fake_is_valid_email)
+    monkeypatch.setattr(
+        "service.utilisateur_service.is_valid_email", fake_is_valid_email
+    )
 
     ok, msg = service_utilisateur.changer_email(1, "new@", "mdp")
 
@@ -287,7 +310,9 @@ def test_changer_email_retourne_false_si_nouvel_email_invalide(service_utilisate
     service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
-def test_changer_email_retourne_false_si_nouvel_email_deja_pris(service_utilisateur, monkeypatch):
+def test_changer_email_retourne_false_si_nouvel_email_deja_pris(
+    service_utilisateur, monkeypatch
+):
     old_mail = "old@test.com"
     u = Utilisateur(1, "A", "A", old_mail, hash_password("mdp", old_mail), "2000-01-01")
     service_utilisateur.dao.find_by_id.return_value = u
@@ -303,7 +328,9 @@ def test_changer_email_retourne_false_si_nouvel_email_deja_pris(service_utilisat
     service_utilisateur.dao.update_mot_de_passe.assert_not_called()
 
 
-def test_changer_email_retourne_false_si_update_echoue(service_utilisateur, monkeypatch):
+def test_changer_email_retourne_false_si_update_echoue(
+    service_utilisateur, monkeypatch
+):
     old_mail = "old@test.com"
     new_mail = "new@test.com"
     u = Utilisateur(1, "A", "A", old_mail, hash_password("mdp", old_mail), "2000-01-01")
@@ -346,4 +373,6 @@ def test_changer_email_succes(service_utilisateur, monkeypatch):
     assert u.mail == new_mail
     expected_hash = hash_password(mdp, new_mail)
     service_utilisateur.dao.update_mail_utilisateur.assert_called_once_with(u)
-    service_utilisateur.dao.update_mot_de_passe.assert_called_once_with(1, expected_hash)
+    service_utilisateur.dao.update_mot_de_passe.assert_called_once_with(
+        1, expected_hash
+    )

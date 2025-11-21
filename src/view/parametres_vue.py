@@ -30,10 +30,12 @@ class ParametresVue(VueAbstraite):
 
             if choix == "Paramètres utilisateur":
                 from view.parametres_utilisateur_vue import ParametresUtilisateurVue
+
                 return ParametresUtilisateurVue()
 
             if choix == "Paramètres personnages IA":
                 from view.parametres_perso_ia_vue import ParametresPersoIAVue
+
                 return ParametresPersoIAVue()
 
             # Annuler

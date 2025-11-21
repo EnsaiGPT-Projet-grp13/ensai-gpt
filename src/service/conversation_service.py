@@ -19,7 +19,9 @@ LLM_TOP_P = os.getenv("LLM_TOP_P", 1.0)
 LLM_TEMPERATURE = os.getenv("LLM_TEMPERATURE", 0.7)
 
 
-API_URL = os.getenv("API_URL", "https://ensai-gpt-109912438483.europe-west4.run.app/generate")
+API_URL = os.getenv(
+    "API_URL", "https://ensai-gpt-109912438483.europe-west4.run.app/generate"
+)
 
 
 def _gen_token(n: int = 16) -> str:
@@ -92,21 +94,31 @@ class ConversationService:
         """Supprimer une conversation."""
         return self.conv_dao.delete(c.id_conversation)
 
-    def liste_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25):
+    def liste_proprietaire_pour_utilisateur(
+        self, id_utilisateur: int, limite: int = 25
+    ):
         """Liste des conversations dont l'utilisateur est propriétaire."""
-        return self.conv_dao.liste_proprietaire_pour_utilisateur(id_utilisateur, limite=limite)
+        return self.conv_dao.liste_proprietaire_pour_utilisateur(
+            id_utilisateur, limite=limite
+        )
 
     def liste_accessible_pour_utilisateur(self, id_utilisateur: int, limite: int = 50):
         """Liste des conversations accessibles."""
-        return self.conv_dao.liste_accessible_pour_utilisateur(id_utilisateur, limite=limite)
+        return self.conv_dao.liste_accessible_pour_utilisateur(
+            id_utilisateur, limite=limite
+        )
 
-    def liste_resumee_proprietaire_pour_utilisateur(self, id_utilisateur: int, limite: int = 25):
+    def liste_resumee_proprietaire_pour_utilisateur(
+        self, id_utilisateur: int, limite: int = 25
+    ):
         """Liste résumée (titre + nom personnage) des conversations dont l'utilisateur est propriétaire."""
         return self.conv_dao.liste_resumee_proprietaire_pour_utilisateur(
             id_utilisateur, limite=limite
         )
 
-    def liste_resumee_accessible_pour_utilisateur(self, id_utilisateur: int, limite: int = 50):
+    def liste_resumee_accessible_pour_utilisateur(
+        self, id_utilisateur: int, limite: int = 50
+    ):
         """Liste résumée (titre + nom personnage) des conversations auxquelles l'utilisateur a accès."""
         return self.conv_dao.liste_resumee_accessible_pour_utilisateur(
             id_utilisateur, limite=limite
@@ -119,12 +131,16 @@ class ConversationService:
     # --------------------------------------------------------------------- #
     # Construction payload API
     # --------------------------------------------------------------------- #
-    def build_history(self, personnage: Dict[str, Any], cid: int) -> List[Dict[str, str]]:
+    def build_history(
+        self, personnage: Dict[str, Any], cid: int
+    ) -> List[Dict[str, str]]:
         """
         Construit l'historique complet au format attendu par l'API :
         [{role:'system'|'user'|'assistant', content:'...'}, ...]
         """
-        history: List[Dict[str, str]] = [{"role": "system", "content": personnage["system_prompt"]}]
+        history: List[Dict[str, str]] = [
+            {"role": "system", "content": personnage["system_prompt"]}
+        ]
         for m in self.msg_dao.list_for_conversation(cid):
             role = "assistant" if m.expediteur == "IA" else "user"
             history.append({"role": role, "content": m.contenu})
@@ -289,7 +305,9 @@ class ConversationService:
         )
 
         # 2) payload
-        payload = self._make_payload(personnage, cid, temperature, top_p, max_tokens, stop=stop)
+        payload = self._make_payload(
+            personnage, cid, temperature, top_p, max_tokens, stop=stop
+        )
 
         # 3) appel API
         try:

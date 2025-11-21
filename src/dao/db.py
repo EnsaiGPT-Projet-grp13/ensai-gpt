@@ -3,7 +3,7 @@ import sys
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from dotenv import load_dotenv, find_dotenv
 from utils.singleton import Singleton
@@ -23,9 +23,9 @@ class DBConnection(metaclass=Singleton):
 
         host = os.environ.get("POSTGRES_HOST", "").strip()
         port = int(os.environ.get("POSTGRES_PORT", "5432").strip())
-        db   = os.environ.get("POSTGRES_DATABASE", "").strip()
+        db = os.environ.get("POSTGRES_DATABASE", "").strip()
         user = os.environ.get("POSTGRES_USER", "").strip()
-        pwd  = os.environ.get("POSTGRES_PASSWORD", "").strip()
+        pwd = os.environ.get("POSTGRES_PASSWORD", "").strip()
         schema = os.environ.get("POSTGRES_SCHEMA", "projetGPT").strip()
 
         self.__connection = psycopg2.connect(

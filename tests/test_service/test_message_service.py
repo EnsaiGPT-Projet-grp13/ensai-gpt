@@ -55,8 +55,20 @@ def test_affichage_message_aucun_message():
 
 def test_affichage_message_messages():
     msgs = [
-        Message(id_message=1, id_conversation=1, expediteur="utilisateur", id_utilisateur=1, contenu="Hello"),
-        Message(id_message=2, id_conversation=1, expediteur="IA", id_utilisateur=None, contenu="Salut !"),
+        Message(
+            id_message=1,
+            id_conversation=1,
+            expediteur="utilisateur",
+            id_utilisateur=1,
+            contenu="Hello",
+        ),
+        Message(
+            id_message=2,
+            id_conversation=1,
+            expediteur="IA",
+            id_utilisateur=None,
+            contenu="Salut !",
+        ),
     ]
 
     class FakeDao:

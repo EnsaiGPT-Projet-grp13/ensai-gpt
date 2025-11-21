@@ -28,7 +28,9 @@ class AfficherConversationVue(VueAbstraite):
 
             conv_svc = ConversationService()
             # Renvoie une liste de RealDictRow (donc des dict)
-            conversations = conv_svc.liste_resumee_proprietaire_pour_utilisateur(uid, limite=25)
+            conversations = conv_svc.liste_resumee_proprietaire_pour_utilisateur(
+                uid, limite=25
+            )
 
             if not conversations:
                 return MenuUtilisateurVue("Vous n'avez aucune conversation.")
@@ -46,10 +48,12 @@ class AfficherConversationVue(VueAbstraite):
                 if date:
                     label += f" ({date})"
 
-                choices.append({
-                    "name": label,
-                    "value": conv["id_conversation"],  # on passe l'ID en value
-                })
+                choices.append(
+                    {
+                        "name": label,
+                        "value": conv["id_conversation"],  # on passe l'ID en value
+                    }
+                )
 
             choices.append({"name": "Retour", "value": None})
 
@@ -68,4 +72,6 @@ class AfficherConversationVue(VueAbstraite):
 
         except Exception as e:
             print("[AfficherConversationVue] Exception :", repr(e))
-            return MenuUtilisateurVue("Une erreur est survenue, retour au menu principal.")
+            return MenuUtilisateurVue(
+                "Une erreur est survenue, retour au menu principal."
+            )

@@ -5,6 +5,7 @@ from dao.db import DBConnection
 
 SCHEMA = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
+
 class SessionDao:
     """
     DAO pour gérer les sessions utilisateurs :
@@ -25,7 +26,7 @@ class SessionDao:
                 VALUES (%s)
                 RETURNING id_session;
                 """,
-                (id_utilisateur,)
+                (id_utilisateur,),
             )
             row = cur.fetchone()
         self.conn.commit()
@@ -40,7 +41,7 @@ class SessionDao:
                 SET ended_at = NOW()
                 WHERE id_session = %s AND ended_at IS NULL;
                 """,
-                (id_session,)
+                (id_session,),
             )
             updated = cur.rowcount
         self.conn.commit()
@@ -58,11 +59,13 @@ class SessionDao:
                 ORDER BY started_at DESC
                 LIMIT 1;
                 """,
-                (id_utilisateur,)
+                (id_utilisateur,),
             )
             return cur.fetchone()
 
-    def list_by_user(self, id_utilisateur: int, limit: int = 50) -> List[Dict[str, Any]]:
+    def list_by_user(
+        self, id_utilisateur: int, limit: int = 50
+    ) -> List[Dict[str, Any]]:
         """Liste les sessions (anciennes et actives) d’un utilisateur."""
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
@@ -73,6 +76,6 @@ class SessionDao:
                 ORDER BY started_at DESC
                 LIMIT %s;
                 """,
-                (id_utilisateur, limit)
+                (id_utilisateur, limit),
             )
             return cur.fetchall() or []

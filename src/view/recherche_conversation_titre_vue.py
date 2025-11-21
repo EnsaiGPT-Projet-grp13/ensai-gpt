@@ -17,25 +17,33 @@ class RechercheConversationTitreVue(VueAbstraite):
 
     def choisir_menu(self):
         """Recherche de conversations par mots dans le titre."""
-        print("\n" + "-" * 50 + "\nRecherche conversation par titre\n" + "-" * 50 + "\n")
+        print(
+            "\n" + "-" * 50 + "\nRecherche conversation par titre\n" + "-" * 50 + "\n"
+        )
         s = Session()
         id_utilisateur = s.utilisateur.get("id_utilisateur")
 
         conv_svc = ConversationService()
 
         # On vérifie qu'il existe au moins une conversation accessible
-        conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(id_utilisateur)
+        conversations = conv_svc.liste_resumee_accessible_pour_utilisateur(
+            id_utilisateur
+        )
         if not conversations:
             from view.menu_utilisateur_vue import MenuUtilisateurVue
+
             return MenuUtilisateurVue("Aucune conversation dans l'historique.")
 
         # Saisie du motif dans le titre
-        mots = (inquirer.text(
-            message="Quel titre recherchez-vous ? :"
-        ).execute() or "").strip().lower()
+        mots = (
+            (inquirer.text(message="Quel titre recherchez-vous ? :").execute() or "")
+            .strip()
+            .lower()
+        )
 
         if not mots:
             from view.historique_vue import HistoriqueVue
+
             return HistoriqueVue("Recherche annulée (titre vide).")
 
         # Recherche des conversations dont le titre contient ces mots
@@ -43,14 +51,21 @@ class RechercheConversationTitreVue(VueAbstraite):
 
         if not listes_titres:
             from view.historique_vue import HistoriqueVue
-            return HistoriqueVue("Aucune conversation ne contient ces mots dans le titre.")
+
+            return HistoriqueVue(
+                "Aucune conversation ne contient ces mots dans le titre."
+            )
 
         # Construction des choix pour Inquirer (sans afficher l'ID)
         choices = []
         for c in listes_titres:
             cid = c.get("id_conversation")
             titre = c.get("titre") or "(sans titre)"
-            perso = c.get("personnageIA_name") or c.get("personnage_name") or "Personnage inconnu"
+            perso = (
+                c.get("personnageIA_name")
+                or c.get("personnage_name")
+                or "Personnage inconnu"
+            )
 
             label = f"{titre} avec {perso}"
             choices.append({"name": label, "value": cid})
@@ -64,10 +79,12 @@ class RechercheConversationTitreVue(VueAbstraite):
 
         if cid_choisi is None:
             from view.historique_vue import HistoriqueVue
+
             return HistoriqueVue()
 
         # On mémorise simplement l'id de la conversation en session
         s.conversation_id = cid_choisi
 
         from view.parametres_conversation_vue import ParametresConversationVue
+
         return ParametresConversationVue()

@@ -32,13 +32,14 @@ class ChoisirPersonnageVue(VueAbstraite):
             uid = self.session_svc.get_user_id()
             persos = self.perso_svc.list_for_user(uid)
             if not persos:
-                return MenuUtilisateurVue("Aucun personnage disponible. Créez-en un d'abord.")
+                return MenuUtilisateurVue(
+                    "Aucun personnage disponible. Créez-en un d'abord."
+                )
 
             # 1) Sélection du personnage (+ option Retour)
             choices = [p.name for p in persos] + ["Retour"]
             label = inquirer.select(
-                message="Choisir un personnage :",
-                choices=choices
+                message="Choisir un personnage :", choices=choices
             ).execute()
 
             if label == "Retour":
@@ -62,8 +63,7 @@ class ChoisirPersonnageVue(VueAbstraite):
             default_title = f"Chat avec {perso.name}"
             titre = (
                 inquirer.text(
-                    message="Titre de la conversation :",
-                    default=default_title
+                    message="Titre de la conversation :", default=default_title
                 ).execute()
                 or ""
             ).strip() or default_title
@@ -77,7 +77,7 @@ class ChoisirPersonnageVue(VueAbstraite):
             if mode == "Retour":
                 return MenuUtilisateurVue("Retour au menu.")
 
-            is_collab = (mode == "Collaboratif")
+            is_collab = mode == "Collaboratif"
 
             # 5) Création de la conversation via le SERVICE
             conv = self.conv_svc.start(
@@ -100,9 +100,12 @@ class ChoisirPersonnageVue(VueAbstraite):
             )
 
             # 7) Première question (Entrée vide pour quitter)
-            texte = inquirer.text(
-                message=f"[{perso.name}] Première question ? (Entrée vide pour quitter) :"
-            ).execute() or ""
+            texte = (
+                inquirer.text(
+                    message=f"[{perso.name}] Première question ? (Entrée vide pour quitter) :"
+                ).execute()
+                or ""
+            )
             if not texte.strip():
                 return MenuUtilisateurVue("Conversation annulée.")
 
@@ -111,4 +114,6 @@ class ChoisirPersonnageVue(VueAbstraite):
         except Exception as e:
             print("\n[ChoisirPersonnageVue] Exception :", repr(e))
             print(traceback.format_exc())
-            return MenuUtilisateurVue("Erreur pendant la sélection du personnage (voir logs).")
+            return MenuUtilisateurVue(
+                "Erreur pendant la sélection du personnage (voir logs)."
+            )

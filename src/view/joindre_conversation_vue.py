@@ -42,7 +42,9 @@ class JoindreConversationVue(VueAbstraite):
                 # On tente de rejoindre la conversation via le SERVICE
                 conv = self.service.join_by_token(user_id, token)
                 if not conv:
-                    print("Token invalide ou conversation non collaborative. Réessaie.\n")
+                    print(
+                        "Token invalide ou conversation non collaborative. Réessaie.\n"
+                    )
                     continue  # on redemande un token
 
                 # Conversation OK : mise à jour de la session

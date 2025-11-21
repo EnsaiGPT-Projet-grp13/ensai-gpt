@@ -27,15 +27,19 @@ class StatistiquesVue(VueAbstraite):
             ["Total Conversations", total_conversations or "Aucune conversation"],
             [
                 "Moyenne Messages par Conversation",
-                f"{moyenne_messages_par_conversation:.2f}"
-                if moyenne_messages_par_conversation
-                else "Aucune donnée pour la moyenne",
+                (
+                    f"{moyenne_messages_par_conversation:.2f}"
+                    if moyenne_messages_par_conversation
+                    else "Aucune donnée pour la moyenne"
+                ),
             ],
             [
                 "Persona le plus utilisé",
-                ", ".join([p["name"] for p in persona_le_plus_utilise])
-                if persona_le_plus_utilise
-                else "Aucun persona utilisé",
+                (
+                    ", ".join([p["name"] for p in persona_le_plus_utilise])
+                    if persona_le_plus_utilise
+                    else "Aucun persona utilisé"
+                ),
             ],
             [
                 "Nombre de Personnages IA utilisés",

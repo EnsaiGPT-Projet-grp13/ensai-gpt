@@ -49,7 +49,9 @@ class PersonnageService:
     # ---------------------------------------------------------
     # Création
     # ---------------------------------------------------------
-    def create_personnage(self, uid: int, name: str, system_prompt: str) -> PersonnageIA:
+    def create_personnage(
+        self, uid: int, name: str, system_prompt: str
+    ) -> PersonnageIA:
         """
         Crée un personnage IA avec created_by = uid.
         """
@@ -146,7 +148,9 @@ class PersonnageService:
         return self.dao.delete(personnage_id)
 
     @log
-    def lister_personnages_ia_pour_utilisateur(self, user_id: int) -> list[PersonnageIA]:
+    def lister_personnages_ia_pour_utilisateur(
+        self, user_id: int
+    ) -> list[PersonnageIA]:
         """
         Retourne les personnages IA disponibles pour un utilisateur :
         - personnages standards

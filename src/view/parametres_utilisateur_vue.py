@@ -45,13 +45,15 @@ class ParametresUtilisateurVue(VueAbstraite):
                 mail = s.utilisateur.get("mail")
 
                 # 1) Ancien mot de passe
-                ancien = inquirer.secret(
-                    message="Ancien mot de passe :"
-                ).execute() or ""
+                ancien = (
+                    inquirer.secret(message="Ancien mot de passe :").execute() or ""
+                )
 
                 # Si vide -> on annule proprement
                 if not ancien:
-                    return ParametresUtilisateurVue("Changement de mot de passe annulé.")
+                    return ParametresUtilisateurVue(
+                        "Changement de mot de passe annulé."
+                    )
 
                 # Vérifier immédiatement l’ancien mot de passe
                 user_ok = UtilisateurService().se_connecter(mail, ancien)
@@ -60,36 +62,46 @@ class ParametresUtilisateurVue(VueAbstraite):
                     return ParametresUtilisateurVue("Ancien mot de passe incorrect.")
 
                 # 2) Nouveau mot de passe
-                nouveau = inquirer.secret(
-                    message="Nouveau mot de passe :"
-                ).execute() or ""
+                nouveau = (
+                    inquirer.secret(message="Nouveau mot de passe :").execute() or ""
+                )
 
-                confirmation = inquirer.secret(
-                    message="Confirmez le nouveau mot de passe :"
-                ).execute() or ""
+                confirmation = (
+                    inquirer.secret(
+                        message="Confirmez le nouveau mot de passe :"
+                    ).execute()
+                    or ""
+                )
 
                 if nouveau != confirmation:
-                    return ParametresUtilisateurVue("Les mots de passe ne correspondent pas.")
+                    return ParametresUtilisateurVue(
+                        "Les mots de passe ne correspondent pas."
+                    )
 
                 # 3) Appel du service (validation + hash + update)
                 ok, msg = svc.changer_mot_de_passe(uid, ancien, nouveau)
                 return ParametresUtilisateurVue(msg)
 
-
             # -----------------------------
             # Changer e-mail
             # -----------------------------
             if choix == "Changer e-mail":
-                nouvel_email = inquirer.text(
-                    message="Nouvel e-mail (Entrée vide pour annuler) :"
-                ).execute() or ""
+                nouvel_email = (
+                    inquirer.text(
+                        message="Nouvel e-mail (Entrée vide pour annuler) :"
+                    ).execute()
+                    or ""
+                )
 
                 if not nouvel_email.strip():
                     return ParametresUtilisateurVue("Changement d'e-mail annulé.")
 
-                mdp = inquirer.secret(
-                    message="Mot de passe actuel (Entrée vide pour annuler) :"
-                ).execute() or ""
+                mdp = (
+                    inquirer.secret(
+                        message="Mot de passe actuel (Entrée vide pour annuler) :"
+                    ).execute()
+                    or ""
+                )
 
                 if not mdp:
                     return ParametresUtilisateurVue("Changement d'e-mail annulé.")
@@ -98,15 +110,16 @@ class ParametresUtilisateurVue(VueAbstraite):
                 return ParametresUtilisateurVue(msg)
 
             # ----------------------------- #
-            # Changer identité (prénom + nom) 
+            # Changer identité (prénom + nom)
             # -----------------------------
             if choix == "Changer identité (prénom + nom)":
-                nouveau_prenom = inquirer.text(message="Nouveau prénom :").execute() or ""
+                nouveau_prenom = (
+                    inquirer.text(message="Nouveau prénom :").execute() or ""
+                )
                 nouveau_nom = inquirer.text(message="Nouveau nom :").execute() or ""
                 ok, msg = svc.changer_identite(uid, nouveau_prenom, nouveau_nom)
-                
-                return ParametresUtilisateurVue(msg)
 
+                return ParametresUtilisateurVue(msg)
 
             # -----------------------------
             # Retour

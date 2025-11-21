@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
         except Exception as e:
             # >>> ICI le except (autour de la boucle) <<<
-            print(f"[EXC] {type(e).__name__}: {e}")         # diagnostic immédiat en console
+            print(f"[EXC] {type(e).__name__}: {e}")  # diagnostic immédiat en console
             logging.error(f"{type(e).__name__} : {e}", exc_info=True)
             nb_erreurs += 1
             vue_courante = AccueilVue(
