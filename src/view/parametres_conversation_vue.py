@@ -1,13 +1,14 @@
-from InquirerPy import inquirer
-from dataclasses import asdict
-import urllib.parse
 import os
+import urllib.parse
+from dataclasses import asdict
+
+from InquirerPy import inquirer
 
 from objects.session import Session
-from service.message_service import MessageService
-from service.personnage_service import PersonnageService
 from service.conversation_service import ConversationService
 from service.export_service import start_flask_server
+from service.message_service import MessageService
+from service.personnage_service import PersonnageService
 from view.vue_abstraite import VueAbstraite
 
 
@@ -29,6 +30,7 @@ class ParametresConversationVue(VueAbstraite):
             s = Session()
             if s.conversation_id is None:
                 from view.historique_vue import HistoriqueVue
+
                 return HistoriqueVue("Aucune conversation sélectionnée.")
             id_conversation = s.conversation_id
 
@@ -57,10 +59,12 @@ class ParametresConversationVue(VueAbstraite):
                 if personnage is not None:
                     s.personnage = asdict(personnage)
                     from view.reponse_ia_vue import ReponseIAVue
+
                     return ReponseIAVue()
                 else:
                     print(f"Erreur : Le personnage avec l'ID {id_personnage} n'existe pas ou plus.")
                     from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                     return MenuUtilisateurVue("Personnage non trouvé")
 
             # -------------------------------------------------
@@ -70,7 +74,9 @@ class ParametresConversationVue(VueAbstraite):
                 print(
                     "\n" + "-" * 50 + f"\n Conversation : {conversation.titre}\n" + "-" * 50 + "\n"
                 )
-                MessageService().affichage_message_conversation(id_conversation)
+                texte = MessageService().affichage_message_conversation(id_conversation)
+                print(texte)
+                input("\nAppuyez sur Entrée pour revenir aux paramètres...")
                 return ParametresConversationVue()
 
             # -------------------------------------------------
@@ -105,6 +111,7 @@ class ParametresConversationVue(VueAbstraite):
                 )
 
                 import requests
+
                 r = requests.get(url_telechargement)
 
                 dossier_exports = "exports"
@@ -119,6 +126,7 @@ class ParametresConversationVue(VueAbstraite):
                     message = f"Erreur {r.status_code} : {r.text[:200]}"
 
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                 return MenuUtilisateurVue(message)
 
             # -------------------------------------------------
@@ -127,6 +135,7 @@ class ParametresConversationVue(VueAbstraite):
             if choix == "Supprimer la conversation":
                 ConversationService().supprimer(conversation)
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                 return MenuUtilisateurVue(f"Vous avez supprimé la conversation « {titre} ».")
 
             # -------------------------------------------------
@@ -134,12 +143,15 @@ class ParametresConversationVue(VueAbstraite):
             # -------------------------------------------------
             if choix == "Retour":
                 from view.menu_utilisateur_vue import MenuUtilisateurVue
+
                 return MenuUtilisateurVue()
 
             from view.menu_utilisateur_vue import MenuUtilisateurVue
+
             return MenuUtilisateurVue()
 
         except Exception as e:
             print("[ParametresConversationVue] Exception :", repr(e))
             from view.menu_utilisateur_vue import MenuUtilisateurVue
+
             return MenuUtilisateurVue("Erreur dans les options de conversation.")
