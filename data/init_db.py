@@ -49,16 +49,6 @@ CREATE TABLE IF NOT EXISTS personnageIA (
 );
 
 -- ================================
--- Table : SESSION
--- ================================
-CREATE TABLE IF NOT EXISTS session (
-    id_session     SERIAL PRIMARY KEY,
-    id_utilisateur INTEGER NOT NULL REFERENCES utilisateur(id_utilisateur) ON DELETE CASCADE,
-    started_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    ended_at       TIMESTAMPTZ DEFAULT NULL
-);
-
--- ================================
 -- Table : CONVERSATION
 -- ================================
 CREATE TABLE IF NOT EXISTS conversation (
@@ -100,9 +90,6 @@ CREATE TABLE IF NOT EXISTS conv_utilisateur (
 -- ================================
 DROP INDEX IF EXISTS idx_utilisateur_mail;
 CREATE INDEX idx_utilisateur_mail ON utilisateur(mail);
-
-DROP INDEX IF EXISTS idx_session_user;
-CREATE INDEX idx_session_user ON session(id_utilisateur);
 
 DROP INDEX IF EXISTS idx_conversation_personnageIA;
 CREATE INDEX idx_conversation_personnageIA ON conversation(id_personnageIA);
