@@ -229,41 +229,34 @@ class ConversationDao:
             return cur.fetchall() or []
 
     def affichage_message_conversation(
-        self, id_utilisateur: int, limite: int = 50
-    ) -> List[Dict[str, Any]]:
-        """Renvoie un résumé des conversations (id + titre + nom personnageIA) dont l’utilisateur a l'accès."""
-        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                f"""
-                SELECT
-                c.id_conversation,
-                c.titre,
-                c.updated_at,
-                c.created_at,
-                p.name AS "personnage_name"
-                FROM {SCHEMA}.conversation c
-                JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
-                WHERE c.id_proprio = %s
-
-                UNION
-
-                SELECT
-                c.id_conversation,
-                c.titre,
-                c.updated_at,
-                c.created_at,
-                p.name AS "personnage_name"
-                FROM {SCHEMA}.conversation c
-                JOIN {SCHEMA}.personnageIA p ON p.id_personnageIA = c.id_personnageIA
-                JOIN {SCHEMA}.conv_utilisateur cu ON cu.id_conversation = c.id_conversation
-                WHERE cu.id_utilisateur = %s
-
-                ORDER BY updated_at DESC
-                LIMIT %s
-                """,
-                (id_utilisateur, id_utilisateur, limite),
-            )
-            return cur.fetchall() or []
+            self,
+            id_conversation: int
+        ) -> List[Dict[str, Any]]:
+            """
+            Renvoie tous les messages d'une conversation (collaborative ou non),
+            avec les infos éventuelles sur l'utilisateur (prenom/nom).
+            """
+            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(
+                    f"""
+                    SELECT
+                        m.id_message,
+                        m.id_conversation,
+                        m.expediteur,
+                        m.id_utilisateur,
+                        u.prenom,
+                        u.nom,
+                        m.contenu,
+                        m.created_at
+                    FROM {SCHEMA}.message m
+                    LEFT JOIN {SCHEMA}.utilisateur u
+                    ON u.id_utilisateur = m.id_utilisateur
+                    WHERE m.id_conversation = %s
+                    ORDER BY m.created_at ASC, m.id_message ASC
+                    """,
+                    (id_conversation,),
+                )
+                return cur.fetchall() or []
 
 
     def touch(self, cid: int) -> None:
