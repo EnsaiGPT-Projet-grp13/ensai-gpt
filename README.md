@@ -30,7 +30,7 @@ source ~/work/ensai-gpt/.venv/bin/activate
 pip install -r requirements.txt
 ````
 
-## **3- Configurer la base de données**
+### **3- Configurer la base de données**
 
  Dans la racine, créer un fichier .env et copier les lignes suivantes :
 
