@@ -1,6 +1,5 @@
 from dao.utilisateur_dao import UtilisateurDao
 from dao.personnage_ia_dao import PersonnageIADao
-from objects.personnage_ia import PersonnageIA
 
 from tests.test_dao.helpers_dao import (
     create_test_user,
