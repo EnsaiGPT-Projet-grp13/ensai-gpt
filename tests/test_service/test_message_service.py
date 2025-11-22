@@ -52,8 +52,8 @@ def test_affichage_message_aucun_message():
 
     assert result == "Aucun message trouvé pour cette conversation."
 
-
 def test_affichage_message_messages():
+    # Messages factices
     msgs = [
         Message(
             id_message=1,
@@ -76,9 +76,9 @@ def test_affichage_message_messages():
             assert id_conv == 1
             return msgs
 
-    message_service.MessageDao = FakeDao
-
     service = MessageService()
+    service.message_dao = FakeDao()
+
     result = service.affichage_message_conversation(1)
 
     assert "Message de utilisateur : Hello" in result

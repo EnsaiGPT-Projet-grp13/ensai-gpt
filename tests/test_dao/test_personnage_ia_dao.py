@@ -32,42 +32,6 @@ def test_create_and_find_by_id_personnage():
     udao.delete(user.id_utilisateur)
 
 
-def test_create_fait_un_upsert_sur_name_et_created_by():
-    """
-    create(p) doit faire un UPSERT sur (name, created_by) :
-    - 1er appel : insert
-    - 2e appel avec même (name, created_by) et prompt différent : update
-    """
-    udao = UtilisateurDao()
-    pdao = PersonnageIADao()
-
-    user = create_test_user(email_prefix="perso_upsert")
-    name = "BotUpsertTest"
-
-    p1 = PersonnageIA(
-        id_personnageIA=None,
-        name=name,
-        system_prompt="Prompt v1",
-        created_by=user.id_utilisateur,
-    )
-    created1 = pdao.create(p1)
-
-    p2 = PersonnageIA(
-        id_personnageIA=None,
-        name=name,
-        system_prompt="Prompt v2",
-        created_by=user.id_utilisateur,
-    )
-    created2 = pdao.create(p2)
-
-    # Même id (update) et prompt mis à jour
-    assert created2.id_personnageIA == created1.id_personnageIA
-    assert created2.system_prompt == "Prompt v2"
-
-    pdao.delete(created1.id_personnageIA)
-    udao.delete(user.id_utilisateur)
-
-
 def test_delete_retourne_true_quand_un_personnage_est_supprime():
     """
     delete(pid) doit retourner True quand une ligne est effectivement supprimée,

@@ -61,11 +61,6 @@ def test_get_by_id_retourne_none_si_inexistant(service_personnage):
     dao_mock.find_by_id.assert_called_once_with(1234)
 
 
-# =========================
-# Tests de create_personnage
-# =========================
-
-
 def test_create_personnage_construit_objet_et_appelle_create(service_personnage):
     dao_mock = Mock()
     fake_perso = PersonnageIA(

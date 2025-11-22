@@ -25,7 +25,7 @@ def test_nbre_conv_utilisateurs_retourne_un_entier():
     assert res >= 0
 
 
-def test_moyenne_msg_par_conv_retourne_un_nombre():
+def test_moyenne_msg_par_conv_retourne_un_positif():
     """
     Vérifie que moyenne_msg_par_conv retourne un nombre (float ou int) >= 0.
     Dans ta situation actuelle, ce sera probablement 0.0.
