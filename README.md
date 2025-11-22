@@ -6,25 +6,8 @@ Il met en œuvre une architecture en couches (DAO, service, view, business_objec
 Un module de **Chat IA** est intégré grâce à l’API :  
 👉 [API ENSAI-GPT](https://ensai-gpt-109912438483.europe-west4.run.app/docs#/default/chat_generate_post)
 
----
 
-## **Structure du Projet**
-
-### Dossier `data`
-Scripts SQL et initialisation de la base de données.
-
-### Dossier `src`
-Code source principal : objets métiers, DAO, services, vues CLI et API.
-
-### Dossier `tests`
-Tests unitaires et d’intégration (pytest).
-
-### Dossier `doc`
-Documentation technique, schémas et suivi du projet.
-
----
-
-## **Préparer l’environnement virtuel**
+## **Lancer l'application**
 
 ### **1- Initialiser l'environnement.**
 
@@ -81,8 +64,6 @@ Démarre l’interface en ligne de commande :
 python src/main.py
 ````
 
----
-
 ## **Tests unitaires**
 
 Exécuter :  
@@ -101,6 +82,22 @@ coverage html
 ````
 
 -> Ouvrir `coverage_report/index.html` pour un rapport détaillé.  
+
+## **Structure du Projet**
+
+### Dossier `data`
+Scripts SQL et initialisation de la base de données.
+
+### Dossier `src`
+Code source principal : objets métiers, DAO, services, vues CLI et API.
+
+### Dossier `tests`
+Tests unitaires et d’intégration (pytest).
+
+### Dossier `doc`
+Documentation technique, schémas et suivi du projet.
+
+---
 
 
 
