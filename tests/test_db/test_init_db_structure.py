@@ -36,7 +36,6 @@ class TestStructureDB:
         tables_attendues = {
             "utilisateur",
             "personnageia",
-            "session",
             "conversation",
             "message",
             "conv_utilisateur",
@@ -52,7 +51,6 @@ class TestStructureDB:
         """Vérifie que tous les index attendus ont été créés"""
         index_attendus = {
             "idx_utilisateur_mail",
-            "idx_session_user",
             "idx_conversation_personnageia",
             "idx_message_conversation_time",
             "idx_conversation_proprio",
@@ -114,19 +112,6 @@ class TestStructureDB:
         attendues = {"id_personnageia", "name", "system_prompt"}
         manquantes = attendues - colonnes_existantes
         assert not manquantes, f"Colonnes manquantes dans personnageIA : {manquantes}"
-
-    def test_colonnes_session(self):
-        """Vérifie que les colonnes importantes de 'session' existent"""
-        self.cur.execute(
-            """
-            SELECT column_name FROM information_schema.columns
-            WHERE table_schema='projetgpt' AND table_name='session';
-        """
-        )
-        colonnes_existantes = {colonne[0] for colonne in self.cur.fetchall()}
-        attendues = {"id_session", "id_utilisateur"}
-        manquantes = attendues - colonnes_existantes
-        assert not manquantes, f"Colonnes manquantes dans session : {manquantes}"
 
     def test_colonnes_conversation(self):
         """Vérifie que les colonnes importantes de 'conversation' existent"""

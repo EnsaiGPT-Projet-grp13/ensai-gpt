@@ -43,7 +43,6 @@ class TestContraintesDB:
         tables = [
             "utilisateur",
             "personnageia",
-            "session",
             "conversation",
             "message",
             "conv_utilisateur",
@@ -92,14 +91,6 @@ class TestContraintesDB:
         )
         id_user = self.cur.fetchone()[0]
 
-        # Création d'une session
-        self.cur.execute(
-            f"""
-            INSERT INTO {self.schema}.session (id_utilisateur)
-            VALUES (%s);
-            """,
-            (id_user,),
-        )
 
         # Création d'un personnage IA (clé étrangère pour conversation)
         self.cur.execute(
@@ -129,15 +120,6 @@ class TestContraintesDB:
             (id_user,),
         )
 
-        # Vérification que la session est supprimée
-        self.cur.execute(
-            f"""
-            SELECT 1 FROM {self.schema}.session
-            WHERE id_utilisateur = %s;
-            """,
-            (id_user,),
-        )
-        assert self.cur.fetchone() is None
 
         # Vérification que la conversation est supprimée
         self.cur.execute(

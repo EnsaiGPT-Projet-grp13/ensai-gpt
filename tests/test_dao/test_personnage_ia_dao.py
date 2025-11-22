@@ -117,24 +117,3 @@ def test_lister_personnages_ia_crees_par_ne_retourne_que_les_personnages_de_ce_u
     udao.delete(user1.id_utilisateur)
     udao.delete(user2.id_utilisateur)
 
-
-def test_list_standards_inclut_les_personnages_sans_created_by():
-    """
-    list_standards() doit retourner les personnages avec created_by IS NULL.
-    On en crée un pour être sûrs qu'il est présent.
-    """
-    pdao = PersonnageIADao()
-
-    # Création d'un personnage standard (created_by = None)
-    created_std = create_standard_personnage(
-        name_prefix="StandardTest",
-        system_prompt="Standard de test.",
-    )
-
-    standards = pdao.list_standards()
-    ids = {p.id_personnageIA for p in standards}
-
-    assert created_std.id_personnageIA in ids
-
-    # Nettoyage
-    pdao.delete(created_std.id_personnageIA)

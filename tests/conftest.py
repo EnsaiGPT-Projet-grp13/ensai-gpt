@@ -1,4 +1,3 @@
-# tests/conftest.py
 import os
 import sys
 from unittest import mock
@@ -6,10 +5,17 @@ from unittest.mock import patch
 
 import pytest
 
+
+# Ajoute src/ au PYTHONPATH pour que `dao`, `service`, `utils`, etc. soient trouvés
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))  # ../
+SRC_PATH = os.path.join(PROJECT_ROOT, "src")
+
+if SRC_PATH not in sys.path:
+    sys.path.insert(0, SRC_PATH)
+    
 # === Imports du projet ===
 from dao.utilisateur_dao import UtilisateurDao
 from objects.utilisateur import Utilisateur
-from utils.reset_database import ResetDatabase
 from utils.securite import hash_password
 
 # === Ajouter src/ au PYTHONPATH ===
@@ -30,10 +36,7 @@ def environnement_tests():
     """
     schema = os.getenv("POSTGRES_SCHEMA", "projetGPT")
 
-    with patch.dict(os.environ, {"SCHEMA": schema}):
-        # ResetDatabase.lancer ne fait plus rien, retourne juste True.
-        with mock.patch.object(ResetDatabase, "lancer", return_value=True):
-            yield
+
 
 
 @pytest.fixture

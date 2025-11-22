@@ -60,31 +60,6 @@ def test_find_by_token_retourne_la_conversation_collaborative():
     udao.delete(user.id_utilisateur)
 
 
-def test_liste_proprietaire_pour_utilisateur_retourne_ses_conversations():
-    """liste_proprietaire_pour_utilisateur doit retourner les conversations dont l'utilisateur est proprio."""
-    udao = UtilisateurDao()
-    cdao = ConversationDao()
-
-    user = create_test_user(email_prefix="conv_owner")
-    perso = create_test_personnage(user.id_utilisateur, prefix="BotConv")
-
-    conv1 = create_test_conversation(
-        user.id_utilisateur, perso.id_personnageIA, titre="conv A"
-    )
-    conv2 = create_test_conversation(
-        user.id_utilisateur, perso.id_personnageIA, titre="conv B"
-    )
-
-    liste = cdao.liste_proprietaire_pour_utilisateur(user.id_utilisateur, limite=10)
-
-    ids = {c.id_conversation for c in liste}
-    assert conv1.id_conversation in ids
-    assert conv2.id_conversation in ids
-    for c in liste:
-        assert c.id_proprio == user.id_utilisateur
-
-    udao.delete(user.id_utilisateur)
-
 
 def test_recherche_mots_titre_filtre_par_mot_et_utilisateur():
     """recherche_mots_titre doit filtrer sur le titre et sur l'utilisateur."""

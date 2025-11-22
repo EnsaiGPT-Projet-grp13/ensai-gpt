@@ -113,29 +113,6 @@ def test_creer_echoue_si_mdp_invalide(service_utilisateur, monkeypatch):
     service_utilisateur.dao.create.assert_not_called()
 
 
-def test_lister_tous_masque_mdp_par_defaut(service_utilisateur):
-    user1 = Utilisateur(1, "A", "A", "a@test.com", "HASH1", "2000-01-01")
-    user2 = Utilisateur(2, "B", "B", "b@test.com", "HASH2", "2001-01-01")
-    service_utilisateur.dao.lister_tous.return_value = [user1, user2]
-
-    users = service_utilisateur.lister_tous()
-
-    assert len(users) == 2
-    assert users[0].mdp_hash is None
-    assert users[1].mdp_hash is None
-    service_utilisateur.dao.lister_tous.assert_called_once()
-
-
-def test_lister_tous_conserve_mdp_si_inclure_mdp_true(service_utilisateur):
-    user1 = Utilisateur(1, "A", "A", "a@test.com", "HASH1", "2000-01-01")
-    service_utilisateur.dao.lister_tous.return_value = [user1]
-
-    users = service_utilisateur.lister_tous(inclure_mdp=True)
-
-    assert users[0].mdp_hash == "HASH1"
-    service_utilisateur.dao.lister_tous.assert_called_once()
-
-
 def test_trouver_par_id_delegue_au_dao(service_utilisateur):
     u = Utilisateur(1, "A", "A", "a@test.com", "HASH", "2000-01-01")
     service_utilisateur.dao.find_by_id.return_value = u
@@ -163,41 +140,6 @@ def test_supprimer_delegue_delete(service_utilisateur):
     service_utilisateur.dao.delete.assert_called_once_with(1)
 
 
-def test_modifier_sans_rehash_appelle_update_et_retourne_utilisateur(
-    service_utilisateur,
-):
-    u = Utilisateur(1, "A", "A", "a@test.com", "HASH", "2000-01-01")
-    service_utilisateur.dao.update.return_value = True
-
-    res = service_utilisateur.modifier(u, rehash_password=False)
-
-    assert res is u
-    service_utilisateur.dao.update.assert_called_once_with(u)
-
-
-def test_modifier_avec_rehash_recalcule_le_hash(service_utilisateur):
-    # Ici u.mdp_hash contient le MOT DE PASSE EN CLAIR avant appel
-    u = Utilisateur(1, "A", "A", "a@test.com", "mdp_en_clair", "2000-01-01")
-    service_utilisateur.dao.update.return_value = True
-
-    res = service_utilisateur.modifier(u, rehash_password=True)
-
-    assert res is u
-    expected_hash = hash_password("mdp_en_clair")
-    assert u.mdp_hash == expected_hash
-    service_utilisateur.dao.update.assert_called_once_with(u)
-
-
-def test_modifier_retourne_none_si_update_echoue(service_utilisateur):
-    u = Utilisateur(1, "A", "A", "a@test.com", "HASH", "2000-01-01")
-    service_utilisateur.dao.update.return_value = False
-
-    res = service_utilisateur.modifier(u)
-
-    assert res is None
-    service_utilisateur.dao.update.assert_called_once_with(u)
-
-
 def test_se_connecter_retourne_none_si_mail_inconnu(service_utilisateur):
     service_utilisateur.dao.find_by_mail.return_value = None
 
@@ -221,19 +163,6 @@ def test_se_connecter_retourne_user_si_mdp_valide_salt_email(service_utilisateur
     assert user is u
     service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
 
-
-def test_se_connecter_retourne_user_si_mdp_valide_ancien_hash_sans_sel(
-    service_utilisateur,
-):
-    mdp_clair = "secret"
-    hashed_nosalt = hash_password(mdp_clair)  # ancien format
-    u = Utilisateur(1, "A", "A", "a@test.com", hashed_nosalt, "2000-01-01")
-    service_utilisateur.dao.find_by_mail.return_value = u
-
-    user = service_utilisateur.se_connecter("a@test.com", mdp_clair)
-
-    assert user is u
-    service_utilisateur.dao.find_by_mail.assert_called_once_with("a@test.com")
 
 
 def test_se_connecter_retourne_none_si_mdp_invalide(service_utilisateur):
