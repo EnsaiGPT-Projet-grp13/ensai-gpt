@@ -66,3 +66,24 @@ class PersonnageService:
         Retourne les personnages IA d'un utilisateur
         """
         return self.dao.lister_personnages_ia_pour_utilisateur(user_id)
+
+    @log
+    def modifier_system_prompt(
+        self, user_id: int, personnage_id: int, nouveau_prompt: str
+    ) -> Optional[PersonnageIA]:
+        """
+        Modifie le system_prompt d'un personnage IA appartenant à l'utilisateur.
+        Retourne le personnage mis à jour, ou None si non autorisé / introuvable.
+        """
+        # Vérification que le personnage appartient bien à l'utilisateur
+        persos = self.dao.lister_personnages_ia_crees_par(user_id)
+        if not any(p.id_personnageIA == personnage_id for p in persos):
+            return None
+
+        nouveau_prompt = nouveau_prompt.strip()
+        if not nouveau_prompt:
+            return None
+
+        return self.dao.update_system_prompt(personnage_id, nouveau_prompt)
+
+

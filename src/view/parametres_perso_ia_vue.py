@@ -26,7 +26,7 @@ class ParametresPersoIAVue(VueAbstraite):
                 choices=[
                     "Supprimer un personnage IA existant",
                     "Créer un nouveau personnage IA",
-                    "Description des personnages existants",
+                    "Modification prompts personnages",
                     "Annuler",
                 ],
             ).execute()
@@ -111,9 +111,9 @@ class ParametresPersoIAVue(VueAbstraite):
                 perso = svc.create_personnage(uid, name, prompt_full)
                 return MenuUtilisateurVue(f"Personnage « {perso.name} » créé.")
 
-            if sous == "Description des personnages existants":
+            if sous == "Modification prompts personnages":
                 while True:
-                    persos = svc.lister_personnages_ia_pour_utilisateur(uid)
+                    persos = svc.lister_personnages_ia_crees_par(uid)
 
                     if not persos:
                         return MenuUtilisateurVue(
@@ -126,7 +126,7 @@ class ParametresPersoIAVue(VueAbstraite):
                     choices.append({"name": "Retour", "value": None})
 
                     pid = inquirer.select(
-                        message="Choisir un personnage pour consulter sa description :",
+                        message="Choisir un personnage à modifier :",
                         choices=choices,
                     ).execute()
 
@@ -135,8 +135,30 @@ class ParametresPersoIAVue(VueAbstraite):
 
                     perso = next(p for p in persos if p.id_personnageIA == pid)
 
-                    print(f"\nDescription du personnage '{perso.name}':\n")
-                    print(f"{perso.system_prompt}\n")
+                    print(f"\nModification du prompt de « {perso.name} » :\n")
+
+                    # --- ÉDITION DIRECTE DU PROMPT AVEC VALIDATION PAR ENTRÉE ---
+                    nouveau_prompt = (
+                        inquirer.text(
+                            message="Éditer le prompt puis valider avec Entrée :",
+                            default=perso.system_prompt,   # montre l'ancien prompt
+                        ).execute()
+                        or ""
+                    ).strip()
+
+                    if not nouveau_prompt:
+                        return MenuUtilisateurVue("Modification annulée.")
+
+                    perso_mod = svc.modifier_system_prompt(uid, pid, nouveau_prompt)
+
+                    if perso_mod is None:
+                        return MenuUtilisateurVue(
+                            "Impossible de modifier ce prompt."
+                        )
+
+                    return MenuUtilisateurVue(
+                        f"Prompt du personnage « {perso_mod.name} » mis à jour."
+                    )
 
             if sous == "Annuler":
                 return MenuUtilisateurVue()

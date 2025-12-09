@@ -176,3 +176,27 @@ class PersonnageIADao:
             )
             rows = cur.fetchall() or []
         return [PersonnageIA(**r) for r in rows]
+
+    def update_system_prompt(self, pid: int, system_prompt: str) -> Optional[PersonnageIA]:
+        """Met à jour uniquement le system_prompt d'un personnage IA."""
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                f"""
+                UPDATE {SCHEMA}.personnageIA
+                SET system_prompt = %s,
+                    updated_at = NOW()
+                WHERE id_personnageIA = %s
+                RETURNING
+                id_personnageIA AS "id_personnageIA",
+                name,
+                system_prompt,
+                created_by,
+                created_at,
+                updated_at
+                """,
+                (system_prompt, pid),
+            )
+            row = cur.fetchone()
+        self.conn.commit()
+        return PersonnageIA(**row) if row else None
+
